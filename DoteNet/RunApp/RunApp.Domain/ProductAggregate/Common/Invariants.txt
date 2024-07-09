@@ -1,0 +1,5 @@
+﻿1.- The minimum number of stars for a review is 1.0.
+2.- All products must be named
+3.- All reviews must be have a comment
+4.- Maximum discount must be of 70% on a product
+5.- All prices with discount must have a promotional text
