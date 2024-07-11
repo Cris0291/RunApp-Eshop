@@ -9,12 +9,13 @@ namespace RunApp.Domain.Products
     public class Product
     {
         private Product() { }
+        public Guid ProductId { get; set; }
         public string Name { get; private set; }
-        public decimal? PriceWithDiscount { get; private set; }
+        public decimal PriceWithDiscount { get; private set; } = 0m;
         public decimal ActualPrice { get; private set; }
         public string Description { get; private set; }
         public string? PromotionalText { get; private set; }
-        public int? Discount { get; private set; }
+        public double? Discount { get; private set; }
 
         //This is a value type that belongs to the root aggregate and should be map to ownsmany in entity framework
         public ICollection<About> BulletPoints { get; private set; }
@@ -69,7 +70,7 @@ namespace RunApp.Domain.Products
         public ErrorOr<Success> AddPriceWithDiscount(decimal priceWithDiscount, string promotionalText)
         {
             decimal maximumDiscount = 0.7m;
-            if (priceWithDiscount < ActualPrice * maximumDiscount) return ProductError.DiscountPricesMustBeMaximum70Percent;
+            if (priceWithDiscount < ActualPrice - (ActualPrice * maximumDiscount)) return ProductError.DiscountPricesMustBeMaximum70Percent;
             if (string.IsNullOrEmpty(promotionalText)) return ProductError.AllPricesWithDiscountMustHaveAPromotionalText;
 
             PriceWithDiscount = priceWithDiscount;
@@ -80,10 +81,10 @@ namespace RunApp.Domain.Products
 
         public ErrorOr<Success> RemovePriceWithDiscount()
         {
-            PriceWithDiscount = null;
+            PriceWithDiscount = 0m;
             PromotionalText = null;
 
-            return Result.Success
+            return Result.Success;
         }
     }
 }
