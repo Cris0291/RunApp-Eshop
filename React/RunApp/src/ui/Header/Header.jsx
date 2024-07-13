@@ -1,40 +1,48 @@
 import { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import Dropdown from "./Dropdown";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+
 import UserAvatar from "./UserAvatar";
+import SearchBar from "./SearchBar";
+import Drawer from "./Drawer";
+import Tab from "./Tab";
 
 function Header() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchedValue, setSearchedValue] = useState("");
-
-  function handleinputChange(e) {
-    setSearchedValue(e.target.value);
-    console.log(e.target.value);
-  }
+  const [selectedItem, setSelectedItem] = useState("Greedo");
+  const navigate = useNavigate();
 
   function handleSubmit(e) {
     e.preventDefault();
+    console.log([selectedItem, searchedValue]);
+    navigate("/products");
   }
+
   return (
     <div className="navbar bg-base-100">
-      <div className="flex-1">
-        <Link to="/" className="btn btn-ghost text-xl">
-          daisyUI
-        </Link>
-      </div>
-      <div className="flex-none gap-2">
-        <Dropdown />
-        <div className="form-control ">
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              placeholder="Search"
-              className="input input-bordered w-24 md:w-auto"
-              value={searchedValue}
-              onChange={handleinputChange}
-            />
-          </form>
+      <div className="navbar-start">
+        <div>
+          <Drawer />
         </div>
+        <a className="btn btn-ghost text-xl">daisyUI</a>
+      </div>
+      <div className="join">
+        <div>
+          <div>
+            <SearchBar />
+          </div>
+        </div>
+        <select className="select select-bordered join-item">
+          <option disabled selected>
+            Filter
+          </option>
+          <option>Sci-fi</option>
+          <option>Drama</option>
+          <option>Action</option>
+        </select>
+      </div>
+      <div className="navbar-end">
+        <Tab />
         <UserAvatar />
       </div>
     </div>
