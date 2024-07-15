@@ -1,6 +1,6 @@
-﻿namespace Contracts.Requests
+﻿namespace Contracts.Products.Requests
 {
     public record BulletPoint(string Point);
-    
-    
+
+
 }
