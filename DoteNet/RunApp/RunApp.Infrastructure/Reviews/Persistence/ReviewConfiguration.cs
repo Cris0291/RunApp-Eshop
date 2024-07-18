@@ -9,6 +9,10 @@ namespace RunApp.Infrastructure.Reviews.Persistence
         {
             builder.Property(r => r.Date)
                 .HasDefaultValueSql("getutcdate()");
+
+            builder.Property(r => r.ReviewDescription)
+                .HasConversion<string>();
+
         }
     }
 }
