@@ -1,6 +1,8 @@
 ﻿using Contracts.Products.Requests;
 using Contracts.Products.Responses;
 using RunApp.Domain.Products;
+using RunnApp.Application.Products.Commands.CreateProduct;
+using RunnApp.Application.Products.Commands.UpdateProduct;
 
 namespace RunApp.Api.Mappers.Products
 {
@@ -18,9 +20,20 @@ namespace RunApp.Api.Mappers.Products
             return new ProductsResponse(responses);
         }
 
-        public static IEnumerable<string> BulletPointsToStrings(this IEnumerable<BulletPoint> bulletpoints)
+        public static ICollection<string> BulletPointsToStrings(this IEnumerable<BulletPoint> bulletpoints)
         {
            return bulletpoints.Select(bulletpoint => bulletpoint.Point).ToList();
+        }
+        public static CreateProductCommand ProductRequestToProductCommand(this CreateProductRequest createProduct)
+        {
+            return new CreateProductCommand(createProduct.Name, createProduct.Description,
+                createProduct.Price, createProduct.Bulletpoints.BulletPointsToStrings(),
+                createProduct.PriceWithDiscount, createProduct.PromotionalText);
+        }
+
+        public static UpdateProductCommand UpdateProductRequestToUpdateProdcutCommand(this UpdateProductRequest updateProduct, Guid ProductId)
+        {
+            return new UpdateProductCommand(ProductId, updateProduct.Name, updateProduct.Description,updateProduct.Price, updateProduct.Bulletpoints.BulletPointsToStrings(), updateProduct.PriceWithDiscount, updateProduct.PromotionalText);
         }
     }
 }

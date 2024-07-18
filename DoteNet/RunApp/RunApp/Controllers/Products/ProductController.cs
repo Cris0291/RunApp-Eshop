@@ -50,10 +50,45 @@ namespace RunApp.Api.Controllers.Products
         [HttpPost(ApiEndpoints.Products.Create)]
         public async Task<IActionResult> CreateProduct(CreateProductRequest createProduct)
         {
-            CreateProductCommand createProductCommand = new(createProduct.Name,createProduct.Description, 
-                createProduct.Price,createProduct.Bulletpoints.BulletPointsToStrings(),
-                createProduct.PriceWithDiscount, createProduct.PromotionalText);
+            CreateProductCommand productCommand = createProduct.ProductRequestToProductCommand();
+            ErrorOr<Product> productorError =  await _mediator.Send(productCommand);
 
+            return productorError.Match(product => (IActionResult)CreatedAtAction(nameof(Get), new { id = product.ProductId }, product),
+               errors =>
+               {
+                   var problems =errors.ConvertAll(error => new ProblemDetails()
+                   {
+                       Status = 404,
+                       Detail = error.Description,
+                       Title = "A validation error ocurred"
+
+                   });
+
+                   return BadRequest(problems);
+               }
+                ); ;
+        }
+
+        [HttpPut(ApiEndpoints.Products.UpdateProduct)]
+        public async Task<IActionResult> UdateProduct([FromRoute] Guid productId, UpdateProductRequest updateProduct)
+        {
+            var productCommand = updateProduct.UpdateProductRequestToUpdateProdcutCommand(productId);
+
+           var updatedProductResult =  await _mediator.Send(productCommand);
+
+           return updatedProductResult.Match(result => Ok(), errors =>
+            {
+                if (errors.First().Type == ErrorType.NotFound) return (IActionResult)NotFound();
+
+                var problems =  errors.ConvertAll(error => new ProblemDetails()
+                {
+                    Status =404,
+                    Detail = error.Description,
+                    Title = "A validation error ocurred"
+                });
+
+                return BadRequest(problems);
+            });
         }
     }
 }
