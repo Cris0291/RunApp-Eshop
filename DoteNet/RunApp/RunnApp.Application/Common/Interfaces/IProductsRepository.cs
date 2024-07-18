@@ -1,4 +1,5 @@
 ﻿
+using ErrorOr;
 using RunApp.Domain.Products;
 
 namespace RunnApp.Application.Common.Interfaces
@@ -9,6 +10,6 @@ namespace RunnApp.Application.Common.Interfaces
         Task<IEnumerable<Product>> GetProducts();
         Task CreateProduct(Product product);
         Task DeleteProduct(Guid id);
-        Task UpdateProduct(Product product);
+       
     }
 }
