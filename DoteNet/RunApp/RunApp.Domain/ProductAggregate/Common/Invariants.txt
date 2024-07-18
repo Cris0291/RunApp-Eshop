@@ -3,3 +3,4 @@
 3.- All reviews must be have a comment
 4.- Maximum discount must be of 70% on a product
 5.- All prices with discount must have a promotional text
+6.- All products must have a description
