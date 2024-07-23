@@ -11,6 +11,7 @@ using RunApp.Api.Mappers.Products;
 using RunnApp.Application.Products.Queries.GetProducts;
 using Contracts.Products.Requests;
 using RunnApp.Application.Products.Commands.CreateProduct;
+using RunnApp.Application.Products.Commands.DeleteProduct;
 
 
 
@@ -58,7 +59,7 @@ namespace RunApp.Api.Controllers.Products
                {
                    var problems =errors.ConvertAll(error => new ProblemDetails()
                    {
-                       Status = 404,
+                       Status = 400,
                        Detail = error.Description,
                        Title = "A validation error ocurred"
 
@@ -82,12 +83,26 @@ namespace RunApp.Api.Controllers.Products
 
                 var problems =  errors.ConvertAll(error => new ProblemDetails()
                 {
-                    Status =404,
+                    Status =400,
                     Detail = error.Description,
                     Title = "A validation error ocurred"
                 });
 
                 return BadRequest(problems);
+            });
+        }
+
+        [HttpDelete(ApiEndpoints.Products.DeleteProduct)]
+        public async Task<IActionResult> DeleteProduct([FromRoute] Guid ProductId)
+        {
+            var deleteProductCommand = new DeleteProductCommand(ProductId);
+            var deleteResult = await _mediator.Send(deleteProductCommand);
+
+            return deleteResult.MatchFirst(result => Ok(), error =>
+            {
+                if (error.Type == ErrorType.NotFound) return (IActionResult)NotFound(error.Description);
+
+                return BadRequest(error.Description);
             });
         }
     }

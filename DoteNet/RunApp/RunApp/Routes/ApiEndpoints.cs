@@ -12,6 +12,12 @@
             public const string DeleteProduct = $"{ProductBase}/{{id:guid}}";
             public const string UpdateProduct = $"{ProductBase}/{{id:guid}}";
             public const string GetProducts = ProductBase;
+
+            public const string AddReview = $"{ProductBase}/{{id:guid}}/reviews";
+            public const string DeleteReview = $"{ProductBase}/{{id:guid}}/reviews";
+
+            public const string AddPriceWithDiscount = $"{ProductBase}/{{id:guid}}/discounts";
+            public const string DeletePriceWithDiscount = $"{ProductBase}/{{id:guid}}/discounts";
         }
     }
 }
