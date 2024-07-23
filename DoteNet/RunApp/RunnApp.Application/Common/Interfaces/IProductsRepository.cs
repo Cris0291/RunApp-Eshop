@@ -10,6 +10,7 @@ namespace RunnApp.Application.Common.Interfaces
         Task<IEnumerable<Product>> GetProducts();
         Task CreateProduct(Product product);
         Task DeleteProduct(Guid id);
+        Task<bool> ExistProduct(Guid id);
        
     }
 }
