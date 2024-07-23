@@ -9,20 +9,19 @@ namespace RunApp.Domain.Products
 {
     public class Product
     {
-        private Product() { }
-        public Guid ProductId { get; private set; }
-        public string Name { get; private set; }
-        public decimal PriceWithDiscount { get; private set; } = 0m;
-        public decimal ActualPrice { get; private set; }
-        public string Description { get; private set; }
-        public string? PromotionalText { get; private set; }
-        public double? Discount { get; private set; }
+        public Product() { }
+        public Guid ProductId { get; set; }
+        public string Name { get;  set; }
+        public decimal PriceWithDiscount { get;  set; } = 0m;
+        public decimal ActualPrice { get;  set; }
+        public string Description { get;  set; }
+        public string? PromotionalText { get; set; }
+        public double? Discount { get;  set; }
 
         //This is a value type that belongs to the root aggregate and should be map to ownsmany in entity framework
-        public ICollection<About> BulletPoints { get; private set; }
+        public ICollection<About> BulletPoints { get;  set; }
 
-        private HashSet<Review> _reviews = new();
-        public IReadOnlyCollection<Review> Reviews => _reviews?.ToList();
+        public List<Review> Reviews { get; private set; }
         public static List<Error> Errors { get; private set; } = new();
 
         public static ErrorOr<Product> CreateProduct(string name, string description, decimal price, ICollection<string> bulletpoints, decimal priceWithDiscount, string? promotionalText)
@@ -85,13 +84,13 @@ namespace RunApp.Domain.Products
             if (Errors.Any()) return CreateErrorListCopy();
 
 
-            _reviews.Add(new Review { Comment = comment, NumOfStars = numStars});
+            Reviews.Add(new Review() { Comment = comment, NumOfStars = numStars});
             return Result.Success;
         }
 
         public ErrorOr<Success> DeleteReview(Guid ReviewId)
         {
-            Review review = _reviews.SingleOrDefault(x => x.ReviewId == ReviewId);
+            Review review = Reviews.SingleOrDefault(x => x.ReviewId == ReviewId);
             if(review == null)
             {
                 throw new InvalidOperationException("Review wasn't found");
