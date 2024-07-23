@@ -1,66 +1,81 @@
-import { Image, Text, Container, ThemeIcon, Title, SimpleGrid } from '@mantine/core';
-
+import { Title, SimpleGrid, Text, Button, ThemeIcon, Grid, rem } from '@mantine/core';
+import { IconReceiptOff, IconFlame, IconCircleDotted, IconFileCode } from '@tabler/icons-react';
 import classes from './modules/Main.module.css';
 
-const data = [
+const features = [
   {
-    image: 'auditors',
-    title: 'Pharmacists',
-    description: 'Azurill can be seen bouncing and playing on its big, rubbery tail',
+    icon: IconReceiptOff,
+    title: 'Free and open source',
+    description: 'All packages are published under MIT license, you can use Mantine in any project',
   },
   {
-    image: 'lawyers',
-    title: 'Lawyers',
-    description: 'Fans obsess over the particular length and angle of its arms',
+    icon: IconFileCode,
+    title: 'TypeScript based',
+    description: 'Build type safe applications, all components and hooks export types',
   },
   {
-    image: 'accountants',
-    title: 'Bank owners',
-    description: 'They divvy up their prey evenly among the members of their pack',
+    icon: IconCircleDotted,
+    title: 'No annoying focus ring',
+    description:
+      'With new :focus-visible selector focus ring will appear only when user navigates with keyboard',
   },
   {
-    image: 'others',
-    title: 'Others',
-    description: 'Phanpy uses its long nose to shower itself',
+    icon: IconFlame,
+    title: 'Flexible',
+    description:
+      'Customize colors, spacing, shadows, fonts and many other settings with global theme object',
   },
 ];
 
 export function Main() {
-  const items = data.map((item) => (
-    <div className={classes.item} key={item.image}>
-      <ThemeIcon variant="light" className={classes.itemIcon} size={60} radius="md">
-        HI
+  const items = features.map((feature) => (
+    <div key={feature.title}>
+      <ThemeIcon
+        size={44}
+        radius="md"
+        variant="gradient"
+        gradient={{ deg: 133, from: 'blue', to: 'cyan' }}
+      >
+        <feature.icon style={{ width: rem(26), height: rem(26) }} stroke={1.5} />
       </ThemeIcon>
-
-      <div>
-        <Text fw={700} fz="lg" className={classes.itemTitle}>
-          {item.title}
-        </Text>
-        <Text c="dimmed">{item.description}</Text>
-      </div>
+      <Text fz="lg" mt="sm" fw={500}>
+        {feature.title}
+      </Text>
+      <Text c="dimmed" fz="sm">
+        {feature.description}
+      </Text>
     </div>
   ));
 
   return (
-    <Container size={700} className={classes.wrapper}>
-      <Text className={classes.supTitle}>Use cases</Text>
+    <div className={classes.wrapper}>
+      <Grid gutter={80}>
+        <Grid.Col span={{ base: 12, md: 5 }}>
+          <Title className={classes.title} order={2}>
+            A fully featured React components library for your next project
+          </Title>
+          <Text c="dimmed">
+            Build fully functional accessible web applications faster than ever – Mantine includes
+            more than 120 customizable components and hooks to cover you in any situation
+          </Text>
 
-      <Title className={classes.title} order={2}>
-        PharmLand is <span className={classes.highlight}>not</span> just for pharmacists
-      </Title>
-
-      <Container size={660} p={0}>
-        <Text c="dimmed" className={classes.description}>
-          Its lungs contain an organ that creates electricity. The crackling sound of electricity
-          can be heard when it exhales. Azurill’s tail is large and bouncy. It is packed full of the
-          nutrients this Pokémon needs to grow.
-        </Text>
-      </Container>
-
-      <SimpleGrid cols={{ base: 1, xs: 2 }} spacing={50} mt={30}>
-        {items}
-      </SimpleGrid>
-    </Container>
+          <Button
+            variant="gradient"
+            gradient={{ deg: 133, from: 'blue', to: 'cyan' }}
+            size="lg"
+            radius="md"
+            mt="xl"
+          >
+            Get started
+          </Button>
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 7 }}>
+          <SimpleGrid cols={{ base: 1, md: 2 }} spacing={30}>
+            {items}
+          </SimpleGrid>
+        </Grid.Col>
+      </Grid>
+    </div>
   );
 }
 

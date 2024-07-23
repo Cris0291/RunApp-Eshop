@@ -87,7 +87,7 @@ export function NavBar() {
   ));
 
   return (
-    <Box pb={120}>
+    <Box pb={100}>
       <header className={classes.header}>
         <Group justify="space-between" h="100%">
           <MantineLogo size={30} />
