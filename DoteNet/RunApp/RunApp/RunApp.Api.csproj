@@ -16,10 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Contracts\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Contracts\Contracts.csproj" />
     <ProjectReference Include="..\RunApp.Infrastructure\RunApp.Infrastructure.csproj" />
     <ProjectReference Include="..\RunnApp.Application\RunnApp.Application.csproj" />

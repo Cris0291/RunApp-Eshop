@@ -18,8 +18,8 @@ using RunnApp.Application.Products.Commands.DeleteProduct;
 namespace RunApp.Api.Controllers.Products
 {
 
-    [ApiController]
-    public class ProductController : ControllerBase
+  
+    public class ProductController : BaseApiController
     {
         private readonly IMediator _mediator;
         public ProductController(IMediator mediator)
@@ -35,7 +35,7 @@ namespace RunApp.Api.Controllers.Products
             ErrorOr<Product> queryResponse = await _mediator.Send(productQuery);
 
            return queryResponse.MatchFirst(product => Ok(product.ProductToProductResponse()),
-            error => (ObjectResult)NotFound(error));
+            Problem);
             
         }
 
@@ -54,20 +54,8 @@ namespace RunApp.Api.Controllers.Products
             CreateProductCommand productCommand = createProduct.ProductRequestToProductCommand();
             ErrorOr<Product> productorError =  await _mediator.Send(productCommand);
 
-            return productorError.Match(product => (IActionResult)CreatedAtAction(nameof(Get), new { id = product.ProductId }, product),
-               errors =>
-               {
-                   var problems =errors.ConvertAll(error => new ProblemDetails()
-                   {
-                       Status = 400,
-                       Detail = error.Description,
-                       Title = "A validation error ocurred"
-
-                   });
-
-                   return BadRequest(problems);
-               }
-                ); ;
+            return productorError.Match(product => CreatedAtAction(nameof(Get), new { id = product.ProductId }, product),
+              Problem); 
         }
 
         [HttpPut(ApiEndpoints.Products.UpdateProduct)]
@@ -77,19 +65,7 @@ namespace RunApp.Api.Controllers.Products
 
            var updatedProductResult =  await _mediator.Send(productCommand);
 
-           return updatedProductResult.Match(result => Ok(), errors =>
-            {
-                if (errors.First().Type == ErrorType.NotFound) return (IActionResult)NotFound();
-
-                var problems =  errors.ConvertAll(error => new ProblemDetails()
-                {
-                    Status =400,
-                    Detail = error.Description,
-                    Title = "A validation error ocurred"
-                });
-
-                return BadRequest(problems);
-            });
+           return updatedProductResult.Match(result => Ok(), Problem);
         }
 
         [HttpDelete(ApiEndpoints.Products.DeleteProduct)]
@@ -98,12 +74,7 @@ namespace RunApp.Api.Controllers.Products
             var deleteProductCommand = new DeleteProductCommand(ProductId);
             var deleteResult = await _mediator.Send(deleteProductCommand);
 
-            return deleteResult.MatchFirst(result => Ok(), error =>
-            {
-                if (error.Type == ErrorType.NotFound) return (IActionResult)NotFound(error.Description);
-
-                return BadRequest(error.Description);
-            });
+            return deleteResult.Match(result => Ok(), Problem);
         }
     }
 }
