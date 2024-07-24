@@ -4,6 +4,7 @@ using RunApp.Domain.ProductAggregate.Reviews.ReviewErrors;
 using ErrorOr;
 using RunApp.Domain.ProductAggregate.ProductErrors;
 using System.Collections.Immutable;
+using RunApp.Domain.ProductAggregate.Reviews.Common;
 
 namespace RunApp.Domain.Products
 {
@@ -75,7 +76,7 @@ namespace RunApp.Domain.Products
 
             return Result.Success;
         }
-        public ErrorOr<Success> AddReview(string comment, double numStars)
+        public ErrorOr<Review> AddReview(string comment, double numStars,ReviewDescriptionEnums reviewEnum)
         {
             double minNumOfStars = 1.0;
             //This should be validated in the presentation/application layer as a model validation and not as an invariant
@@ -83,9 +84,9 @@ namespace RunApp.Domain.Products
             if(numStars < minNumOfStars) AddError(ReviewError.MinimumNunberOfStarsCannotBeLessThanOne);
             if (Errors.Any()) return CreateErrorListCopy();
 
-
-            Reviews.Add(new Review() { Comment = comment, NumOfStars = numStars});
-            return Result.Success;
+            Review newReview = new Review() { Comment = comment, NumOfStars = numStars, ReviewDescription = reviewEnum };
+            Reviews.Add(newReview);
+            return newReview;
         }
 
         public ErrorOr<Success> DeleteReview(Guid ReviewId)
