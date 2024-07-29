@@ -13,11 +13,11 @@ namespace RunApp.Domain.Products
         public Product() { }
         public Guid ProductId { get; set; }
         public string Name { get;  set; }
-        public decimal PriceWithDiscount { get;  set; } = 0m;
+        public decimal? PriceWithDiscount { get;  set; }
         public decimal ActualPrice { get;  set; }
         public string Description { get;  set; }
         public string? PromotionalText { get; set; }
-        public double? Discount { get;  set; }
+        public decimal? Discount { get;  set; }
 
         //This is a value type that belongs to the root aggregate and should be map to ownsmany in entity framework
         public ICollection<About> BulletPoints { get;  set; }
@@ -58,7 +58,7 @@ namespace RunApp.Domain.Products
             ActualPrice = price;
             Description = description;
             BulletPoints = bulletpoints.Select(point => new About() { BulletPoint = point }).ToList();
-            
+
             return Result.Success;
         }
 
@@ -91,11 +91,10 @@ namespace RunApp.Domain.Products
 
         public ErrorOr<Success> DeleteReview(Guid ReviewId)
         {
-            Review review = Reviews.SingleOrDefault(x => x.ReviewId == ReviewId);
-            if(review == null)
-            {
-                throw new InvalidOperationException("Review wasn't found");
-            }
+            Review? review = Reviews.SingleOrDefault(x => x.ReviewId == ReviewId);
+            if (review == null) return Error.NotFound(code: "ReviewWasNOtFound", description: "Review was not found with given id");
+
+            Reviews.Remove(review);
 
             return Result.Success;
         }
@@ -114,12 +113,10 @@ namespace RunApp.Domain.Products
             return Result.Success;
         }
 
-        public ErrorOr<Success> RemovePriceWithDiscount()
+        public void RemovePriceWithDiscount()
         {
-            PriceWithDiscount = 0m;
+            PriceWithDiscount = null;
             PromotionalText = null;
-
-            return Result.Success;
         }
 
         private static void AddError(Error error)
