@@ -1,5 +1,6 @@
 using RunApp.Api.Middleware;
 using RunApp.Infrastructure;
+using RunApp.Infrastructure.Common.Persistence;
 using RunnApp.Application;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +13,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("DefaultConnection"));
 builder.Services.AddApplicationLayer();
-
+builder.Logging.AddConsole();
 
 var app = builder.Build();
 

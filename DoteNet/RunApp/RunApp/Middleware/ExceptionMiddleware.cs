@@ -33,7 +33,7 @@ namespace RunApp.Api.Middleware
                     Detail = ex.Message,
 
                 };
-                await httpContext.Response.WriteAsJsonAsync(ex);
+                await httpContext.Response.WriteAsJsonAsync(problemDetails);
             }
         }
     }

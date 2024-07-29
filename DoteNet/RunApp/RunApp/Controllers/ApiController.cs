@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace RunApp.Api.Controllers
 {
-    
+
     [ApiController]
-    public class BaseApiController : ControllerBase
+    public class ApiController : ControllerBase
     {
-        public IActionResult Problem(List<Error> errors)
+        protected IActionResult Problem(List<Error> errors)
         {
             if (errors.Count == 0) return Problem();
 
@@ -17,8 +17,8 @@ namespace RunApp.Api.Controllers
 
             return Problem(errors[0]);
         }
-
-        public IActionResult ValidationProblem(List<Error> errors)
+  
+        protected IActionResult ValidationProblem(List<Error> errors)
         {
             ModelStateDictionary modelState = new ModelStateDictionary();
             foreach(var error in errors)
@@ -29,7 +29,7 @@ namespace RunApp.Api.Controllers
             return ValidationProblem(modelState);
         }
 
-        public IActionResult Problem(Error error)
+        protected IActionResult Problem(Error error)
         {
             var errorType = error.Type switch
             {
