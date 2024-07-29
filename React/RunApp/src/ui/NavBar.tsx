@@ -27,39 +27,41 @@ import {
   IconFingerprint,
   IconCoin,
   IconChevronDown,
+  IconSailboat,
 } from '@tabler/icons-react';
 import classes from './modules/Header.module.css';
+import { Link } from 'react-router-dom';
 
 const mockdata = [
   {
     icon: IconCode,
-    title: 'Open source',
-    description: 'This Pokémon’s cry is very loud and distracting',
+    title: 'Schedule your workout',
+    description: 'Never miss another session, get fit the easy way',
   },
   {
     icon: IconCoin,
-    title: 'Free for everyone',
-    description: 'The fluid of Smeargle’s tail secretions changes',
+    title: 'Best services for your money',
+    description: 'Great products, great quality, cheap prices',
   },
   {
     icon: IconBook,
-    title: 'Documentation',
-    description: 'Yanma is capable of seeing 360 degrees without',
+    title: 'Best sales',
+    description: 'Great prizes, who does not like them!!!',
   },
   {
     icon: IconFingerprint,
-    title: 'Security',
-    description: 'The shell’s rounded shape and the grooves on its.',
+    title: 'Add your friends',
+    description: 'Feeling lonely, do not fear add your friends to your workouts',
   },
   {
     icon: IconChartPie3,
     title: 'Analytics',
-    description: 'This Pokémon uses its flying ability to quickly chase',
+    description: 'Check your progress',
   },
   {
     icon: IconNotification,
-    title: 'Notifications',
-    description: 'Combusken battles with the intensely hot flames it spews',
+    title: 'Share your favorites',
+    description: 'Like your favorite produsts, share them with your friends',
   },
 ];
 
@@ -71,11 +73,11 @@ export function NavBar() {
   const links = mockdata.map((item) => (
     <UnstyledButton className={classes.subLink} key={item.title}>
       <Group wrap="nowrap" align="flex-start">
-        <ThemeIcon size={34} variant="default" radius="md">
-          <item.icon style={{ width: rem(22), height: rem(22) }} color={theme.colors.blue[6]} />
+        <ThemeIcon size={34} variant="filled" radius="md" color="#e779c1">
+          <item.icon style={{ width: rem(22), height: rem(22) }} color="#FFFFFF" />
         </ThemeIcon>
         <div>
-          <Text size="sm" fw={500}>
+          <Text size="sm" fw={500} c=" #FFFFFF">
             {item.title}
           </Text>
           <Text size="xs" c="dimmed">
@@ -90,15 +92,19 @@ export function NavBar() {
     <Box pb={100}>
       <header className={classes.header}>
         <Group justify="space-between" h="100%">
-          <MantineLogo size={30} />
-
+          <Group>
+            <IconSailboat style={{ width: rem(50), height: rem(50) }} stroke={1.5} />
+            <Text fw={900} c="#ffffff">
+              RunningWorld
+            </Text>
+          </Group>
           <Group h="100%" gap={0} visibleFrom="sm">
-            <a href="#" className={classes.link}>
+            <a href="#" className={classes.link} style={{ color: ' #ffffff' }}>
               Home
             </a>
             <HoverCard width={600} position="bottom" radius="md" shadow="md" withinPortal>
               <HoverCard.Target>
-                <a href="#" className={classes.link}>
+                <a href="#" className={classes.link} style={{ color: ' #ffffff' }}>
                   <Center inline>
                     <Box component="span" mr={5}>
                       Features
@@ -111,7 +117,7 @@ export function NavBar() {
                 </a>
               </HoverCard.Target>
 
-              <HoverCard.Dropdown style={{ overflow: 'hidden' }}>
+              <HoverCard.Dropdown style={{ overflow: 'hidden', backgroundColor: '#201047' }}>
                 <Group justify="space-between" px="md">
                   <Text fw={500}>Features</Text>
                   <Anchor href="#" fz="xs">
@@ -132,7 +138,7 @@ export function NavBar() {
                         Get started
                       </Text>
                       <Text size="xs" c="dimmed">
-                        Their food sources have decreased, and their numbers
+                        Organize all your workouts just in one place
                       </Text>
                     </div>
                     <Button variant="default">Get started</Button>
@@ -140,17 +146,19 @@ export function NavBar() {
                 </div>
               </HoverCard.Dropdown>
             </HoverCard>
-            <a href="#" className={classes.link}>
-              Learn
-            </a>
-            <a href="#" className={classes.link}>
-              Academy
+            <Link to="/store" className={classes.link} style={{ color: ' #ffffff' }}>
+              Shop
+            </Link>
+            <a href="#" className={classes.link} style={{ color: ' #ffffff' }}>
+              Hot Sales
             </a>
           </Group>
 
           <Group visibleFrom="sm">
-            <Button variant="default">Log in</Button>
-            <Button>Sign up</Button>
+            <Button variant="filled" color="#00A1E4">
+              Log in
+            </Button>
+            <Button color="#6B31B2">Sign up</Button>
           </Group>
 
           <Burger opened={drawerOpened} onClick={toggleDrawer} hiddenFrom="sm" />

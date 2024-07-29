@@ -1,5 +1,5 @@
-import { Container, Group, Anchor } from '@mantine/core';
-import { MantineLogo } from '@mantinex/mantine-logo';
+import { Container, Group, Anchor, Text, rem, BackgroundImage } from '@mantine/core';
+import { IconSailboat } from '@tabler/icons-react';
 import classes from './modules/Footer.module.css';
 
 const links = [
@@ -12,7 +12,7 @@ const links = [
 export function Footer() {
   const items = links.map((link) => (
     <Anchor<'a'>
-      c="dimmed"
+      c="#ffffff"
       key={link.label}
       href={link.link}
       onClick={(event) => event.preventDefault()}
@@ -24,10 +24,20 @@ export function Footer() {
 
   return (
     <div className={classes.footer}>
-      <Container className={classes.inner}>
-        <MantineLogo size={28} />
-        <Group className={classes.links}>{items}</Group>
-      </Container>
+      <BackgroundImage
+        src="https://as1.ftcdn.net/v2/jpg/07/30/40/04/1000_F_730400411_hGXU0n5Y1kemeIBp4CVnbPBDKZFZ5Shx.jpg"
+        radius="md"
+      >
+        <Container className={classes.inner}>
+          <Group>
+            <IconSailboat style={{ width: rem(50), height: rem(50) }} stroke={1.5} />
+            <Text fw={900} c="#ffffff">
+              RunningWorld
+            </Text>
+          </Group>
+          <Group className={classes.links}>{items}</Group>
+        </Container>
+      </BackgroundImage>
     </div>
   );
 }
