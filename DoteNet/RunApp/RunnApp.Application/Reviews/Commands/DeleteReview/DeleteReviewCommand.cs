@@ -3,5 +3,5 @@ using MediatR;
 
 namespace RunnApp.Application.Reviews.Commands.DeleteReview
 {
-    public record DeleteReviewCommand(Guid ReviewId) : IRequest<ErrorOr<Success>>;
+    public record DeleteReviewCommand(Guid ReviewId, Guid ProductId) : IRequest<ErrorOr<Success>>;
 }

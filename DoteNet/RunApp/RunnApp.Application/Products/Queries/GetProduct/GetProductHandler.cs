@@ -16,10 +16,8 @@ namespace RunnApp.Application.Products.Queries.GetProduct
         {
             Product? product =await _productsRepository.GetProduct(request.ProductId);
 
-            if(product is null)
-            {
-                return Error.NotFound(code: "ProductWasNotFoundWithGivenId", description: "Requested product was not found");
-            }
+            if(product is null) return Error.NotFound(code: "ProductWasNotFoundWithGivenId", description: $"Requested product was not found {request.ProductId}");
+            
 
             return product;
         }
