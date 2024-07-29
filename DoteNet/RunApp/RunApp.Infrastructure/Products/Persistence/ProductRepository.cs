@@ -19,9 +19,18 @@ namespace RunApp.Infrastructure.Products.Persistence
            await _appDbContext.AddAsync(product);
         }
 
-        public Task DeleteProduct(Guid id)
+        public async Task DeleteProduct(Guid id)
         {
-            throw new NotImplementedException();
+            Product product = await _appDbContext.Products
+                .Include(p => p.Reviews)
+                .SingleAsync(p => p.ProductId == id);
+
+             _appDbContext.Products.Remove(product);
+        }
+
+        public async Task<bool> ExistProduct(Guid id)
+        {
+             return await _appDbContext.Products.AnyAsync(p => p.ProductId == id);
         }
 
         public async Task<Product?> GetProduct(Guid id)
