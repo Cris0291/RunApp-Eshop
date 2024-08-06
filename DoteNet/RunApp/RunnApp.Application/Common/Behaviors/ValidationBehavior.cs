@@ -6,22 +6,27 @@ using MediatR;
 
 namespace RunnApp.Application.Common.Behaviors
 {
-    public class ValidationBehavior<TRequest, TResponse>(IValidator<TRequest> validator) : IPipelineBehavior<TRequest, TResponse>
+    public class ValidationBehavior<TRequest, TResponse>(IValidator<TRequest> validator = null) : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse>
         where TResponse : IErrorOr
     {
         private readonly IValidator<TRequest> _validator = validator;
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
-            ValidationResult validationResult = await _validator.ValidateAsync(request);
-            if (validationResult.IsValid)
+            if(_validator != null)
             {
-                return await next();
+                ValidationResult validationResult = await _validator.ValidateAsync(request);
+                if (validationResult.IsValid)
+                {
+                    return await next();
+                }
+
+                List<Error> errors = validationResult.Errors.ConvertAll(error => Error.Validation(code: error.PropertyName, description: error.ErrorMessage));
+
+                return (dynamic)errors;
             }
-
-            List<Error> errors = validationResult.Errors.ConvertAll(error => Error.Validation(code: error.PropertyName, description: error.ErrorMessage));
-
-            return (dynamic)errors;
+            
+            return await next();
         }
     }
 }

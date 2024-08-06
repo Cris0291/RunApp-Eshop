@@ -11,7 +11,7 @@ namespace RunnApp.Application
             services.AddMediatR(options =>
             {
                 options.RegisterServicesFromAssemblyContaining(typeof(DependencyInjection));
-                //options.AddOpenBehavior(typeof(ValidationBehavior<,>));
+                options.AddOpenBehavior(typeof(ValidationBehavior<,>));
             });
 
             services.AddValidatorsFromAssemblyContaining(typeof(DependencyInjection));

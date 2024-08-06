@@ -10,7 +10,7 @@ namespace RunnApp.Application.Products.Commands.DeleteProduct
         private readonly IProductsRepository _productsRepository = productsRepository;
         public async Task<ErrorOr<Success>> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
         {
-            if (request.ProductId == Guid.Empty) return Error.Validation(code: "ProductIdWasNotValid", description: "Product must have a valid id");
+            //if (request.ProductId == Guid.Empty) return Error.Validation(code: "ProductIdWasNotValid", description: "Product must have a valid id");
 
            bool existProduct =  await _productsRepository.ExistProduct(request.ProductId);
            if(!existProduct) return Error.NotFound(code: "ProductWasNotFoundWithGivenId", description: "Product was not found");

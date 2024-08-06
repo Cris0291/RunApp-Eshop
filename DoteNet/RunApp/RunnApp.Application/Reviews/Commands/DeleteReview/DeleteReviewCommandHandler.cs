@@ -15,11 +15,13 @@ namespace RunnApp.Application.Reviews.Commands.DeleteReview
 
             if(!existReview) return Error.NotFound(code: "ReviewWasNotFoundWithGivenId", description: "Requested review was not found");
 
-           Product? product = await _reviewsRpository.GetProductWithReview(request.ProductId, request.ReviewId, cancellationToken);
+           Product? product = await _reviewsRpository.GetProductWithReviews(request.ProductId, request.ReviewId, cancellationToken);
             if (product == null) return Error.NotFound(code: "ProductWasNotFoundWithGivenId", description: "Requested product was not found");
 
             ErrorOr<Success> errorOr = product.DeleteReview(request.ReviewId);
             if (errorOr.IsError) return errorOr.Errors;
+
+           await _unitOfWorkPattern.CommitChangesAsync();
 
             return Result.Success;
         }

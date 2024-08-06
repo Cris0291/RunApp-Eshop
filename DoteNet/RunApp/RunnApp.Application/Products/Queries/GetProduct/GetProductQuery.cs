@@ -4,7 +4,7 @@ using RunApp.Domain.Products;
 
 namespace RunnApp.Application.Products.Queries.GetProduct
 {
-    public record GetProductQuery(Guid ProductId) : IRequest<ErrorOr<Product>>;
+    public record GetProductQuery(Guid ProductId) : IRequest<ErrorOr<Product?>>;
 
 
 }
