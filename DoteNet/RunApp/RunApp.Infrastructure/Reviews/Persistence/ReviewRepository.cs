@@ -17,7 +17,7 @@ namespace RunApp.Infrastructure.Reviews.Persistence
 
             return product;
         }
-        public async Task<Product?> GetProductWithReview(Guid ProductId, Guid ReviewId, CancellationToken cancellationToken)
+        public async Task<Product?> GetProductWithReviews(Guid ProductId, Guid ReviewId, CancellationToken cancellationToken)
         {
             Product? product = await _appStoreDbContext.Products
                 .Include(p => p.Reviews.Where(r => r.ReviewId == ReviewId))
