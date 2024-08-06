@@ -5,6 +5,7 @@ import Footer from './Footer';
 import usePathChange from '@/hooks/usePathChange';
 import StoreNavBar from '@/features/store/StoreNavBar';
 import '@mantine/core/styles/Group.css';
+import StoreMainPage from '@/features/store/StoreMainPage';
 
 function AppLayout() {
   const path = usePathChange();
@@ -20,10 +21,9 @@ function AppLayout() {
     );
 
   return (
-    <Paper p="md" radius={0} style={{ mih: '100vh', backgroundColor: ' #FFFFFF' }}>
-      <Group justify="center">
-        <StoreNavBar />
-      </Group>
+    <Paper radius={0} style={{ mih: '100vh' }}>
+      <StoreNavBar />
+      <StoreMainPage />
     </Paper>
   );
 }
