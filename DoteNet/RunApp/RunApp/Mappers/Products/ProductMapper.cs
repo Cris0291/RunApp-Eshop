@@ -20,10 +20,6 @@ namespace RunApp.Api.Mappers.Products
             return new ProductsResponse(responses);
         }
 
-        public static ICollection<string> BulletPointsToStrings(this IEnumerable<BulletPoint> bulletpoints)
-        {
-           return bulletpoints.Select(bulletpoint => bulletpoint.Point).ToList();
-        }
         public static CreateProductCommand ProductRequestToProductCommand(this CreateProductRequest createProduct)
         {
             return new CreateProductCommand(createProduct.Name, createProduct.Description,

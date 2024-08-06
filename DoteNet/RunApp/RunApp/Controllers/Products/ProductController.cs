@@ -65,9 +65,9 @@ namespace RunApp.Api.Controllers.Products
         }
 
         [HttpPut(ApiEndpoints.Products.UpdateProduct)]
-        public async Task<IActionResult> UpdateProduct([FromRoute] Guid productId, UpdateProductRequest updateProduct)
+        public async Task<IActionResult> UpdateProduct([FromRoute] Guid id, UpdateProductRequest updateProduct)
         {
-            var productCommand = updateProduct.UpdateProductRequestToUpdateProdcutCommand(productId);
+            var productCommand = updateProduct.UpdateProductRequestToUpdateProdcutCommand(id);
 
            var updatedProductResult =  await _mediator.Send(productCommand);
 
@@ -75,18 +75,18 @@ namespace RunApp.Api.Controllers.Products
         }
 
         [HttpDelete(ApiEndpoints.Products.DeleteProduct)]
-        public async Task<IActionResult> DeleteProduct([FromRoute] Guid ProductId)
+        public async Task<IActionResult> DeleteProduct([FromRoute] Guid id)
         {
-            var deleteProductCommand = new DeleteProductCommand(ProductId);
+            var deleteProductCommand = new DeleteProductCommand(id);
             var deleteResult = await _mediator.Send(deleteProductCommand);
 
             return deleteResult.Match(result => Ok(), Problem);
         }
 
         [HttpPost(ApiEndpoints.Products.AddPriceWithDiscount)]
-        public async Task<IActionResult> AddDiscount([FromRoute] Guid productId, ProductDiscountRequest discount)
+        public async Task<IActionResult> AddDiscount([FromRoute] Guid id, ProductDiscountRequest discount)
         {
-            AddDiscountCommand discountCommand = new AddDiscountCommand(productId, discount.PriceWithDiscount, discount.PromotionalText);
+            AddDiscountCommand discountCommand = new AddDiscountCommand(id, discount.PriceWithDiscount, discount.PromotionalText);
 
             var productWithDiscount = await _mediator.Send(discountCommand);
 
@@ -94,9 +94,9 @@ namespace RunApp.Api.Controllers.Products
         }
 
         [HttpDelete(ApiEndpoints.Products.DeletePriceWithDiscount)]
-        public async Task<IActionResult> RemoveDiscount([FromRoute] Guid productId)
+        public async Task<IActionResult> RemoveDiscount([FromRoute] Guid id)
         {
-          var deletedDiscount = await _mediator.Send(new RemoveDiscountCommand(productId));
+          var deletedDiscount = await _mediator.Send(new RemoveDiscountCommand(id));
 
             return deletedDiscount.MatchFirst(result =>Ok(), Problem);
         }
