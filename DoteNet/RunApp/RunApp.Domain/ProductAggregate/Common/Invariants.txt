@@ -4,3 +4,5 @@
 4.- Maximum discount must be of 70% on a product
 5.- All prices with discount must have a promotional text
 6.- All products must have a description
+7.- The actual price cannot be lower than the price with discount
+8.- product bulletpoints should not be empty

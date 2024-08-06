@@ -5,31 +5,52 @@ using ErrorOr;
 using RunApp.Domain.ProductAggregate.ProductErrors;
 using System.Collections.Immutable;
 using RunApp.Domain.ProductAggregate.Reviews.Common;
+using System.Runtime.CompilerServices;
+using System.Linq;
 
+[assembly: InternalsVisibleTo("TestsUtilities")]
 namespace RunApp.Domain.Products
 {
     public class Product
     {
-        public Product() { }
-        public Guid ProductId { get; set; }
-        public string Name { get;  set; }
-        public decimal? PriceWithDiscount { get;  set; }
-        public decimal ActualPrice { get;  set; }
-        public string Description { get;  set; }
-        public string? PromotionalText { get; set; }
-        public decimal? Discount { get;  set; }
+       
+        internal Product() { }
+         // Constructor use for unit testing
+        internal Product(Guid productId, string name, decimal priceWithDiscount, decimal actualPrice, string description, string promotionalText, decimal discount, ICollection<About> bulletpoints, List<Review> reviews)
+        {
+            ProductId = productId;
+            Name = name;
+            PriceWithDiscount = priceWithDiscount;
+            ActualPrice = actualPrice;
+            Description = description;
+            PromotionalText = promotionalText;
+            Discount = discount;
+            BulletPoints = bulletpoints;
+            Reviews = reviews;
+        }
+        public Guid ProductId { get; internal set; }
+        public string Name { get;  internal set; }
+        public decimal? PriceWithDiscount { get; internal set; }
+        public decimal ActualPrice { get; internal set; }
+        public string Description { get; internal set; }
+        public string? PromotionalText { get; internal set; }
+        public decimal? Discount { get; internal set; }
 
         //This is a value type that belongs to the root aggregate and should be map to ownsmany in entity framework
-        public ICollection<About> BulletPoints { get;  set; }
+        public ICollection<About> BulletPoints { get; internal set; }
 
-        public List<Review> Reviews { get; private set; }
-        public static List<Error> Errors { get; private set; } = new();
+        public List<Review> Reviews { get; internal set; } 
+        public static List<Error> Errors { get; internal set; } = new();
 
-        public static ErrorOr<Product> CreateProduct(string name, string description, decimal price, ICollection<string> bulletpoints, decimal priceWithDiscount, string? promotionalText)
+        public static ErrorOr<Product> CreateProduct(string name, string description, decimal price, ICollection<string> bulletpoints, decimal? priceWithDiscount, string? promotionalText)
         {
+            decimal maximumDiscount = 0.7m;
+            if (priceWithDiscount < price - (price * maximumDiscount)) AddError(ProductError.DiscountPricesMustBeMaximum70Percent);
             if (string.IsNullOrEmpty(name)) AddError(ProductError.AllProductsMustHaveAName);
             if (string.IsNullOrEmpty(description)) AddError(ProductError.AllProductsMustHaveADescription);
             if (!bulletpoints.Any()) AddError(ProductError.BulletPointsCollectionShoulNotBeEmpty);
+            if (priceWithDiscount.HasValue && price < priceWithDiscount.Value) AddError(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount);
+            if (priceWithDiscount != null && string.IsNullOrEmpty(promotionalText)) AddError(ProductError.AllPricesWithDiscountMustHaveAPromotionalText);
             if (Errors.Any()) return CreateErrorListCopy();
 
             
@@ -52,6 +73,7 @@ namespace RunApp.Domain.Products
             if (string.IsNullOrEmpty(name)) AddError(ProductError.AllProductsMustHaveAName);
             if (string.IsNullOrEmpty(description)) AddError(ProductError.AllProductsMustHaveADescription);
             if (!bulletpoints.Any()) AddError(ProductError.BulletPointsCollectionShoulNotBeEmpty);
+            if (PriceWithDiscount.HasValue && price < PriceWithDiscount.Value) AddError(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount);
             if (Errors.Any()) return CreateErrorListCopy();
 
             Name = name;
@@ -84,7 +106,7 @@ namespace RunApp.Domain.Products
             if(numStars < minNumOfStars) AddError(ReviewError.MinimumNunberOfStarsCannotBeLessThanOne);
             if (Errors.Any()) return CreateErrorListCopy();
 
-            Review newReview = new Review() { Comment = comment, NumOfStars = numStars, ReviewDescription = reviewEnum };
+            Review newReview = new Review { Comment = comment, NumOfStars = numStars, ReviewDescription = reviewEnum };
             Reviews.Add(newReview);
             return newReview;
         }
@@ -104,6 +126,7 @@ namespace RunApp.Domain.Products
             decimal maximumDiscount = 0.7m;
             if (priceWithDiscount < ActualPrice - (ActualPrice * maximumDiscount)) AddError(ProductError.DiscountPricesMustBeMaximum70Percent);
             if (string.IsNullOrEmpty(promotionalText)) AddError(ProductError.AllPricesWithDiscountMustHaveAPromotionalText);
+            if (ActualPrice < priceWithDiscount) AddError(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount);
             if (Errors.Any()) return CreateErrorListCopy();
 
 
@@ -129,6 +152,13 @@ namespace RunApp.Domain.Products
             List<Error> listOfErrors = Errors.ToList();
             Errors.Clear();
             return listOfErrors;
+        }
+
+        public override string ToString()
+        {
+           var point = string.Join(",", BulletPoints.Select(b => b.BulletPoint));
+           
+            return $"{ProductId}, {Name}, {PriceWithDiscount}, {ActualPrice}, {Description}, {PromotionalText}, {Discount}, {point}";
         }
     }
 }
