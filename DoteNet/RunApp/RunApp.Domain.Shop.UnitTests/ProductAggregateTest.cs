@@ -1,16 +1,14 @@
 using AutoFixture;
-using AutoFixture.Kernel;
 using ErrorOr;
 using RunApp.Domain.ProductAggregate.Reviews;
 using RunApp.Domain.ProductAggregate.Reviews.Common;
 using RunApp.Domain.Products;
 using TestsUtilities.ProductTestUtils;
 using TestsUtilities.ReviewTestUtils;
-using TestsUtilities.Common;
 using FluentAssertions;
 using Xunit.Abstractions;
-using Xunit.Sdk;
-using RunApp.Domain.ProductAggregate.AboutValueType;
+
+
 
 namespace RunApp.Domain.Shop.UnitTests
 {
@@ -31,15 +29,11 @@ namespace RunApp.Domain.Shop.UnitTests
         {
             //Arrange
 
-            // Customize a dummy prpoduct and review
-            _fixture.Customize<Product>(c => c.FromFactory(() => ProductFactory.CreateProduct()));
-            _fixture.Customize<Review>(c => c.FromFactory(() => ReviewFactory.CreateReview(comment: "valid reviews", numOfStars: 3,reviewDescription: ReviewDescriptionEnums.Awesome)));
-
             //Create dummy product 
-            Product productToTest = _fixture.Create<Product>();
+            Product productToTest = CustomizeAndCreateProduct();
 
             //Create dummy reviews
-            List<Review> reviews = Enumerable.Range(0, 3).Select(_ => _fixture.Create<Review>()).ToList();
+            List<Review> reviews = Enumerable.Range(0, 3).Select(_ => CustomizaAndCreateReview(comment: "valid reviews", numOfStars: 3, reviewDescription: ReviewDescriptionEnums.Awesome)).ToList();
 
             //Create review to test
             Review reviewToTest = _fixture.Build<Review>()
@@ -64,13 +58,9 @@ namespace RunApp.Domain.Shop.UnitTests
         {
             //Arrange
 
-            // Customize a dummy prpoduct and review
-            _fixture.Customize<Product>(c => c.FromFactory(() => ProductFactory.CreateProduct()));
-            _fixture.Customize<Review>(c => c.FromFactory(() => ReviewFactory.CreateReview(comment: "valid reviews", numOfStars: 3, reviewDescription: ReviewDescriptionEnums.Awesome)));
-
             //Create dummy product and review
-            Product productToTest = _fixture.Create<Product>();
-            Review validReview = _fixture.Create<Review>();
+            Product productToTest = CustomizeAndCreateProduct();
+            Review validReview = CustomizaAndCreateReview(comment: "valid reviews", numOfStars: 3, reviewDescription: ReviewDescriptionEnums.Awesome);
 
             //Create invalid review
             Review invalidReview =_fixture.Build<Review>()
@@ -92,14 +82,12 @@ namespace RunApp.Domain.Shop.UnitTests
         #region Products
 
         [Fact]
-        public void AddPriceWithDiscount_WhenTheDiscountIsGreaterThan80Percent_ShouldHaveAValidationError()
+        public void AddPriceWithDiscount_WhenTheDiscountIsGreaterThan70Percent_ShouldHaveAValidationError()
         {
             //Arrange
 
             //Create product and fake prices
-            _fixture.Customize<Product>(c => c.FromFactory(() => ProductFactory.CreateProduct()));
-            var product = _fixture.Create<Product>();
-            decimal price = 250.30m;
+            var product = CustomizeAndCreateProduct();
             decimal priceWithDiscount = 20.2m;
             string promotionalText = "fake description";
 
@@ -117,8 +105,7 @@ namespace RunApp.Domain.Shop.UnitTests
             //Arrange
 
             //Create product and fake prices
-            _fixture.Customize<Product>(c => c.FromFactory(() => ProductFactory.CreateProduct(price: 100m)));
-            var product = _fixture.Create<Product>();
+            var product = CustomizeAndCreateProduct(price: 100m);
             decimal priceWithDiscount = 200.2m;
             string promotionalText = "fake description";
 
@@ -135,13 +122,12 @@ namespace RunApp.Domain.Shop.UnitTests
             //Arrange
 
             //Create product and fake prices
-            _fixture.Customize<Product>(c => c.FromFactory(() => ProductFactory.CreateProduct()));
-            var product = _fixture.Create<Product>();
+            var product = CustomizeAndCreateProduct();
             string emptyName = "";
             ICollection<string> points = product.BulletPoints.Select(P => P.BulletPoint).ToList();
 
             //Act
-           ErrorOr<Product> errorOrProduct =  Product.CreateProduct("", product.Description, product.ActualPrice, points,product.PriceWithDiscount, product.PromotionalText);
+           ErrorOr<Product> errorOrProduct =  Product.CreateProduct("", product.Description, product.ActualPrice, points,product.PriceOffer.PriceWithDiscount, product.PriceOffer.PromotionalText);
 
             //Assert
             errorOrProduct.IsError.Should().BeTrue();
@@ -154,13 +140,12 @@ namespace RunApp.Domain.Shop.UnitTests
             //Arrange
 
             //Create product and fake prices
-            _fixture.Customize<Product>(c => c.FromFactory(() => ProductFactory.CreateProduct()));
-            var product = _fixture.Create<Product>();
+            var product = CustomizeAndCreateProduct();
             string promotionalText = "";
             ICollection<string> points = product.BulletPoints.Select(P => P.BulletPoint).ToList();
 
             //Act
-            ErrorOr<Product> errorOrProduct = Product.CreateProduct(product.Name, product.Description, product.ActualPrice, points, product.PriceWithDiscount, promotionalText);
+            ErrorOr<Product> errorOrProduct = Product.CreateProduct(product.Name, product.Description, product.ActualPrice, points, product.PriceOffer.PriceWithDiscount, promotionalText);
 
             //Assert
             errorOrProduct.IsError.Should().BeTrue();
@@ -173,12 +158,11 @@ namespace RunApp.Domain.Shop.UnitTests
             //Arrange
 
             //Create product and fake prices
-            _fixture.Customize<Product>(c => c.FromFactory(() => ProductFactory.CreateProduct()));
-            var product = _fixture.Create<Product>();
+            var product = CustomizeAndCreateProduct();
             string description = "";
             ICollection<string> points = product.BulletPoints.Select(P => P.BulletPoint).ToList();
               //Act
-            ErrorOr<Product> errorOrProduct = Product.CreateProduct(product.Name, description, product.ActualPrice, points, product.PriceWithDiscount, product.PromotionalText);
+            ErrorOr<Product> errorOrProduct = Product.CreateProduct(product.Name, description, product.ActualPrice, points, product.PriceOffer.PriceWithDiscount, product.PriceOffer.PromotionalText);
 
             //Assert
             errorOrProduct.IsError.Should().BeTrue();
@@ -187,5 +171,24 @@ namespace RunApp.Domain.Shop.UnitTests
         
         }
         #endregion
+
+
+        private Product CustomizeAndCreateProduct(Guid? id = null, string? name = null, string? description = null,
+            decimal? price = null, ICollection<string>? bulletpoints = null,
+            decimal? priceWithDiscount = null, string? promotionalText = null, decimal? discount = null, List<Review>? reviews = null)
+        {
+            _fixture.Customize<Product>(c => c.FromFactory(() => ProductFactory.CreateProduct(id, name, description, price, bulletpoints, priceWithDiscount, promotionalText,discount, reviews)));
+            var product = _fixture.Create<Product>();
+            return product;
+        }
+
+        private Review CustomizaAndCreateReview(Guid? reviewId = null, string? comment = null,
+                                         double? numOfStars = null, DateTime? date = null,
+                                         ReviewDescriptionEnums? reviewDescription = null, Guid? productId = null)
+        {
+            _fixture.Customize<Review>(c => c.FromFactory(() => ReviewFactory.CreateReview(reviewId,comment,numOfStars,date,reviewDescription,productId)));
+            var review = _fixture.Create<Review>();
+            return review;
+        }
     }
 }
