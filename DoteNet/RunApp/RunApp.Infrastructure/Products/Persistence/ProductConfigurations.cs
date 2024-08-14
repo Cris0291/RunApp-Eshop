@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RunApp.Domain.ProductAggregate.AboutValueType;
+using RunApp.Domain.ProductAggregate.ValueTypes;
 using RunApp.Domain.Products;
 
 namespace RunApp.Infrastructure.Products.Persistence
@@ -14,11 +14,11 @@ namespace RunApp.Infrastructure.Products.Persistence
             builder.OwnsMany(product => product.BulletPoints)
                 .ToTable("Bulletpoints");
 
+            builder.OwnsOne(p => p.PriceOffer, pO => pO.Property(x => x.Discount).HasComputedColumnSql("100 * (1-[PriceWithDiscount]/[ActualPrice])", stored: true)
+                 .HasColumnType("decimal(5,2)").HasColumnName("Discount"));
 
-
-            builder.Property(p => p.Discount).HasComputedColumnSql("100 * (1-[PriceWithDiscount]/[ActualPrice])", stored: true)
-                 .HasColumnType("decimal(5,2)");
-
+            builder.OwnsOne(p => p.PriceOffer, px => px.Property(x => x.PriceWithDiscount).HasColumnType("decimal(10,2)").HasColumnName("PriceWithDiscount"));
+            builder.OwnsOne(p => p.PriceOffer, px => px.Property(x => x.PromotionalText).HasColumnName("PromotionalText"));
 
             builder.HasMany(p => p.Reviews)
                 .WithOne()
@@ -26,11 +26,7 @@ namespace RunApp.Infrastructure.Products.Persistence
 
             builder.Property(p => p.ActualPrice)
                 .HasColumnType("decimal(10,2)");
-
-
-            builder.Property(p => p.PriceWithDiscount)
-                .HasColumnType("decimal(10,2)");
-            
+  
 
            /* builder.HasData(new Product()
             {

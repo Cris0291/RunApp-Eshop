@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RunApp.Infrastructure.Common.Persistence;
 
@@ -11,9 +12,11 @@ using RunApp.Infrastructure.Common.Persistence;
 namespace RunApp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppStoreDbContext))]
-    partial class AppStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240809154249_IdentityMigration")]
+    partial class IdentityMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -171,8 +174,19 @@ namespace RunApp.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal?>("Discount")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("decimal(5,2)")
+                        .HasComputedColumnSql("100 * (1-[PriceWithDiscount]/[ActualPrice])", true);
+
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("PriceWithDiscount")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("PromotionalText")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ProductId");
@@ -340,7 +354,7 @@ namespace RunApp.Infrastructure.Migrations
 
             modelBuilder.Entity("RunApp.Domain.Products.Product", b =>
                 {
-                    b.OwnsMany("RunApp.Domain.ProductAggregate.ValueType.About", "BulletPoints", b1 =>
+                    b.OwnsMany("RunApp.Domain.ProductAggregate.AboutValueType.About", "BulletPoints", b1 =>
                         {
                             b1.Property<Guid>("ProductId")
                                 .HasColumnType("uniqueidentifier");
@@ -363,37 +377,7 @@ namespace RunApp.Infrastructure.Migrations
                                 .HasForeignKey("ProductId");
                         });
 
-                    b.OwnsOne("RunApp.Domain.ProductAggregate.ValueTypes.PriceOffer", "PriceOffer", b1 =>
-                        {
-                            b1.Property<Guid>("ProductId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<decimal?>("Discount")
-                                .ValueGeneratedOnAddOrUpdate()
-                                .HasColumnType("decimal(5,2)")
-                                .HasColumnName("Discount")
-                                .HasComputedColumnSql("100 * (1-[PriceWithDiscount]/[ActualPrice])", true);
-
-                            b1.Property<decimal?>("PriceWithDiscount")
-                                .HasColumnType("decimal(10,2)")
-                                .HasColumnName("PriceWithDiscount");
-
-                            b1.Property<string>("PromotionalText")
-                                .HasColumnType("nvarchar(max)")
-                                .HasColumnName("PromotionalText");
-
-                            b1.HasKey("ProductId");
-
-                            b1.ToTable("Products");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ProductId");
-                        });
-
                     b.Navigation("BulletPoints");
-
-                    b.Navigation("PriceOffer")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("RunApp.Domain.Products.Product", b =>

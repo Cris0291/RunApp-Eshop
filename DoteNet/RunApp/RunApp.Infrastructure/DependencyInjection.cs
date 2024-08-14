@@ -3,8 +3,11 @@ using RunnApp.Application.Common.Interfaces;
 using RunApp.Infrastructure.Products.Persistence;
 using RunApp.Infrastructure.Common.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using RunApp.Infrastructure.Reviews.Persistence;
+using RunApp.Domain.UserAggregate;
+using RunApp.Domain.UserAggregate.Roles;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace RunApp.Infrastructure
 {
@@ -16,7 +19,21 @@ namespace RunApp.Infrastructure
             services.AddDbContext<AppStoreDbContext>(options => options.UseSqlServer(connectionString));
             services.AddScoped<IUnitOfWorkPattern>(serviceProvider => serviceProvider.GetRequiredService<AppStoreDbContext>());
             services.AddScoped<IReviewsRepository, ReviewRepository>();
-            
+
+            services.AddIdentityCore<AppUser>(opt =>
+            {
+                opt.Password.RequireDigit = true;
+                opt.Password.RequireLowercase = true;
+                opt.Password.RequireNonAlphanumeric = true;
+                opt.Password.RequireUppercase = true;
+                opt.Password.RequiredLength = 7;
+                opt.Password.RequiredUniqueChars = 1;
+            })
+                .AddEntityFrameworkStores<AppStoreDbContext>()
+                .AddRoles<AppRole>()
+                .AddRoleStore<RoleStore<AppRole, AppStoreDbContext, Guid>>()
+                .AddSignInManager()
+                .AddUserStore<UserStore<AppUser, AppRole, AppStoreDbContext, Guid>>();
 
             return services;
         }
