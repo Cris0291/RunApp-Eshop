@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("TestsUtilities")]
-namespace RunApp.Domain.ProductAggregate.AboutValueType
+namespace RunApp.Domain.ProductAggregate.ValueType
 {
     public class About
     {

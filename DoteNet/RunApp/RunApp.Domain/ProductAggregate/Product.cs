@@ -1,59 +1,52 @@
 ﻿using RunApp.Domain.ProductAggregate.Reviews;
-using RunApp.Domain.ProductAggregate.AboutValueType;
+using RunApp.Domain.ProductAggregate.ValueType;
 using RunApp.Domain.ProductAggregate.Reviews.ReviewErrors;
 using ErrorOr;
 using RunApp.Domain.ProductAggregate.ProductErrors;
-using System.Collections.Immutable;
 using RunApp.Domain.ProductAggregate.Reviews.Common;
 using System.Runtime.CompilerServices;
-using System.Linq;
+using RunApp.Domain.ProductAggregate.ValueTypes;
 
 [assembly: InternalsVisibleTo("TestsUtilities")]
 namespace RunApp.Domain.Products
 {
-    public class Product
+    public class Product : ValidationHandler
     {
        
         internal Product() { }
          // Constructor use for unit testing
-        internal Product(Guid productId, string name, decimal priceWithDiscount, decimal actualPrice, string description, string promotionalText, decimal discount, ICollection<About> bulletpoints, List<Review> reviews)
+        internal Product(Guid productId, string name, decimal actualPrice, string description, PriceOffer priceOffer, ICollection<About> bulletpoints, List<Review> reviews)
         {
             ProductId = productId;
             Name = name;
-            PriceWithDiscount = priceWithDiscount;
             ActualPrice = actualPrice;
             Description = description;
-            PromotionalText = promotionalText;
-            Discount = discount;
+            PriceOffer = priceOffer;
             BulletPoints = bulletpoints;
             Reviews = reviews;
         }
         public Guid ProductId { get; internal set; }
         public string Name { get;  internal set; }
-        public decimal? PriceWithDiscount { get; internal set; }
         public decimal ActualPrice { get; internal set; }
         public string Description { get; internal set; }
-        public string? PromotionalText { get; internal set; }
-        public decimal? Discount { get; internal set; }
+        public PriceOffer PriceOffer { get; internal set; }
 
-        //This is a value type that belongs to the root aggregate and should be map to ownsmany in entity framework
         public ICollection<About> BulletPoints { get; internal set; }
 
         public List<Review> Reviews { get; internal set; } 
-        public static List<Error> Errors { get; internal set; } = new();
 
         public static ErrorOr<Product> CreateProduct(string name, string description, decimal price, ICollection<string> bulletpoints, decimal? priceWithDiscount, string? promotionalText)
         {
             decimal maximumDiscount = 0.7m;
-            if (priceWithDiscount < price - (price * maximumDiscount)) AddError(ProductError.DiscountPricesMustBeMaximum70Percent);
-            if (string.IsNullOrEmpty(name)) AddError(ProductError.AllProductsMustHaveAName);
-            if (string.IsNullOrEmpty(description)) AddError(ProductError.AllProductsMustHaveADescription);
-            if (!bulletpoints.Any()) AddError(ProductError.BulletPointsCollectionShoulNotBeEmpty);
-            if (priceWithDiscount.HasValue && price < priceWithDiscount.Value) AddError(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount);
-            if (priceWithDiscount != null && string.IsNullOrEmpty(promotionalText)) AddError(ProductError.AllPricesWithDiscountMustHaveAPromotionalText);
-            if (Errors.Any()) return CreateErrorListCopy();
+            AddValidation(nameof(ProductError.DiscountPricesMustBeMaximum70Percent), () => priceWithDiscount < price - (price * maximumDiscount));
+            AddValidation(nameof(ProductError.AllProductsMustHaveAName), () => string.IsNullOrEmpty(name));
+            AddValidation(nameof(ProductError.AllProductsMustHaveADescription), () => string.IsNullOrEmpty(description));
+            AddValidation(nameof(ProductError.BulletPointsCollectionShoulNotBeEmpty), () => !bulletpoints.Any());
+            AddValidation(nameof(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount),() => priceWithDiscount.HasValue && price < priceWithDiscount.Value);
+            AddValidation(nameof(ProductError.AllPricesWithDiscountMustHaveAPromotionalText), () => priceWithDiscount != null && string.IsNullOrEmpty(promotionalText));
+            Validate();
+            if (HasError()) return Errors;
 
-            
 
             return new Product
             {
@@ -61,8 +54,7 @@ namespace RunApp.Domain.Products
                 ActualPrice = price,
                 Description = description,
                 BulletPoints = bulletpoints.Select(point => new About() { BulletPoint = point }).ToList(),
-                PriceWithDiscount =priceWithDiscount,
-                PromotionalText = promotionalText,
+                PriceOffer = new PriceOffer {PriceWithDiscount = priceWithDiscount.Value, PromotionalText = promotionalText }
             };
            
 
@@ -70,11 +62,12 @@ namespace RunApp.Domain.Products
 
         public ErrorOr<Success> UpdateProduct(string name, string description, decimal price, ICollection<string> bulletpoints)
         {
-            if (string.IsNullOrEmpty(name)) AddError(ProductError.AllProductsMustHaveAName);
-            if (string.IsNullOrEmpty(description)) AddError(ProductError.AllProductsMustHaveADescription);
-            if (!bulletpoints.Any()) AddError(ProductError.BulletPointsCollectionShoulNotBeEmpty);
-            if (PriceWithDiscount.HasValue && price < PriceWithDiscount.Value) AddError(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount);
-            if (Errors.Any()) return CreateErrorListCopy();
+            AddValidation(nameof(ProductError.AllProductsMustHaveAName), () => string.IsNullOrEmpty(name));
+            AddValidation(nameof(ProductError.AllProductsMustHaveADescription),() => string.IsNullOrEmpty(description));
+            AddValidation(nameof(ProductError.BulletPointsCollectionShoulNotBeEmpty), () =>!bulletpoints.Any());
+            AddValidation(nameof(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount), () => PriceOffer.PriceWithDiscount.HasValue && price < PriceOffer.PriceWithDiscount.Value);
+            Validate();
+            if (HasError()) return Errors;
 
             Name = name;
             ActualPrice = price;
@@ -86,12 +79,11 @@ namespace RunApp.Domain.Products
 
         public ErrorOr<Success> AddBulletPoints(IEnumerable<string> points)
         {
-            if (!points.Any())
-            {
-                AddError(ProductError.BulletPointsCollectionShoulNotBeEmpty);
-                return CreateErrorListCopy();
-            }
-            foreach(string point in points)
+            AddValidation(nameof(ProductError.BulletPointsCollectionShoulNotBeEmpty), () => !points.Any());
+            Validate();
+            if (HasError()) return Errors;
+
+            foreach (string point in points)
             {
                 BulletPoints.Add(new About() {BulletPoint = point});
             }
@@ -101,10 +93,10 @@ namespace RunApp.Domain.Products
         public ErrorOr<Review> AddReview(string comment, double numStars,ReviewDescriptionEnums reviewEnum)
         {
             double minNumOfStars = 1.0;
-            //This should be validated in the presentation/application layer as a model validation and not as an invariant
-            if (string.IsNullOrEmpty(comment)) AddError(ReviewError.AllReviewsMustHaveAComment);
-            if(numStars < minNumOfStars) AddError(ReviewError.MinimumNunberOfStarsCannotBeLessThanOne);
-            if (Errors.Any()) return CreateErrorListCopy();
+            AddValidation(nameof(ReviewError.AllReviewsMustHaveAComment), () => string.IsNullOrEmpty(comment));
+            AddValidation(nameof(ReviewError.MinimumNunberOfStarsCannotBeLessThanOne),()=>numStars < minNumOfStars);
+            Validate();
+            if (HasError()) return Errors;
 
             Review newReview = new Review { Comment = comment, NumOfStars = numStars, ReviewDescription = reviewEnum };
             Reviews.Add(newReview);
@@ -124,41 +116,23 @@ namespace RunApp.Domain.Products
         public ErrorOr<Success> AddPriceWithDiscount(decimal priceWithDiscount, string promotionalText)
         {
             decimal maximumDiscount = 0.7m;
-            if (priceWithDiscount < ActualPrice - (ActualPrice * maximumDiscount)) AddError(ProductError.DiscountPricesMustBeMaximum70Percent);
-            if (string.IsNullOrEmpty(promotionalText)) AddError(ProductError.AllPricesWithDiscountMustHaveAPromotionalText);
-            if (ActualPrice < priceWithDiscount) AddError(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount);
-            if (Errors.Any()) return CreateErrorListCopy();
+            AddValidation(nameof(ProductError.DiscountPricesMustBeMaximum70Percent),() =>priceWithDiscount < ActualPrice - (ActualPrice * maximumDiscount));
+            AddValidation(nameof(ProductError.AllPricesWithDiscountMustHaveAPromotionalText), () =>string.IsNullOrEmpty(promotionalText));
+            AddValidation(nameof(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount), () => ActualPrice < priceWithDiscount);
+            Validate();
+            if (HasError()) return Errors;
 
 
-            PriceWithDiscount = priceWithDiscount;
-            PromotionalText = promotionalText;
+            PriceOffer = new PriceOffer { PriceWithDiscount = priceWithDiscount, PromotionalText = promotionalText };
+          
 
             return Result.Success;
         }
 
         public void RemovePriceWithDiscount()
         {
-            PriceWithDiscount = null;
-            PromotionalText = null;
-        }
-
-        private static void AddError(Error error)
-        {
-            Errors.Add(error);
-        }
-
-        private static List<Error> CreateErrorListCopy()
-        {
-            List<Error> listOfErrors = Errors.ToList();
-            Errors.Clear();
-            return listOfErrors;
-        }
-
-        public override string ToString()
-        {
-           var point = string.Join(",", BulletPoints.Select(b => b.BulletPoint));
-           
-            return $"{ProductId}, {Name}, {PriceWithDiscount}, {ActualPrice}, {Description}, {PromotionalText}, {Discount}, {point}";
+            PriceOffer = null;
+            
         }
     }
 }
