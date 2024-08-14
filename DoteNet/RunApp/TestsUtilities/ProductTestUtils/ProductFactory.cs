@@ -1,11 +1,8 @@
-﻿using ErrorOr;
-using Microsoft.VisualBasic;
-using RunApp.Domain.ProductAggregate.AboutValueType;
+﻿using RunApp.Domain.ProductAggregate.ValueType;
 using RunApp.Domain.ProductAggregate.Reviews;
 using RunApp.Domain.Products;
-using System.Drawing;
-using System.Reflection.Metadata;
-using TestsUtilities.ProductTestUtils;
+using RunApp.Domain.ProductAggregate.ValueTypes;
+
 
 namespace TestsUtilities.ProductTestUtils
 {
@@ -17,15 +14,14 @@ namespace TestsUtilities.ProductTestUtils
         {
             var points = bulletpoints ?? Constants.Product.BulletPoints;
             ICollection<About> bullPoints = points.Select(p => new About(p)).ToList();
+            PriceOffer priceType = new PriceOffer { PriceWithDiscount = priceWithDiscount ?? Constants.Product.PriceWithDiscount, PromotionalText = promotionalText ?? Constants.Product.PromotioanlText, Discount = discount ?? Constants.Product.Discount };
             
             return new Product( productId: id ?? Constants.Product.ProductId,
                name: name ?? Constants.Product.Name,
                description: description ?? Constants.Product.Description,
                actualPrice: price ?? Constants.Product.Price,
                bulletpoints: bullPoints,
-               priceWithDiscount: priceWithDiscount ?? Constants.Product.PriceWithDiscount,
-               promotionalText: promotionalText ?? Constants.Product.PromotioanlText,
-               discount: discount ?? Constants.Product.Discount,
+               priceOffer: priceType,
                reviews: reviews ?? Constants.Product.Reviews
                 );
         }
