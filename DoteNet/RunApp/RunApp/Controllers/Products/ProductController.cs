@@ -1,10 +1,7 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
 using RunApp.Api.Routes;
 using RunnApp.Application.Products.Queries.GetProduct;
-using MediatR;
 using ErrorOr;
 using RunApp.Domain.Products;
 using RunApp.Api.Mappers.Products;
@@ -55,7 +52,7 @@ namespace RunApp.Api.Controllers.Products
         }
 
         [HttpPost(ApiEndpoints.Products.Create)]
-        public async Task<IActionResult> CreateProduct([FromBody]CreateProductRequest createProduct)
+        public async Task<IActionResult> CreateProduct(CreateProductRequest createProduct)
         {
             CreateProductCommand productCommand = createProduct.ProductRequestToProductCommand();
             ErrorOr<Product> productorError =  await _mediator.Send(productCommand);

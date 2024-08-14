@@ -1,5 +1,4 @@
 ﻿using Contracts.Reviews.Requests;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RunApp.Api.Routes;
 using RunApp.Domain.ProductAggregate.Reviews.Common;

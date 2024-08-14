@@ -4,7 +4,7 @@
     {
         private const string Base = "api";
 
-        public class Products
+        public static class Products
         {
             private const string ProductBase = $"{Base}/products";
             public const string Create = ProductBase;
@@ -19,6 +19,13 @@
             public const string AddPriceWithDiscount = $"{ProductBase}/{{id:guid}}/discounts";
             public const string DeletePriceWithDiscount = $"{ProductBase}/{{id:guid}}/discounts";
 
+        }
+        public static class Account
+        {
+            private const string AccountBase = $"{Base}/accounts";
+            public const string Login = $"{AccountBase}/login";
+            public const string Register = $"{AccountBase}/register";
+            public const string Logout = $"{AccountBase}/logout";
         }
     }
 }

@@ -11,7 +11,7 @@ namespace RunApp.Api.Mappers.Products
         public static ProductResponse ProductToProductResponse(this Product product)
         {
             IEnumerable<string> bulletpoints = product.BulletPoints.Select(bulletpoint => bulletpoint.BulletPoint);
-            return new ProductResponse(product.ProductId, product.Name, product.Description, product.ActualPrice, bulletpoints, product.PriceWithDiscount, product.PromotionalText, product.Discount);
+            return new ProductResponse(product.ProductId, product.Name, product.Description, product.ActualPrice, bulletpoints, product.PriceOffer.PriceWithDiscount, product.PriceOffer.PromotionalText, product.PriceOffer.Discount);
         }
 
         public static ProductsResponse AllProductsToProductsResponse(this IEnumerable<Product> products)
