@@ -10,6 +10,7 @@ interface StoreBannerProps {
   width: number | undefined;
   margin: number | undefined;
   color: string | undefined;
+  height: number | undefined;
 }
 
 export function StoreBanner({
@@ -20,11 +21,18 @@ export function StoreBanner({
   width,
   margin,
   color,
+  height,
 }: StoreBannerProps) {
   return (
     <div
       className={classes.wrapper}
-      style={{ backgroundColor: color, marginTop: margin, width: `${width}%` }}
+      style={{
+        backgroundColor: color,
+        marginTop: margin,
+        width: `${width}%`,
+        justifyContent: 'space-around',
+        height: `${height}px`,
+      }}
     >
       <div className={classes.body}>
         <Title className={classes.title}>{MainTitle}</Title>

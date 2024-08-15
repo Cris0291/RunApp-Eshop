@@ -4,7 +4,7 @@
   width: 90%;
   padding: calc(var(--mantine-spacing-xl));
   border-radius: var(--mantine-radius-md);
-  background-color: #00b5ff;
+
   border: rem(1px) solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-8));
 
   margin-top: var(--mantine-spacing-xl);
