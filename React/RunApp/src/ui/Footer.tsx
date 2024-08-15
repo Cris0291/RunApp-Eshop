@@ -24,20 +24,15 @@ export function Footer() {
 
   return (
     <div className={classes.footer}>
-      <BackgroundImage
-        src="https://as1.ftcdn.net/v2/jpg/07/30/40/04/1000_F_730400411_hGXU0n5Y1kemeIBp4CVnbPBDKZFZ5Shx.jpg"
-        radius="md"
-      >
-        <Container className={classes.inner}>
-          <Group>
-            <IconSailboat style={{ width: rem(50), height: rem(50) }} stroke={1.5} />
-            <Text fw={900} c="#ffffff">
-              RunningWorld
-            </Text>
-          </Group>
-          <Group className={classes.links}>{items}</Group>
-        </Container>
-      </BackgroundImage>
+      <Container className={classes.inner}>
+        <Group>
+          <IconSailboat style={{ width: rem(50), height: rem(50) }} stroke={1.5} />
+          <Text fw={900} c="#ffffff">
+            RunningWorld
+          </Text>
+        </Group>
+        <Group className={classes.links}>{items}</Group>
+      </Container>
     </div>
   );
 }

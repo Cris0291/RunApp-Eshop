@@ -14,6 +14,20 @@ const router = createBrowserRouter([
       {
         path: '/store',
         element: <Store />,
+        children: [
+          {
+            path: 'hot-sales',
+          },
+        ],
+      },
+      {
+        path: '/login',
+      },
+      {
+        path: '/register',
+      },
+      {
+        path: '/runWorld',
       },
     ],
   },

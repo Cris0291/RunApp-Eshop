@@ -100,7 +100,7 @@ export function NavBar() {
           </Group>
           <Group h="100%" gap={0} visibleFrom="sm">
             <a href="#" className={classes.link} style={{ color: ' #ffffff' }}>
-              Home
+              Workout time!!!
             </a>
             <HoverCard width={600} position="bottom" radius="md" shadow="md" withinPortal>
               <HoverCard.Target>
@@ -120,9 +120,6 @@ export function NavBar() {
               <HoverCard.Dropdown style={{ overflow: 'hidden', backgroundColor: '#201047' }}>
                 <Group justify="space-between" px="md">
                   <Text fw={500}>Features</Text>
-                  <Anchor href="#" fz="xs">
-                    View all
-                  </Anchor>
                 </Group>
 
                 <Divider my="sm" />

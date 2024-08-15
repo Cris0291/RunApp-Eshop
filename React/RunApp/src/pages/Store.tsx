@@ -1,5 +1,7 @@
+import StoreMainPage from '@/features/store/StoreMainPage';
+
 function Store() {
-  return <div>Hello World</div>;
+  return <StoreMainPage />;
 }
 
 export default Store;
