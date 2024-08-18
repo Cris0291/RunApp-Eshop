@@ -1,5 +1,4 @@
-import { Text, Title, TextInput, Button, Image } from '@mantine/core';
-import image from './image.svg';
+import { Text, Title, Button } from '@mantine/core';
 import classes from './storeBanner.module.css';
 
 interface StoreBannerProps {
@@ -44,7 +43,9 @@ export function StoreBanner({
         </Text>
       </div>
       <div className={classes.controls}>
-        <Button className={classes.control}>{Buttontext}</Button>
+        <Button variant="outline" className={classes.control}>
+          {Buttontext}
+        </Button>
       </div>
     </div>
   );

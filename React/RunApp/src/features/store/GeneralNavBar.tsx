@@ -4,10 +4,10 @@ import MainNavBar from './MainNavBar';
 
 function GeneralNavBar() {
   return (
-    <Container fluid>
+    <>
       <StoreNavBar />
       <MainNavBar />
-    </Container>
+    </>
   );
 }
 
