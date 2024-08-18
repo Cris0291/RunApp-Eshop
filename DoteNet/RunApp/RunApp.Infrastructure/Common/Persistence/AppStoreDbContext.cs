@@ -7,6 +7,8 @@ using RunApp.Domain.UserAggregate;
 
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using RunApp.Domain.UserAggregate.Roles;
+using RunApp.Infrastructure.CustomerProfiles.Persistence;
+using RunApp.Infrastructure.ProductStatuses.Persistence;
 
 namespace RunApp.Infrastructure.Common.Persistence
 {
@@ -21,6 +23,8 @@ namespace RunApp.Infrastructure.Common.Persistence
              ;
             modelBuilder.ApplyConfiguration(new ProductConfigurations());
             modelBuilder.ApplyConfiguration(new ReviewConfiguration());
+            modelBuilder.ApplyConfiguration(new CustomerProfileConfiguration());
+            modelBuilder.ApplyConfiguration(new ProductStatusConfiguration());
             base.OnModelCreating(modelBuilder);
         }
 

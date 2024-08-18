@@ -1,14 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RunApp.Domain.ProductAggregate.ValueTypes;
+using RunApp.Domain.CustomerProfileAggregate.ProductStatuses;
 using RunApp.Domain.Products;
 
 namespace RunApp.Infrastructure.Products.Persistence
 {
     public class ProductConfigurations : IEntityTypeConfiguration<Product>
     {
-       
-
         public void Configure(EntityTypeBuilder<Product> builder)
         {
             builder.OwnsMany(product => product.BulletPoints)
@@ -20,13 +18,9 @@ namespace RunApp.Infrastructure.Products.Persistence
             builder.OwnsOne(p => p.PriceOffer, px => px.Property(x => x.PriceWithDiscount).HasColumnType("decimal(10,2)").HasColumnName("PriceWithDiscount"));
             builder.OwnsOne(p => p.PriceOffer, px => px.Property(x => x.PromotionalText).HasColumnName("PromotionalText"));
 
-            builder.HasMany(p => p.Reviews)
-                .WithOne()
-                .HasForeignKey(r => r.ProductId);
-
             builder.Property(p => p.ActualPrice)
                 .HasColumnType("decimal(10,2)");
-  
+
 
            /* builder.HasData(new Product()
             {

@@ -12,8 +12,8 @@ using RunApp.Infrastructure.Common.Persistence;
 namespace RunApp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppStoreDbContext))]
-    [Migration("20240813133034_ValueTypeMigration")]
-    partial class ValueTypeMigration
+    [Migration("20240817195805_InitailMigration")]
+    partial class InitailMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -128,10 +128,76 @@ namespace RunApp.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("RunApp.Domain.CustomerProfileAggregate.CustomerProfile", b =>
+                {
+                    b.Property<Guid>("CustomerProfileId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NickName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Phone")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("CustomerProfileId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CustomerProfile");
+                });
+
+            modelBuilder.Entity("RunApp.Domain.CustomerProfileAggregate.ProductStatuses.ProductStatus", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Bought")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Dislike")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Like")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("viewed")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id", "ProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductStatus");
+                });
+
             modelBuilder.Entity("RunApp.Domain.ProductAggregate.Reviews.Review", b =>
                 {
-                    b.Property<Guid>("ReviewId")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Comment")
@@ -147,16 +213,13 @@ namespace RunApp.Infrastructure.Migrations
                         .HasPrecision(2, 1)
                         .HasColumnType("float(2)");
 
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("ReviewDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("ReviewId");
+                    b.HasKey("ProductId", "Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("Id");
 
                     b.ToTable("Review");
                 });
@@ -332,8 +395,86 @@ namespace RunApp.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RunApp.Domain.CustomerProfileAggregate.CustomerProfile", b =>
+                {
+                    b.HasOne("RunApp.Domain.UserAggregate.AppUser", null)
+                        .WithOne()
+                        .HasForeignKey("RunApp.Domain.CustomerProfileAggregate.CustomerProfile", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RunApp.Domain.UserAggregate.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("RunApp.Domain.CustomerProfileAggregate.ValueTypes.Address", "ShippingAdress", b1 =>
+                        {
+                            b1.Property<Guid>("CustomerProfileId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<int>("AlternativeHouseNumber")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("AlternativeStreet")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Country")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("HouseNumber")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Street")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("ZipCode")
+                                .HasColumnType("int");
+
+                            b1.HasKey("CustomerProfileId");
+
+                            b1.ToTable("CustomerProfile");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CustomerProfileId");
+                        });
+
+                    b.Navigation("ShippingAdress")
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("RunApp.Domain.CustomerProfileAggregate.ProductStatuses.ProductStatus", b =>
+                {
+                    b.HasOne("RunApp.Domain.CustomerProfileAggregate.CustomerProfile", null)
+                        .WithMany("Statuses")
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RunApp.Domain.Products.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("RunApp.Domain.ProductAggregate.Reviews.Review", b =>
                 {
+                    b.HasOne("RunApp.Domain.CustomerProfileAggregate.CustomerProfile", null)
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("RunApp.Domain.Products.Product", null)
                         .WithMany("Reviews")
                         .HasForeignKey("ProductId")
@@ -397,6 +538,11 @@ namespace RunApp.Infrastructure.Migrations
 
                     b.Navigation("PriceOffer")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("RunApp.Domain.CustomerProfileAggregate.CustomerProfile", b =>
+                {
+                    b.Navigation("Statuses");
                 });
 
             modelBuilder.Entity("RunApp.Domain.Products.Product", b =>

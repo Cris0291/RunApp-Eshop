@@ -9,26 +9,26 @@ namespace RunApp.Infrastructure.Reviews.Persistence
     public class ReviewRepository(AppStoreDbContext appStoreDbContext) : IReviewsRepository
     {
         private readonly AppStoreDbContext _appStoreDbContext = appStoreDbContext;
-        public async Task<Product?> GetProductWithReviews(Guid ProductId, CancellationToken cancellationToken)
+        public async Task<Product?> GetProductWithReviews(Guid productId, CancellationToken cancellationToken)
         {
             Product? product =  await _appStoreDbContext.Products
                 .Include(p => p.Reviews)
-                .SingleOrDefaultAsync(p => p.ProductId == ProductId, cancellationToken);
+                .SingleOrDefaultAsync(p => p.ProductId == productId, cancellationToken);
 
             return product;
         }
-        public async Task<Product?> GetProductWithReviews(Guid ProductId, Guid ReviewId, CancellationToken cancellationToken)
+        public async Task<Product?> GetProductWithReviews(Guid productId, Guid userId, CancellationToken cancellationToken)
         {
             Product? product = await _appStoreDbContext.Products
-                .Include(p => p.Reviews.Where(r => r.ReviewId == ReviewId))
-                .SingleOrDefaultAsync(p => p.ProductId == ProductId, cancellationToken);
+                .Include(p => p.Reviews.Where(r => r.Id == userId && r.ProductId == productId))
+                .SingleOrDefaultAsync(p => p.ProductId == productId, cancellationToken);
 
             return product;
         }
 
-        public async Task<bool> ExistReview(Guid ReviewId, CancellationToken cancellationToken)
+        public async Task<bool> ExistReview(Guid userId, Guid productId, CancellationToken cancellationToken)
         {
-            bool existReview = await _appStoreDbContext.Set<Review>().AnyAsync(r => r.ReviewId == ReviewId);
+            bool existReview = await _appStoreDbContext.Set<Review>().AnyAsync(r => r.Id == userId && r.ProductId == productId);
             return existReview;
         }
     }
