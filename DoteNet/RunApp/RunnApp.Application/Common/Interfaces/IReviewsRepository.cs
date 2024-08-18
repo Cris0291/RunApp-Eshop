@@ -4,9 +4,9 @@ namespace RunnApp.Application.Common.Interfaces
 {
     public interface IReviewsRepository
     {
-        Task<Product?> GetProductWithReviews(Guid ProductId, CancellationToken cancellationToken);
-        Task<Product?> GetProductWithReviews(Guid ProductId, Guid ReviewId, CancellationToken cancellationToken);
-        Task<bool> ExistReview(Guid ReviewId, CancellationToken cancellationToken);
+        Task<Product?> GetProductWithReviews(Guid productId, CancellationToken cancellationToken);
+        Task<Product?> GetProductWithReviews(Guid productId, Guid userId, CancellationToken cancellationToken);
+        Task<bool> ExistReview(Guid userId, Guid productId, CancellationToken cancellationToken);
         
     }
 }

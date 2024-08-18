@@ -11,14 +11,14 @@ namespace RunnApp.Application.Reviews.Commands.DeleteReview
         private readonly IUnitOfWorkPattern _unitOfWorkPattern = unitOfWorkPattern;
         public async Task<ErrorOr<Success>> Handle(DeleteReviewCommand request, CancellationToken cancellationToken)
         {
-            bool existReview = await _reviewsRpository.ExistReview(request.ReviewId, cancellationToken);
+            bool existReview = await _reviewsRpository.ExistReview(request.userId, request.productId, cancellationToken);
 
             if(!existReview) return Error.NotFound(code: "ReviewWasNotFoundWithGivenId", description: "Requested review was not found");
 
-           Product? product = await _reviewsRpository.GetProductWithReviews(request.ProductId, request.ReviewId, cancellationToken);
+           Product? product = await _reviewsRpository.GetProductWithReviews(request.productId, request.userId, cancellationToken);
             if (product == null) return Error.NotFound(code: "ProductWasNotFoundWithGivenId", description: "Requested product was not found");
 
-            ErrorOr<Success> errorOr = product.DeleteReview(request.ReviewId);
+            ErrorOr<Success> errorOr = product.DeleteReview(request.userId, request.productId);
             if (errorOr.IsError) return errorOr.Errors;
 
            await _unitOfWorkPattern.CommitChangesAsync();
