@@ -5,6 +5,8 @@ using RunnApp.Application;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using RunApp.Api.Services;
+using RunApp.Infrastructure.Common.Persistence;
+using RunApp.Infrastructure.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +42,7 @@ builder.Services.AddAuthentication(opt =>
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+app.UseEventsInfrastructureMiddleware();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

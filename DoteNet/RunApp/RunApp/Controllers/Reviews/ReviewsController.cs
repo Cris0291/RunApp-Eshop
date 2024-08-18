@@ -8,6 +8,7 @@ using MediatR;
 using ErrorOr;
 using RunApp.Domain.ProductAggregate.Reviews;
 using RunnApp.Application.Reviews.Commands.DeleteReview;
+using RunApp.Api.Services;
 
 
 namespace RunApp.Api.Controllers.Reviews
@@ -22,8 +23,9 @@ namespace RunApp.Api.Controllers.Reviews
         [HttpPost(ApiEndpoints.Products.AddReview)]
         public async Task<IActionResult> AddReview([FromRoute] Guid id, AddReviewRequest reviewRequest, CancellationToken cancellationToken)
         {
+           Guid userId =HttpContext.GetUserId();
            ReviewDescriptionEnums reviewEnum = ReviewDescriptionEnums.FromName(reviewRequest.reviewDescription.ToString());
-           CreateReviewCommand reviewCommand = reviewRequest.ReviewRequestToReviewCommand(id,reviewEnum);
+           CreateReviewCommand reviewCommand = reviewRequest.ReviewRequestToReviewCommand(id,reviewEnum, userId);
 
             ErrorOr<Review> reviewsOrError = await _mediator.Send(reviewCommand, cancellationToken);
 
@@ -32,10 +34,10 @@ namespace RunApp.Api.Controllers.Reviews
         }
 
         [HttpDelete(ApiEndpoints.Products.DeleteReview)]
-        public async Task<IActionResult> DeleteReview([FromRoute] Guid ProductId, [FromRoute] Guid ReviewId, CancellationToken cancellationToken)
+        public async Task<IActionResult> DeleteReview([FromRoute] Guid ProductId, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("productId {}, reviewId {}", ProductId, ReviewId);
-            ErrorOr<Success> errorOr = await _mediator.Send(new DeleteReviewCommand(ReviewId, ProductId), cancellationToken);
+            Guid userId = HttpContext.GetUserId();
+            ErrorOr<Success> errorOr = await _mediator.Send(new DeleteReviewCommand(userId, ProductId), cancellationToken);
             return errorOr.MatchFirst(value =>Ok(), Problem);
         }
     }

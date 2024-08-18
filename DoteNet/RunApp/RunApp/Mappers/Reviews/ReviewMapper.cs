@@ -6,9 +6,9 @@ namespace RunApp.Api.Mappers.Reviews
 {
     public static class ReviewMapper
     {
-        public static CreateReviewCommand ReviewRequestToReviewCommand(this AddReviewRequest reviewRequest, Guid ProductId, ReviewDescriptionEnums reviewEnum)
+        public static CreateReviewCommand ReviewRequestToReviewCommand(this AddReviewRequest reviewRequest, Guid ProductId, ReviewDescriptionEnums reviewEnum, Guid userId)
         {
-            return new CreateReviewCommand(ProductId, reviewRequest.comment, reviewRequest.numOfStars, reviewEnum);
+            return new CreateReviewCommand(ProductId, userId, reviewRequest.comment, reviewRequest.numOfStars, reviewEnum);
         }
     }
 }

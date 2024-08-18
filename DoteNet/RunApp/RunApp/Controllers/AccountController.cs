@@ -7,18 +7,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RunApp.Api.Routes;
 using RunApp.Api.Services;
+using RunApp.Domain.Common;
 using RunApp.Domain.UserAggregate;
+using RunApp.Domain.UserAggregate.Events;
+using System.Diagnostics.Eventing.Reader;
 
 namespace RunApp.Api.Controllers
 {
 
     [AllowAnonymous]
     [ApiController]
-    public class AccountController(UserManager<AppUser> userManager, IJwtServiceGenerator jwtServiceGenerator) : ControllerBase
+    public class AccountController(UserManager<AppUser> userManager, IJwtServiceGenerator jwtServiceGenerator, IHttpContextAccessor httpContextAccessor) : ControllerBase
     {
         private readonly UserManager<AppUser> _userManager = userManager;
         private readonly IJwtServiceGenerator _jwtServiceGenerator = jwtServiceGenerator;
-        
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
         [HttpPost(ApiEndpoints.Account.Register)]
         public async Task<IActionResult> Register(RegisterDto registerDto)
@@ -42,6 +45,7 @@ namespace RunApp.Api.Controllers
             if (result.Succeeded)
             {
                 var token = _jwtServiceGenerator.GenerateJwtToken(newUser);
+                AddCustomerProfileEvent(_httpContextAccessor, newUser);
                 UserDto userDto = new UserDto(newUser.UserName, newUser.NickName,token, newUser.Email);
                 
                 return Ok(userDto);
@@ -75,7 +79,7 @@ namespace RunApp.Api.Controllers
             });
 
             var token = _jwtServiceGenerator.GenerateJwtToken(user);
-            UserDto userDto = new UserDto(user.UserName, user.NickName, token, user.Email);
+            UserDto userDto = new UserDto(user.UserName!, user.NickName, token, user.Email!);
             return Ok(userDto);
         }
 
@@ -85,6 +89,15 @@ namespace RunApp.Api.Controllers
             //ControllerContext.HttpContext.Response.Headers.Remove("Authorization");
 
             return Ok();
+        }
+
+        private void AddCustomerProfileEvent(IHttpContextAccessor httpContextAccessor, AppUser user)
+        {
+            Queue<IDomainEvent> domainEventsQueue =  httpContextAccessor.HttpContext!.Items.TryGetValue("DomainEvents", out var events)  && events is Queue<IDomainEvent> domainEvents ? domainEvents : new Queue<IDomainEvent>();
+            var profileEvent = new CreateCustomerProfileEvent(user.Id, user.Email!, user.UserName!, user.NickName);
+            domainEventsQueue.Enqueue(profileEvent);
+
+            httpContextAccessor.HttpContext!.Items["DomainEvents"] = domainEventsQueue;
         }
     }
 }
