@@ -9,9 +9,9 @@ namespace RunApp.Domain.ProductAggregate.Reviews
     {
         internal Review() { }
         // Constructor use for unit testing
-        internal Review(Guid reviewId, string comment, double numOfStars, DateTime date, ReviewDescriptionEnums reviewDescription, Guid productId)
+        internal Review(Guid id, string comment, double numOfStars, DateTime date, ReviewDescriptionEnums reviewDescription, Guid productId)
         {
-            ReviewId = reviewId;
+            Id = id;
             Comment = comment;
             NumOfStars = numOfStars;
             Date = date;
@@ -19,13 +19,13 @@ namespace RunApp.Domain.ProductAggregate.Reviews
             ProductId = productId;
         }
 
-        public Guid ReviewId { get; internal set; }
         public string Comment { get; internal set; }
         public double NumOfStars { get; internal set; }
         //Could be map to the database as a computed column
         public DateTime Date { get; internal set; }
         public ReviewDescriptionEnums ReviewDescription { get; internal set; }
         public Guid ProductId { get; internal set; }
+        public Guid Id { get; internal set; }
 
     }
 }

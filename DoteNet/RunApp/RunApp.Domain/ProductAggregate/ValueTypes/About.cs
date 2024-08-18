@@ -12,7 +12,7 @@ namespace RunApp.Domain.ProductAggregate.ValueType
         {
             BulletPoint = bulletpoint;
         }
-        public string BulletPoint { get; set; }
+        public string BulletPoint { get; internal set; }
 
     }
 }

@@ -6,11 +6,13 @@ using RunApp.Domain.ProductAggregate.ProductErrors;
 using RunApp.Domain.ProductAggregate.Reviews.Common;
 using System.Runtime.CompilerServices;
 using RunApp.Domain.ProductAggregate.ValueTypes;
+using RunApp.Domain.CustomerProfileAggregate.ProductStatuses;
+using RunApp.Domain.Common;
 
 [assembly: InternalsVisibleTo("TestsUtilities")]
 namespace RunApp.Domain.Products
 {
-    public class Product : ValidationHandler
+    public class Product : Entity
     {
        
         internal Product() { }
@@ -30,7 +32,6 @@ namespace RunApp.Domain.Products
         public decimal ActualPrice { get; internal set; }
         public string Description { get; internal set; }
         public PriceOffer PriceOffer { get; internal set; }
-
         public ICollection<About> BulletPoints { get; internal set; }
 
         public List<Review> Reviews { get; internal set; } 
@@ -103,9 +104,9 @@ namespace RunApp.Domain.Products
             return newReview;
         }
 
-        public ErrorOr<Success> DeleteReview(Guid ReviewId)
+        public ErrorOr<Success> DeleteReview(Guid userId, Guid productId)
         {
-            Review? review = Reviews.SingleOrDefault(x => x.ReviewId == ReviewId);
+            Review? review = Reviews.SingleOrDefault(x => x.Id == userId && x.ProductId == productId);
             if (review == null) return Error.NotFound(code: "ReviewWasNOtFound", description: "Review was not found with given id");
 
             Reviews.Remove(review);

@@ -1,8 +1,8 @@
 ﻿using ErrorOr;
 
-namespace RunApp.Domain
+namespace RunApp.Domain.Common
 {
-    public class ErrorHandler
+    public abstract class ErrorHandler
     {
         private static List<Error> _errors = new();
         protected static List<Error> Errors
@@ -14,7 +14,7 @@ namespace RunApp.Domain
                 return temp;
             }
         }
-        
+
         public static void AddError(Error error)
         {
             _errors.Add(error);
