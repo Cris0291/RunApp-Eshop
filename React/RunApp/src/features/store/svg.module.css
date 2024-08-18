@@ -1,0 +1,8 @@
+.title {
+  color: #ff69b4;
+  font-family: 'Grandstander';
+  line-height: 1;
+  margin-bottom: var(--mantine-spacing-xl);
+  font-size: 100px;
+  text-decoration: underline;
+}
