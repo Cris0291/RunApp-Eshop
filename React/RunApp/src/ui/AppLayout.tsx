@@ -8,7 +8,7 @@ import GeneralNavBar from '@/features/store/GeneralNavBar';
 
 function AppLayout() {
   const path = usePathChange();
-  const test = path == '/' ? '#1a103d' : '';
+  const test = path == '/' ? '#1a103d' : '#000000';
   return (
     <Paper radius={0} style={{ mih: '100vh', backgroundColor: test }}>
       {path == '/' ? <NavBar /> : <GeneralNavBar />}
