@@ -91,7 +91,7 @@ namespace RunApp.Domain.Products
 
             return Result.Success;
         }
-        public ErrorOr<Review> AddReview(string comment, double numStars,ReviewDescriptionEnums reviewEnum)
+        public ErrorOr<Review> AddReview(string comment, double numStars,ReviewDescriptionEnums reviewEnum, Guid productId, Guid userId)
         {
             double minNumOfStars = 1.0;
             AddValidation(nameof(ReviewError.AllReviewsMustHaveAComment), () => string.IsNullOrEmpty(comment));
@@ -99,7 +99,7 @@ namespace RunApp.Domain.Products
             Validate();
             if (HasError()) return Errors;
 
-            Review newReview = new Review { Comment = comment, NumOfStars = numStars, ReviewDescription = reviewEnum };
+            Review newReview = new Review { Comment = comment, NumOfStars = numStars, ReviewDescription = reviewEnum, ProductId = productId, Id = userId };
             Reviews.Add(newReview);
             return newReview;
         }

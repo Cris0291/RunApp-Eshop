@@ -1,5 +1,6 @@
 ﻿using ErrorOr;
 using RunApp.Domain.CustomerProfileAggregate.CustomerProfileErrors;
+using RunApp.Domain.CustomerProfileAggregate.ProductStatuses.ProductStatusErrors;
 using RunApp.Domain.ProductAggregate.ProductErrors;
 using RunApp.Domain.ProductAggregate.Reviews.ReviewErrors;
 
@@ -38,10 +39,7 @@ namespace RunApp.Domain.Common
                 nameof(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount) => ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount,
                 nameof(ReviewError.AllReviewsMustHaveAComment) => ReviewError.AllReviewsMustHaveAComment,
                 nameof(ReviewError.MinimumNunberOfStarsCannotBeLessThanOne) => ReviewError.MinimumNunberOfStarsCannotBeLessThanOne,
-                nameof(CustomerProfileError.EmailCannotBeNullOrEmpty) => CustomerProfileError.EmailCannotBeNullOrEmpty,
-                nameof(CustomerProfileError.NickNameCannotBeNullOrEmpty) => CustomerProfileError.NickNameCannotBeNullOrEmpty,
-                nameof(CustomerProfileError.UserNameCannotBeNullOrEmpty) => CustomerProfileError.UserNameCannotBeNullOrEmpty,
-                nameof(CustomerProfileError.EmailDoesNotHaveCorrectFormat) => CustomerProfileError.EmailDoesNotHaveCorrectFormat
+                nameof(ProductStatusError.LikeAndDislikeStatusesCannotBeSetAtTheSameTime) => ProductStatusError.LikeAndDislikeStatusesCannotBeSetAtTheSameTime
             };
 
             AddError(ValidationError);
