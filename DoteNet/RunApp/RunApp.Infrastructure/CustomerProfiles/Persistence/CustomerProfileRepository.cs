@@ -1,16 +1,39 @@
-﻿using RunApp.Domain.CustomerProfileAggregate;
+﻿using Microsoft.EntityFrameworkCore;
+using RunApp.Domain.CustomerProfileAggregate;
 using RunApp.Infrastructure.Common.Persistence;
 using RunnApp.Application.Common.Interfaces;
-
 
 namespace RunApp.Infrastructure.CustomerProfiles.Persistence
 {
     public class CustomerProfileRepository(AppStoreDbContext appStoreDbContext) : ICustomerProfileRepository
     {
         private readonly AppStoreDbContext _appStoreDbContext = appStoreDbContext;
+
         public async Task CreateCustomerProfile(CustomerProfile customerProfile)
         {
             await _appStoreDbContext.AddAsync(customerProfile);
+        }
+
+        public async Task<CustomerProfile?> GetCustomerProfile(Guid id)
+        {
+            var customerProfile = await _appStoreDbContext.CustomerProfiles.SingleOrDefaultAsync(x => x.Id == id);
+            return customerProfile;
+        }
+
+        public async Task<CustomerProfile?> GetCustomerProfileWithStatuses(Guid id, Guid? productId = null)
+        {
+            if (productId == null)
+            {
+                var customerProfile = await _appStoreDbContext.CustomerProfiles
+                    .Include(x => x.Statuses)
+                    .SingleOrDefaultAsync(x => x.Id == id);
+                return customerProfile;
+            }
+
+            var customerProfileWithStatus = await _appStoreDbContext.CustomerProfiles
+                   .Include(x => x.Statuses.Where(y => y.ProductId == productId.Value))
+                   .SingleOrDefaultAsync(x => x.Id == id);
+            return customerProfileWithStatus;
         }
     }
 }

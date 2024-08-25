@@ -8,6 +8,7 @@ using RunApp.Domain.UserAggregate;
 using RunApp.Domain.UserAggregate.Roles;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using RunApp.Infrastructure.CustomerProfiles.Persistence;
 
 namespace RunApp.Infrastructure
 {
@@ -19,6 +20,7 @@ namespace RunApp.Infrastructure
             services.AddDbContext<AppStoreDbContext>(options => options.UseSqlServer(connectionString));
             services.AddScoped<IUnitOfWorkPattern>(serviceProvider => serviceProvider.GetRequiredService<AppStoreDbContext>());
             services.AddScoped<IReviewsRepository, ReviewRepository>();
+            services.AddScoped<ICustomerProfileRepository, CustomerProfileRepository>();
 
             services.AddIdentityCore<AppUser>(opt =>
             {
@@ -32,7 +34,6 @@ namespace RunApp.Infrastructure
                 .AddEntityFrameworkStores<AppStoreDbContext>()
                 .AddRoles<AppRole>()
                 .AddRoleStore<RoleStore<AppRole, AppStoreDbContext, Guid>>()
-                .AddSignInManager()
                 .AddUserStore<UserStore<AppUser, AppRole, AppStoreDbContext, Guid>>();
 
             return services;

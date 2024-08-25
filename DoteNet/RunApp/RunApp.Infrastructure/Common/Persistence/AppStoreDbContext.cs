@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using RunApp.Domain.UserAggregate.Roles;
 using RunApp.Infrastructure.CustomerProfiles.Persistence;
 using RunApp.Infrastructure.ProductStatuses.Persistence;
+using RunApp.Domain.CustomerProfileAggregate;
 
 namespace RunApp.Infrastructure.Common.Persistence
 {
@@ -16,6 +17,7 @@ namespace RunApp.Infrastructure.Common.Persistence
     {
        
         public DbSet<Product> Products => Set<Product>();
+        public DbSet<CustomerProfile> CustomerProfiles => Set<CustomerProfile>();
         public AppStoreDbContext(DbContextOptions<AppStoreDbContext> options) : base(options) { }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)

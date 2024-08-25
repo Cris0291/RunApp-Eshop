@@ -16,7 +16,13 @@ namespace RunApp.Infrastructure.CustomerProfiles.Persistence
                 .HasForeignKey<CustomerProfile>(x => x.Id)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.OwnsOne(x => x.ShippingAdress);
+            builder.OwnsOne(x => x.ShippingAdress, px => px.Property(y => y.ZipCode).IsRequired(false));
+            builder.OwnsOne(x => x.ShippingAdress, px => px.Property(y => y.Street).IsRequired(false));
+            builder.OwnsOne(x => x.ShippingAdress, px => px.Property(y => y.AlternativeStreet).IsRequired(false));
+            builder.OwnsOne(x => x.ShippingAdress, px => px.Property(y => y.City).IsRequired(false));
+            builder.OwnsOne(x => x.ShippingAdress, px => px.Property(y => y.HouseNumber).IsRequired(false));
+            builder.OwnsOne(x => x.ShippingAdress, px => px.Property(y => y.Country).IsRequired(false));
+            builder.OwnsOne(x => x.ShippingAdress, px => px.Property(y => y.AlternativeHouseNumber).IsRequired(false));
         }
     }
 }

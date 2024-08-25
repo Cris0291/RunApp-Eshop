@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RunApp.Infrastructure.Common.Persistence;
 
@@ -11,9 +12,11 @@ using RunApp.Infrastructure.Common.Persistence;
 namespace RunApp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppStoreDbContext))]
-    partial class AppStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240819154538_AddressNullValueMigration")]
+    partial class AddressNullValueMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -154,7 +157,7 @@ namespace RunApp.Infrastructure.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.ToTable("CustomerProfiles");
+                    b.ToTable("CustomerProfile");
                 });
 
             modelBuilder.Entity("RunApp.Domain.CustomerProfileAggregate.ProductStatuses.ProductStatus", b =>
@@ -165,16 +168,16 @@ namespace RunApp.Infrastructure.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool?>("Bought")
+                    b.Property<bool>("Bought")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("Dislike")
+                    b.Property<bool>("Dislike")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("Like")
+                    b.Property<bool>("Like")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("Viewed")
+                    b.Property<bool>("viewed")
                         .HasColumnType("bit");
 
                     b.HasKey("Id", "ProductId");
@@ -423,7 +426,7 @@ namespace RunApp.Infrastructure.Migrations
 
                             b1.HasKey("CustomerProfileId");
 
-                            b1.ToTable("CustomerProfiles");
+                            b1.ToTable("CustomerProfile");
 
                             b1.WithOwner()
                                 .HasForeignKey("CustomerProfileId");

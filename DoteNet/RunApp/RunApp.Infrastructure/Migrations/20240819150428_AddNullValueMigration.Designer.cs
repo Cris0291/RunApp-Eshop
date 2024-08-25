@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RunApp.Infrastructure.Common.Persistence;
 
@@ -11,9 +12,11 @@ using RunApp.Infrastructure.Common.Persistence;
 namespace RunApp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppStoreDbContext))]
-    partial class AppStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240819150428_AddNullValueMigration")]
+    partial class AddNullValueMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -154,7 +157,7 @@ namespace RunApp.Infrastructure.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.ToTable("CustomerProfiles");
+                    b.ToTable("CustomerProfile");
                 });
 
             modelBuilder.Entity("RunApp.Domain.CustomerProfileAggregate.ProductStatuses.ProductStatus", b =>
@@ -165,16 +168,16 @@ namespace RunApp.Infrastructure.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool?>("Bought")
+                    b.Property<bool>("Bought")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("Dislike")
+                    b.Property<bool>("Dislike")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("Like")
+                    b.Property<bool>("Like")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("Viewed")
+                    b.Property<bool>("viewed")
                         .HasColumnType("bit");
 
                     b.HasKey("Id", "ProductId");
@@ -400,36 +403,40 @@ namespace RunApp.Infrastructure.Migrations
                             b1.Property<Guid>("CustomerProfileId")
                                 .HasColumnType("uniqueidentifier");
 
-                            b1.Property<int?>("AlternativeHouseNumber")
+                            b1.Property<int>("AlternativeHouseNumber")
                                 .HasColumnType("int");
 
                             b1.Property<string>("AlternativeStreet")
                                 .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("City")
+                                .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("Country")
+                                .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<int?>("HouseNumber")
+                            b1.Property<int>("HouseNumber")
                                 .HasColumnType("int");
 
                             b1.Property<string>("Street")
+                                .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<int?>("ZipCode")
+                            b1.Property<int>("ZipCode")
                                 .HasColumnType("int");
 
                             b1.HasKey("CustomerProfileId");
 
-                            b1.ToTable("CustomerProfiles");
+                            b1.ToTable("CustomerProfile");
 
                             b1.WithOwner()
                                 .HasForeignKey("CustomerProfileId");
                         });
 
-                    b.Navigation("ShippingAdress");
+                    b.Navigation("ShippingAdress")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("RunApp.Domain.CustomerProfileAggregate.ProductStatuses.ProductStatus", b =>
