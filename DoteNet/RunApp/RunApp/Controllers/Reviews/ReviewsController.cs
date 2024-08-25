@@ -9,6 +9,7 @@ using ErrorOr;
 using RunApp.Domain.ProductAggregate.Reviews;
 using RunnApp.Application.Reviews.Commands.DeleteReview;
 using RunApp.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace RunApp.Api.Controllers.Reviews
@@ -20,10 +21,12 @@ namespace RunApp.Api.Controllers.Reviews
         private readonly IMediator _mediator = mediator;
         private readonly ILogger<ReviewsController> _logger = logger;
 
+        [Authorize]
         [HttpPost(ApiEndpoints.Products.AddReview)]
         public async Task<IActionResult> AddReview([FromRoute] Guid id, AddReviewRequest reviewRequest, CancellationToken cancellationToken)
         {
-           Guid userId =HttpContext.GetUserId();
+           Guid userId = HttpContext.GetUserId();
+            
            ReviewDescriptionEnums reviewEnum = ReviewDescriptionEnums.FromName(reviewRequest.reviewDescription.ToString());
            CreateReviewCommand reviewCommand = reviewRequest.ReviewRequestToReviewCommand(id,reviewEnum, userId);
 
@@ -33,6 +36,7 @@ namespace RunApp.Api.Controllers.Reviews
             return reviewsOrError.Match( Ok, Problem);
         }
 
+        [Authorize]
         [HttpDelete(ApiEndpoints.Products.DeleteReview)]
         public async Task<IActionResult> DeleteReview([FromRoute] Guid ProductId, CancellationToken cancellationToken)
         {

@@ -21,11 +21,11 @@ namespace RunApp.Api.Services
                 new Claim(ClaimTypes.NameIdentifier, user.NickName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()),
                 new Claim("UserId", user.Id.ToString())
             };
-
-            var securityToken = new JwtSecurityToken(_configuration["Jwt:Issuer"],null, claims,expires: DateTime.UtcNow.AddMinutes(3), signingCredentials: signCredentials);
+         
+            var securityToken = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"], claims,expires: DateTime.UtcNow.AddMinutes(5), signingCredentials: signCredentials);
            
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             string token = jwtTokenHandler.WriteToken(securityToken);

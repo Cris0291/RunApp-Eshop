@@ -19,6 +19,8 @@
             public const string AddPriceWithDiscount = $"{ProductBase}/{{id:guid}}/discounts";
             public const string DeletePriceWithDiscount = $"{ProductBase}/{{id:guid}}/discounts";
 
+            public const string AddProductStatus = $"{ProductBase}/{{id:guid}}/status";
+
         }
         public static class Account
         {
