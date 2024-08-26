@@ -10,6 +10,10 @@ using RunApp.Domain.UserAggregate.Roles;
 using RunApp.Infrastructure.CustomerProfiles.Persistence;
 using RunApp.Infrastructure.ProductStatuses.Persistence;
 using RunApp.Domain.CustomerProfileAggregate;
+using RunApp.Infrastructure.Sales.Persistence;
+using RunApp.Infrastructure.Stocks.Persistence;
+using RunApp.Infrastructure.StoreOwnerProfiles.Persistence;
+using RunApp.Domain.StoreOwnerProfileAggregate;
 
 namespace RunApp.Infrastructure.Common.Persistence
 {
@@ -18,6 +22,7 @@ namespace RunApp.Infrastructure.Common.Persistence
        
         public DbSet<Product> Products => Set<Product>();
         public DbSet<CustomerProfile> CustomerProfiles => Set<CustomerProfile>();
+        public DbSet<StoreOwnerProfile> StoreOwnerProfiles => Set<StoreOwnerProfile>();
         public AppStoreDbContext(DbContextOptions<AppStoreDbContext> options) : base(options) { }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -27,6 +32,9 @@ namespace RunApp.Infrastructure.Common.Persistence
             modelBuilder.ApplyConfiguration(new ReviewConfiguration());
             modelBuilder.ApplyConfiguration(new CustomerProfileConfiguration());
             modelBuilder.ApplyConfiguration(new ProductStatusConfiguration());
+            modelBuilder.ApplyConfiguration(new SalesConfiguration());
+            modelBuilder.ApplyConfiguration(new StockConfiguration());
+            modelBuilder.ApplyConfiguration(new StoreOwnerProfileConfiguration());
             base.OnModelCreating(modelBuilder);
         }
 

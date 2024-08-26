@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RunApp.Domain.CustomerProfileAggregate.ProductStatuses;
 using RunApp.Domain.Products;
+using RunApp.Domain.StoreOwnerProfileAggregate.Sales;
+using RunApp.Domain.StoreOwnerProfileAggregate.Stocks;
 
 namespace RunApp.Infrastructure.Products.Persistence
 {
@@ -21,6 +23,13 @@ namespace RunApp.Infrastructure.Products.Persistence
             builder.Property(p => p.ActualPrice)
                 .HasColumnType("decimal(10,2)");
 
+            builder.HasMany<Sale>()
+                .WithOne(x => x.ProductSold)
+                .HasForeignKey(x => x.ProductId);
+
+            builder.HasMany<Stock>()
+                .WithOne(x => x.ProductSold)
+                .HasForeignKey(x => x.ProductId);
 
            /* builder.HasData(new Product()
             {
