@@ -29,5 +29,10 @@
             public const string Register = $"{AccountBase}/register";
             public const string Logout = $"{AccountBase}/logout";
         }
+        public static class StoreOwnerProfiles
+        {
+            private const string StoreOwnerProfileBase = $"{Base}/storeprofiles";
+            public const string CreateStoreOwnerProfile = $"{StoreOwnerProfileBase}";
+        }
     }
 }
