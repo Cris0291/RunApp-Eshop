@@ -19,7 +19,7 @@ export function SimpleProductCard() {
     <Card padding="lg" radius="md" className={classes.card}>
       <Card.Section mb="sm">
         <Image
-          src="https://m.media-amazon.com/images/I/81XVpnuaxIL._AC_SX425_.jpg"
+          src="https://images.unsplash.com/photo-1605812860427-4024433a70fd?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           alt="Top 50 underrated plants for house decoration"
           style={{ objectFit: 'fill' }}
         />

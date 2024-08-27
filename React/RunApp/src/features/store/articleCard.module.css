@@ -1,0 +1,27 @@
+.card {
+  background-color: #023020;
+  border: solid 3px #d7ab61;
+
+  @mixin hover {
+    background-color: black;
+  }
+}
+
+.title {
+  font-weight: bold;
+  font-family:
+    Greycliff CF,
+    var(--mantine-font-family);
+  line-height: 1.2;
+}
+
+.body {
+  padding: var(--mantine-spacing-md);
+}
+
+.vertical {
+  background-color: black;
+  @mixin hover {
+    background-color: Yellow;
+  }
+}

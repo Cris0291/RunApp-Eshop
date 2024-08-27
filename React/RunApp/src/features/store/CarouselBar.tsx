@@ -1,10 +1,11 @@
 import { Carousel } from '@mantine/carousel';
 import SimpleProductCard from './SimpleProductCard';
+import ProductCard from './ProductCard';
 
 function CarouselBar() {
   const products = Array.from({ length: 10 }).map((x) => (
     <Carousel.Slide>
-      <SimpleProductCard />
+      <ProductCard />
     </Carousel.Slide>
   ));
   return (

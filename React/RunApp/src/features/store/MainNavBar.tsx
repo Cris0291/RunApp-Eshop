@@ -16,6 +16,7 @@ function MainNavBar() {
             visibleFrom="xs"
             radius="xl"
             size="md"
+            classNames={{ input: classes.input }}
           />
         </Group>
       </div>

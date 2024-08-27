@@ -32,6 +32,7 @@ export function StoreNavBar() {
       onClick={(event) => event.preventDefault()}
       size="lg"
       variant="outline"
+      color="#d7ab61"
     >
       {link.Icon}
     </ActionIcon>
@@ -42,7 +43,8 @@ export function StoreNavBar() {
       key={link.label}
       className={classes.link}
       onClick={(event) => event.preventDefault()}
-      variant="light"
+      variant="outline"
+      color={'black'}
     >
       {link.label}
     </Button>

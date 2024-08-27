@@ -1,7 +1,7 @@
 .header {
   height: rem(56px);
-  background-color: var(--mantine-color-black);
-  border-bottom: rem(1px) solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  background-color: #f5f7f7;
+
   padding-left: var(--mantine-spacing-md);
   padding-right: var(--mantine-spacing-md);
 }
@@ -31,3 +31,18 @@
 .search {
   width: rem(700px);
 }
+
+.input {
+  background-color: #f5f7f7;
+}
+
+/* background-image: linear-gradient(
+    rgb(200, 35, 55) 0%,
+    rgb(200, 35, 55) 25%,
+    rgb(224, 98, 54) 25%,
+    rgb(224, 98, 54) 50%,
+    rgb(215, 171, 97) 50%,
+    rgb(215, 171, 97) 75%,
+    rgb(47, 76, 121) 75%,
+    rgb(47, 76, 121) 100%
+  );*/

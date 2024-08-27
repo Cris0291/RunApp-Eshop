@@ -43,7 +43,10 @@ export function StoreBanner({
         </Text>
       </div>
       <div className={classes.controls}>
-        <Button variant="outline" className={classes.control}>
+        <Button variant="white" color="black" size="lg" className={classes.control}>
+          {Buttontext}
+        </Button>
+        <Button variant="outline" color="#d7ab61" size="lg" className={classes.control}>
           {Buttontext}
         </Button>
       </div>
