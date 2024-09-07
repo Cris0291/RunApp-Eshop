@@ -1,4 +1,6 @@
-﻿namespace Contracts.StoreOwnerProfiles.Request
+﻿using Contracts.Common;
+
+namespace Contracts.StoreOwnerProfiles.Request
 {
-    public record StoreOwnerProfileRequest(string StoreName, int TotalProductsSold, decimal TotalSalesInCash, int TotalStock);
+    public record StoreOwnerProfileRequest(string StoreName, AddressRequest? AddressRequest, CardRequest CardRequest, decimal InitialInvestment, CustomClaim[] Claims);
 }
