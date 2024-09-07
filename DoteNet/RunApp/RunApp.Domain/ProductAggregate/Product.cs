@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using RunApp.Domain.ProductAggregate.ValueTypes;
 using RunApp.Domain.CustomerProfileAggregate.ProductStatuses;
 using RunApp.Domain.Common;
+using RunApp.Domain.ProductAggregate.Events;
 
 [assembly: InternalsVisibleTo("TestsUtilities")]
 namespace RunApp.Domain.Products
@@ -32,11 +33,12 @@ namespace RunApp.Domain.Products
         public decimal ActualPrice { get; internal set; }
         public string Description { get; internal set; }
         public PriceOffer PriceOffer { get; internal set; }
+        public Characteristics Characteristic { get; internal set; }
         public ICollection<About> BulletPoints { get; internal set; }
 
         public List<Review> Reviews { get; internal set; } 
 
-        public static ErrorOr<Product> CreateProduct(string name, string description, decimal price, ICollection<string> bulletpoints, decimal? priceWithDiscount, string? promotionalText)
+        public static ErrorOr<Product> CreateProduct(string name, string description, decimal price, ICollection<string> bulletpoints, decimal? priceWithDiscount, string? promotionalText, string brand, string type, string color, double weight, Guid storeProfileId)
         {
             decimal maximumDiscount = 0.7m;
             AddValidation(nameof(ProductError.DiscountPricesMustBeMaximum70Percent), () => priceWithDiscount < price - (price * maximumDiscount));
@@ -45,28 +47,32 @@ namespace RunApp.Domain.Products
             AddValidation(nameof(ProductError.BulletPointsCollectionShoulNotBeEmpty), () => !bulletpoints.Any());
             AddValidation(nameof(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount),() => priceWithDiscount.HasValue && price < priceWithDiscount.Value);
             AddValidation(nameof(ProductError.AllPricesWithDiscountMustHaveAPromotionalText), () => priceWithDiscount != null && string.IsNullOrEmpty(promotionalText));
+            AddValidation(nameof(ProductError.ProductWeightCannotBeGreaterThan200Kilograms), () => weight > 200);
             Validate();
             if (HasError()) return Errors;
-
-
-            return new Product
+            
+            var result =  new Product
             {
                 Name = name,
                 ActualPrice = price,
                 Description = description,
                 BulletPoints = bulletpoints.Select(point => new About() { BulletPoint = point }).ToList(),
-                PriceOffer = new PriceOffer {PriceWithDiscount = priceWithDiscount.Value, PromotionalText = promotionalText }
+                PriceOffer = new PriceOffer {PriceWithDiscount = priceWithDiscount.Value, PromotionalText = promotionalText },
+                Characteristic = new Characteristics() { Brand = brand, Type = type, Color = color, Weight = weight}
             };
-           
 
+            result.RaiseEvent(new CreateStockEvent(result, storeProfileId));
+            return result;
         }
 
         public ErrorOr<Success> UpdateProduct(string name, string description, decimal price, ICollection<string> bulletpoints)
         {
+            decimal maximumDiscount = 0.7m;
             AddValidation(nameof(ProductError.AllProductsMustHaveAName), () => string.IsNullOrEmpty(name));
             AddValidation(nameof(ProductError.AllProductsMustHaveADescription),() => string.IsNullOrEmpty(description));
             AddValidation(nameof(ProductError.BulletPointsCollectionShoulNotBeEmpty), () =>!bulletpoints.Any());
             AddValidation(nameof(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount), () => PriceOffer.PriceWithDiscount.HasValue && price < PriceOffer.PriceWithDiscount.Value);
+            AddValidation(nameof(ProductError.DiscountPricesMustBeMaximum70Percent), () => PriceOffer.PriceWithDiscount.HasValue && PriceOffer.PriceWithDiscount.Value < price - (price * maximumDiscount));
             Validate();
             if (HasError()) return Errors;
 

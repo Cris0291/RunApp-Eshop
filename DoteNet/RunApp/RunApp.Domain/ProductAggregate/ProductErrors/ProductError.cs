@@ -11,5 +11,6 @@ namespace RunApp.Domain.ProductAggregate.ProductErrors
         public static Error AllPricesWithDiscountMustHaveAPromotionalText = Error.Validation(code: "AllPricesWithDiscountMustHaveAPromotionalText", description: "All prices with discount must have a promotional text");
         public static Error AllProductsMustHaveADescription = Error.Validation(code: "AllProductsMustHaveADescription", description: "All products must have a description");
         public static Error ActualPriceCannotBeLowerThanPriceWithDiscount = Error.Validation(code: "ActualPriceCannotBeLowerThanPriceWithDiscount", description: "The price of the product cannot be lower than the price with discount");
+        public static Error ProductWeightCannotBeGreaterThan200Kilograms = Error.Validation(code: "ProductWeightCannotBeGreaterThan200Kilograms", description: "Product weight cannot be greater than 200 kilograms");
     }
 }

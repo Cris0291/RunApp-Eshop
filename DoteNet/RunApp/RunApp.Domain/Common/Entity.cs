@@ -9,7 +9,7 @@ namespace RunApp.Domain.Common
         {
             _domainEvents.Add(domainEvent);
         }
-        protected IReadOnlyCollection<IDomainEvent> GetEvents()
+        public IReadOnlyCollection<IDomainEvent> GetEvents()
         {
             var temp = _domainEvents.ToList();
             _domainEvents.Clear();
