@@ -14,20 +14,24 @@ using RunApp.Infrastructure.Sales.Persistence;
 using RunApp.Infrastructure.Stocks.Persistence;
 using RunApp.Infrastructure.StoreOwnerProfiles.Persistence;
 using RunApp.Domain.StoreOwnerProfileAggregate;
+using RunApp.Domain.Common;
+using Microsoft.AspNetCore.Http;
 
 namespace RunApp.Infrastructure.Common.Persistence
 {
-    public class AppStoreDbContext : IdentityDbContext<AppUser,AppRole, Guid>, IUnitOfWorkPattern
+    public class AppStoreDbContext: IdentityDbContext<AppUser,AppRole, Guid>, IUnitOfWorkPattern
     {
-       
+        private IHttpContextAccessor _httpContextAccessor; 
         public DbSet<Product> Products => Set<Product>();
         public DbSet<CustomerProfile> CustomerProfiles => Set<CustomerProfile>();
         public DbSet<StoreOwnerProfile> StoreOwnerProfiles => Set<StoreOwnerProfile>();
-        public AppStoreDbContext(DbContextOptions<AppStoreDbContext> options) : base(options) { }
+        public AppStoreDbContext(DbContextOptions<AppStoreDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options) 
+        {
+            _httpContextAccessor = httpContextAccessor;
+        }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-             ;
             modelBuilder.ApplyConfiguration(new ProductConfigurations());
             modelBuilder.ApplyConfiguration(new ReviewConfiguration());
             modelBuilder.ApplyConfiguration(new CustomerProfileConfiguration());
@@ -40,7 +44,20 @@ namespace RunApp.Infrastructure.Common.Persistence
 
         public async Task<int> CommitChangesAsync()
         {
+            var domainEvents = ChangeTracker.Entries<Entity>().Select(x => x.Entity.GetEvents()).SelectMany(x => x).ToList();
+           if(domainEvents.Count > 0) AddDomainEventsToQueue(domainEvents);
+
            return await base.SaveChangesAsync();
+        }
+
+        private void AddDomainEventsToQueue(List<IDomainEvent> domainEventsToAdd)
+        {
+          var eventCollection =   _httpContextAccessor.HttpContext.Items.TryGetValue("DomainEvents", out var events) && events is Queue<IDomainEvent> domainEvents 
+                ? domainEvents : new Queue<IDomainEvent>();
+
+            domainEventsToAdd.ForEach(eventCollection.Enqueue);
+
+            _httpContextAccessor.HttpContext.Items["DomainEvents"] = eventCollection;
         }
     }
 }

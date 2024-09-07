@@ -35,5 +35,10 @@ namespace RunApp.Infrastructure.CustomerProfiles.Persistence
                    .SingleOrDefaultAsync(x => x.Id == id);
             return customerProfileWithStatus;
         }
+        public async Task<bool> ExistCustomerProfile(Guid id)
+        {
+            bool isUser = await _appStoreDbContext.CustomerProfiles.AnyAsync(x => x.Id == id);
+            return isUser;
+        }
     }
 }

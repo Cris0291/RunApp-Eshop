@@ -9,6 +9,7 @@ using RunApp.Domain.UserAggregate.Roles;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using RunApp.Infrastructure.CustomerProfiles.Persistence;
+using RunApp.Infrastructure.StoreOwnerProfiles.Persistence;
 
 namespace RunApp.Infrastructure
 {
@@ -21,6 +22,7 @@ namespace RunApp.Infrastructure
             services.AddScoped<IUnitOfWorkPattern>(serviceProvider => serviceProvider.GetRequiredService<AppStoreDbContext>());
             services.AddScoped<IReviewsRepository, ReviewRepository>();
             services.AddScoped<ICustomerProfileRepository, CustomerProfileRepository>();
+            services.AddScoped<IStoreOwnerProfileRepository, StoreOwnerProfileRepository>();
 
             services.AddIdentityCore<AppUser>(opt =>
             {

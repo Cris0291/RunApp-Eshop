@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RunApp.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitailMigration : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -175,34 +175,68 @@ namespace RunApp.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CustomerProfile",
+                name: "CustomerProfiles",
                 columns: table => new
                 {
                     CustomerProfileId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NickName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phone = table.Column<int>(type: "int", nullable: false),
-                    ShippingAdress_ZipCode = table.Column<int>(type: "int", nullable: false),
-                    ShippingAdress_Street = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ShippingAdress_City = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ShippingAdress_HouseNumber = table.Column<int>(type: "int", nullable: false),
-                    ShippingAdress_Country = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Phone = table.Column<int>(type: "int", nullable: true),
+                    ShippingAdress_ZipCode = table.Column<int>(type: "int", nullable: true),
+                    ShippingAdress_Street = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ShippingAdress_City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ShippingAdress_HouseNumber = table.Column<int>(type: "int", nullable: true),
+                    ShippingAdress_Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ShippingAdress_AlternativeStreet = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ShippingAdress_AlternativeHouseNumber = table.Column<int>(type: "int", nullable: false),
-                    
+                    ShippingAdress_AlternativeHouseNumber = table.Column<int>(type: "int", nullable: true),
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CustomerProfile", x => x.CustomerProfileId);
+                    table.PrimaryKey("PK_CustomerProfiles", x => x.CustomerProfileId);
                     table.ForeignKey(
-                        name: "FK_CustomerProfile_AspNetUsers_Id",
+                        name: "FK_CustomerProfiles_AspNetUsers_Id",
                         column: x => x.Id,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                   
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StoreOwnerProfiles",
+                columns: table => new
+                {
+                    StoreProfileId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StoreName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TotalProductsSold = table.Column<int>(type: "int", nullable: false),
+                    TotalSalesInCash = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
+                    TotalStock = table.Column<int>(type: "int", nullable: false),
+                    IsAccountPaid = table.Column<bool>(type: "bit", nullable: false),
+                    InitialInvestment = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
+                    BussinesAdress_ZipCode = table.Column<int>(type: "int", nullable: false),
+                    BussinesAdress_Street = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BussinesAdress_City = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BussinesAdress_BuildingNumber = table.Column<int>(type: "int", nullable: false),
+                    BussinesAdress_Country = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BussinesAdress_AlternativeStreet = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BussinesAdress_AlternativeBuildingNumber = table.Column<int>(type: "int", nullable: true),
+                    CreditOrBussinesCard_HoldersName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreditOrBussinesCard_CardNumber = table.Column<int>(type: "int", nullable: false),
+                    CreditOrBussinesCard_CVV = table.Column<int>(type: "int", nullable: false),
+                    CreditOrBussinesCard_ExpityDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    SalesLevel = table.Column<string>(type: "nvarchar(max)", nullable: false, computedColumnSql: "case when [TotalProductsSold] >=0 and [TotalProductsSold] < 1000 then 'Junior' \r\n                                        when [TotalProductsSold] >= 1000 and [TotalProductsSold] < 5000 then 'Intermediate'\r\n                                         else 'Senior' end", stored: true),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StoreOwnerProfiles", x => x.StoreProfileId);
+                    table.ForeignKey(
+                        name: "FK_StoreOwnerProfiles_AspNetUsers_Id",
+                        column: x => x.Id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -231,18 +265,18 @@ namespace RunApp.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Like = table.Column<bool>(type: "bit", nullable: false),
-                    Dislike = table.Column<bool>(type: "bit", nullable: false),
-                    viewed = table.Column<bool>(type: "bit", nullable: false),
-                    Bought = table.Column<bool>(type: "bit", nullable: false)
+                    Like = table.Column<bool>(type: "bit", nullable: true),
+                    Dislike = table.Column<bool>(type: "bit", nullable: true),
+                    Viewed = table.Column<bool>(type: "bit", nullable: true),
+                    Bought = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProductStatus", x => new { x.Id, x.ProductId });
                     table.ForeignKey(
-                        name: "FK_ProductStatus_CustomerProfile_Id",
+                        name: "FK_ProductStatus_CustomerProfiles_Id",
                         column: x => x.Id,
-                        principalTable: "CustomerProfile",
+                        principalTable: "CustomerProfiles",
                         principalColumn: "CustomerProfileId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -268,9 +302,9 @@ namespace RunApp.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Review", x => new { x.ProductId, x.Id });
                     table.ForeignKey(
-                        name: "FK_Review_CustomerProfile_Id",
+                        name: "FK_Review_CustomerProfiles_Id",
                         column: x => x.Id,
-                        principalTable: "CustomerProfile",
+                        principalTable: "CustomerProfiles",
                         principalColumn: "CustomerProfileId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -278,6 +312,62 @@ namespace RunApp.Infrastructure.Migrations
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "ProductId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Sale",
+                columns: table => new
+                {
+                    SaleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AmountSold = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
+                    NumberOfitemsSold = table.Column<int>(type: "int", nullable: false),
+                    DateOfTheSale = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getutcdate()"),
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StoreOwnerProfileId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sale", x => x.SaleId);
+                    table.ForeignKey(
+                        name: "FK_Sale_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "ProductId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Sale_StoreOwnerProfiles_StoreOwnerProfileId",
+                        column: x => x.StoreOwnerProfileId,
+                        principalTable: "StoreOwnerProfiles",
+                        principalColumn: "StoreProfileId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Stock",
+                columns: table => new
+                {
+                    StockId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AddedStock = table.Column<int>(type: "int", nullable: false),
+                    SoldStock = table.Column<int>(type: "int", nullable: false),
+                    StockChangeDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getutcdate()"),
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StoreOwnerProfileId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Stock", x => x.StockId);
+                    table.ForeignKey(
+                        name: "FK_Stock_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "ProductId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Stock_StoreOwnerProfiles_StoreOwnerProfileId",
+                        column: x => x.StoreOwnerProfileId,
+                        principalTable: "StoreOwnerProfiles",
+                        principalColumn: "StoreProfileId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -321,12 +411,10 @@ namespace RunApp.Infrastructure.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CustomerProfile_Id",
-                table: "CustomerProfile",
+                name: "IX_CustomerProfiles_Id",
+                table: "CustomerProfiles",
                 column: "Id",
                 unique: true);
-
-            
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductStatus_ProductId",
@@ -337,6 +425,32 @@ namespace RunApp.Infrastructure.Migrations
                 name: "IX_Review_Id",
                 table: "Review",
                 column: "Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sale_ProductId",
+                table: "Sale",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sale_StoreOwnerProfileId",
+                table: "Sale",
+                column: "StoreOwnerProfileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Stock_ProductId",
+                table: "Stock",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Stock_StoreOwnerProfileId",
+                table: "Stock",
+                column: "StoreOwnerProfileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StoreOwnerProfiles_Id",
+                table: "StoreOwnerProfiles",
+                column: "Id",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -367,13 +481,22 @@ namespace RunApp.Infrastructure.Migrations
                 name: "Review");
 
             migrationBuilder.DropTable(
+                name: "Sale");
+
+            migrationBuilder.DropTable(
+                name: "Stock");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "CustomerProfile");
+                name: "CustomerProfiles");
 
             migrationBuilder.DropTable(
                 name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "StoreOwnerProfiles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

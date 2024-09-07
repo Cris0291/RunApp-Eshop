@@ -20,6 +20,8 @@ namespace RunApp.Infrastructure.Products.Persistence
             builder.OwnsOne(p => p.PriceOffer, px => px.Property(x => x.PriceWithDiscount).HasColumnType("decimal(10,2)").HasColumnName("PriceWithDiscount"));
             builder.OwnsOne(p => p.PriceOffer, px => px.Property(x => x.PromotionalText).HasColumnName("PromotionalText"));
 
+            builder.OwnsOne(p => p.Characteristic, px => px.Property(x => x.Weight).HasColumnType("decimal(6,2)"));
+
             builder.Property(p => p.ActualPrice)
                 .HasColumnType("decimal(10,2)");
 
@@ -28,8 +30,8 @@ namespace RunApp.Infrastructure.Products.Persistence
                 .HasForeignKey(x => x.ProductId);
 
             builder.HasMany<Stock>()
-                .WithOne(x => x.ProductSold)
-                .HasForeignKey(x => x.ProductId);
+                .WithOne()
+                .HasForeignKey(x => x.StockProductId);
 
            /* builder.HasData(new Product()
             {

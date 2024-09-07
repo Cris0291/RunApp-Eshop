@@ -12,8 +12,8 @@ using RunApp.Infrastructure.Common.Persistence;
 namespace RunApp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppStoreDbContext))]
-    [Migration("20240821145148_AddDbMigration")]
-    partial class AddDbMigration
+    [Migration("20240907165249_StockRelationMigration")]
+    partial class StockRelationMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -168,16 +168,16 @@ namespace RunApp.Infrastructure.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("Bought")
+                    b.Property<bool?>("Bought")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("Dislike")
+                    b.Property<bool?>("Dislike")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("Like")
+                    b.Property<bool?>("Like")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("viewed")
+                    b.Property<bool?>("Viewed")
                         .HasColumnType("bit");
 
                     b.HasKey("Id", "ProductId");
@@ -239,6 +239,137 @@ namespace RunApp.Infrastructure.Migrations
                     b.HasKey("ProductId");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("RunApp.Domain.StoreOwnerProfileAggregate.Sales.Sale", b =>
+                {
+                    b.Property<Guid>("SaleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("AmountSold")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<DateTime>("DateOfTheSale")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getutcdate()");
+
+                    b.Property<int>("NumberOfitemsSold")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("StoreOwnerProfileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("SaleId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("StoreOwnerProfileId");
+
+                    b.ToTable("Sale");
+                });
+
+            modelBuilder.Entity("RunApp.Domain.StoreOwnerProfileAggregate.Stocks.Stock", b =>
+                {
+                    b.Property<Guid>("StockId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("AddedStock")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProductType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SoldStock")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("StockAddedDate")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasComputedColumnSql("case when [AddedStock] is not null then [StockDate]\r\n                                              else null end", true);
+
+                    b.Property<DateTime>("StockDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getutcdate()");
+
+                    b.Property<Guid>("StockProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("StockRemoveDate")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasComputedColumnSql("case when [SoldStock] is not null then [StockDate]\r\n                                              else null end", true);
+
+                    b.Property<Guid>("StoreOwnerProfileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("StockId");
+
+                    b.HasIndex("StockProductId");
+
+                    b.HasIndex("StoreOwnerProfileId");
+
+                    b.ToTable("Stock");
+                });
+
+            modelBuilder.Entity("RunApp.Domain.StoreOwnerProfileAggregate.StoreOwnerProfile", b =>
+                {
+                    b.Property<Guid>("StoreProfileId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("InitialInvestment")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<bool>("IsAccountPaid")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SalesLevel")
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("nvarchar(max)")
+                        .HasComputedColumnSql("case when [TotalProductsSold] >=0 and [TotalProductsSold] < 1000 then 'Junior' \r\n                                        when [TotalProductsSold] >= 1000 and [TotalProductsSold] < 5000 then 'Intermediate'\r\n                                         else 'Senior' end", true);
+
+                    b.Property<string>("StoreName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TotalProductsSold")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalSalesInCash")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("TotalStock")
+                        .HasColumnType("int");
+
+                    b.HasKey("StoreProfileId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("StoreOwnerProfiles");
                 });
 
             modelBuilder.Entity("RunApp.Domain.UserAggregate.AppUser", b =>
@@ -490,6 +621,34 @@ namespace RunApp.Infrastructure.Migrations
                                 .HasForeignKey("ProductId");
                         });
 
+                    b.OwnsOne("RunApp.Domain.ProductAggregate.ValueTypes.Characteristics", "Characteristic", b1 =>
+                        {
+                            b1.Property<Guid>("ProductId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Brand")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Color")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Type")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<decimal>("Weight")
+                                .HasColumnType("decimal(6,2)");
+
+                            b1.HasKey("ProductId");
+
+                            b1.ToTable("Products");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ProductId");
+                        });
+
                     b.OwnsOne("RunApp.Domain.ProductAggregate.ValueTypes.PriceOffer", "PriceOffer", b1 =>
                         {
                             b1.Property<Guid>("ProductId")
@@ -519,7 +678,120 @@ namespace RunApp.Infrastructure.Migrations
 
                     b.Navigation("BulletPoints");
 
+                    b.Navigation("Characteristic")
+                        .IsRequired();
+
                     b.Navigation("PriceOffer")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RunApp.Domain.StoreOwnerProfileAggregate.Sales.Sale", b =>
+                {
+                    b.HasOne("RunApp.Domain.Products.Product", "ProductSold")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RunApp.Domain.StoreOwnerProfileAggregate.StoreOwnerProfile", null)
+                        .WithMany("Sales")
+                        .HasForeignKey("StoreOwnerProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductSold");
+                });
+
+            modelBuilder.Entity("RunApp.Domain.StoreOwnerProfileAggregate.Stocks.Stock", b =>
+                {
+                    b.HasOne("RunApp.Domain.Products.Product", null)
+                        .WithMany()
+                        .HasForeignKey("StockProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RunApp.Domain.StoreOwnerProfileAggregate.StoreOwnerProfile", null)
+                        .WithMany("Stocks")
+                        .HasForeignKey("StoreOwnerProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RunApp.Domain.StoreOwnerProfileAggregate.StoreOwnerProfile", b =>
+                {
+                    b.HasOne("RunApp.Domain.UserAggregate.AppUser", null)
+                        .WithOne()
+                        .HasForeignKey("RunApp.Domain.StoreOwnerProfileAggregate.StoreOwnerProfile", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("RunApp.Domain.StoreOwnerProfileAggregate.ValueTypes.Address", "BussinesAdress", b1 =>
+                        {
+                            b1.Property<Guid>("StoreOwnerProfileStoreProfileId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<int?>("AlternativeBuildingNumber")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("AlternativeStreet")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("BuildingNumber")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Country")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Street")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("ZipCode")
+                                .HasColumnType("int");
+
+                            b1.HasKey("StoreOwnerProfileStoreProfileId");
+
+                            b1.ToTable("StoreOwnerProfiles");
+
+                            b1.WithOwner()
+                                .HasForeignKey("StoreOwnerProfileStoreProfileId");
+                        });
+
+                    b.OwnsOne("RunApp.Domain.StoreOwnerProfileAggregate.ValueTypes.Card", "CreditOrBussinesCard", b1 =>
+                        {
+                            b1.Property<Guid>("StoreOwnerProfileStoreProfileId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<int>("CVV")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("CardNumber")
+                                .HasColumnType("int");
+
+                            b1.Property<DateTime>("ExpityDate")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("HoldersName")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("StoreOwnerProfileStoreProfileId");
+
+                            b1.ToTable("StoreOwnerProfiles");
+
+                            b1.WithOwner()
+                                .HasForeignKey("StoreOwnerProfileStoreProfileId");
+                        });
+
+                    b.Navigation("BussinesAdress")
+                        .IsRequired();
+
+                    b.Navigation("CreditOrBussinesCard")
                         .IsRequired();
                 });
 
@@ -531,6 +803,13 @@ namespace RunApp.Infrastructure.Migrations
             modelBuilder.Entity("RunApp.Domain.Products.Product", b =>
                 {
                     b.Navigation("Reviews");
+                });
+
+            modelBuilder.Entity("RunApp.Domain.StoreOwnerProfileAggregate.StoreOwnerProfile", b =>
+                {
+                    b.Navigation("Sales");
+
+                    b.Navigation("Stocks");
                 });
 #pragma warning restore 612, 618
         }
