@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using RunApp.Api.Services;
 using RunApp.Infrastructure.Middleware;
+using RunApp.Infrastructure.Common.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,9 +40,15 @@ builder.Services.AddAuthentication(opt =>
         opt.IncludeErrorDetails = true;
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(
+        "StoreProfile", 
+        policyBuilder => policyBuilder.RequireClaim("StoreProfile", "true"));
+});
 
 var app = builder.Build();
+
 app.UseEventsInfrastructureMiddleware();
 
 app.UseExceptionMiddleware();

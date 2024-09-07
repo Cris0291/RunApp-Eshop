@@ -12,6 +12,7 @@ using RunnApp.Application.Products.Commands.DeleteProduct;
 using RunnApp.Application.Products.Commands.AddDiscount;
 using RunnApp.Application.Products.Commands.RemoveDiscount;
 using Microsoft.AspNetCore.Authorization;
+using RunApp.Api.Services;
 
 
 
@@ -54,18 +55,19 @@ namespace RunApp.Api.Controllers.Products
            return Ok(products.AllProductsToProductsResponse());
         }
 
-        [Authorize]
+        [Authorize("StoreProfile")]
         [HttpPost(ApiEndpoints.Products.Create)]
         public async Task<IActionResult> CreateProduct(CreateProductRequest createProduct)
         {
-            CreateProductCommand productCommand = createProduct.ProductRequestToProductCommand();
+            Guid storeProfileId = HttpContext.GetStoreOwnerId();
+            CreateProductCommand productCommand = createProduct.ProductRequestToProductCommand(storeProfileId);
             ErrorOr<Product> productorError =  await _mediator.Send(productCommand);
 
             return productorError.Match(product => CreatedAtAction(nameof(Get), new { id = product.ProductId }, product.ProductToProductResponse()),
               Problem); 
         }
 
-        [Authorize]
+        [Authorize("StoreProfile")]
         [HttpPut(ApiEndpoints.Products.UpdateProduct)]
         public async Task<IActionResult> UpdateProduct([FromRoute] Guid id, UpdateProductRequest updateProduct)
         {
@@ -76,7 +78,7 @@ namespace RunApp.Api.Controllers.Products
            return updatedProductResult.Match(result => Ok(result.ProductToProductResponse()), Problem);
         }
 
-        [Authorize]
+        [Authorize("StoreProfile")]
         [HttpDelete(ApiEndpoints.Products.DeleteProduct)]
         public async Task<IActionResult> DeleteProduct([FromRoute] Guid id)
         {
@@ -86,7 +88,7 @@ namespace RunApp.Api.Controllers.Products
             return deleteResult.Match(result => Ok(), Problem);
         }
 
-        [Authorize]
+        [Authorize("StoreProfile")]
         [HttpPost(ApiEndpoints.Products.AddPriceWithDiscount)]
         public async Task<IActionResult> AddDiscount([FromRoute] Guid id, ProductDiscountRequest discount)
         {
@@ -97,7 +99,7 @@ namespace RunApp.Api.Controllers.Products
            return productWithDiscount.Match(result => Ok(result.ProductToProductResponse()), Problem);
         }
 
-        [Authorize]
+        [Authorize("StoreProfile")]
         [HttpDelete(ApiEndpoints.Products.DeletePriceWithDiscount)]
         public async Task<IActionResult> RemoveDiscount([FromRoute] Guid id)
         {

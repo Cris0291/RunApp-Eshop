@@ -26,6 +26,7 @@
         {
             private const string AccountBase = $"{Base}/accounts";
             public const string Login = $"{AccountBase}/login";
+            public const string LoginSalesProfile = $"{AccountBase}/login/sales";
             public const string Register = $"{AccountBase}/register";
             public const string Logout = $"{AccountBase}/logout";
         }
@@ -33,6 +34,7 @@
         {
             private const string StoreOwnerProfileBase = $"{Base}/storeprofiles";
             public const string CreateStoreOwnerProfile = $"{StoreOwnerProfileBase}";
+            public const string AddStock = $"{StoreOwnerProfileBase}/stocks";
         }
     }
 }

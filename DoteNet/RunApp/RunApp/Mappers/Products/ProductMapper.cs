@@ -1,5 +1,6 @@
 ﻿using Contracts.Products.Requests;
 using Contracts.Products.Responses;
+using RunApp.Domain.ProductAggregate.ValueTypes;
 using RunApp.Domain.Products;
 using RunnApp.Application.Products.Commands.CreateProduct;
 using RunnApp.Application.Products.Commands.UpdateProduct;
@@ -20,11 +21,12 @@ namespace RunApp.Api.Mappers.Products
             return new ProductsResponse(responses);
         }
 
-        public static CreateProductCommand ProductRequestToProductCommand(this CreateProductRequest createProduct)
+        public static CreateProductCommand ProductRequestToProductCommand(this CreateProductRequest createProduct, Guid storeProfileId)
         {
             return new CreateProductCommand(createProduct.Name, createProduct.Description,
                 createProduct.Price, createProduct.Bulletpoints,
-                createProduct.PriceWithDiscount, createProduct.PromotionalText);
+                createProduct.PriceWithDiscount, createProduct.PromotionalText, createProduct.Characteristics.Brand, 
+                createProduct.Characteristics.Type, createProduct.Characteristics.Color, createProduct.Characteristics.Weight, storeProfileId);
         }
 
         public static UpdateProductCommand UpdateProductRequestToUpdateProdcutCommand(this UpdateProductRequest updateProduct, Guid ProductId)

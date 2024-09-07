@@ -1,6 +1,6 @@
 ﻿using Contracts.Reviews.Requests;
-using RunnApp.Application.Reviews.Commands.CreateReview;
 using RunApp.Domain.ProductAggregate.Reviews.Common;
+using RunnApp.Application.Reviews.Commands.CreateReview;
 
 namespace RunApp.Api.Mappers.Reviews
 {
