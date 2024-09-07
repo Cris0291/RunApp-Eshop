@@ -19,7 +19,8 @@ namespace RunnApp.Application.Products.Commands.CreateProduct
         }
         public async Task<ErrorOr<Product>> Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
-            ErrorOr<Product> productOrError = Product.CreateProduct(request.Name, request.Description, request.Price, request.Bulletpoints, request.PriceWithDiscount, request.PromotionalText);
+            ErrorOr<Product> productOrError = Product.CreateProduct(request.Name, request.Description, request.Price, request.Bulletpoints, 
+                                                                    request.PriceWithDiscount, request.PromotionalText, request.Brand, request.Type, request.Color, request.Weight,request.StoreProfileId);
 
             if (productOrError.IsError) return productOrError.Errors;
 

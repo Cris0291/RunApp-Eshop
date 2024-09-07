@@ -10,6 +10,10 @@ namespace RunnApp.Application.Products.Commands.CreateProduct
             RuleFor(command => command.Description).NotNull();
             RuleFor(command => command.Price).GreaterThanOrEqualTo(0);
             RuleFor(command => command.PriceWithDiscount).GreaterThanOrEqualTo(0m);
+            RuleFor(command => command.Brand).NotNull().NotEmpty();
+            RuleFor(command => command.Type).NotNull().NotEmpty();
+            RuleFor(command => command.Color).NotNull().NotEmpty();
+            RuleFor(command => command.Weight).GreaterThanOrEqualTo(0);
         }
     }
 }
