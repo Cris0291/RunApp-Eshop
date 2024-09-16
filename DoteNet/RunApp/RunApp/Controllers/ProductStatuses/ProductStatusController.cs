@@ -14,12 +14,11 @@ namespace RunApp.Api.Controllers.ProductStatuses
         private readonly ISender _mediator = mediator;
 
         [Authorize]
-
-        [HttpPut(ApiEndpoints.Products.AddProductStatus)]
-        public async Task<IActionResult> AddProductStatus(ProductStatusRequest productStatusRequest, [FromRoute] Guid id)
+        [HttpPut(ApiEndpoints.Products.AddOrRemoveProductLike)]
+        public async Task<IActionResult> AddOrRemoveProductLike([FromRoute] Guid id, [FromQuery] bool added)
         {
             Guid userId = HttpContext.GetUserId();
-            var productStatusCommand = new AddProductStatusCommand(id, userId, productStatusRequest.Like, productStatusRequest.Dislike, productStatusRequest.Viewed, productStatusRequest.Bought);
+            var productStatusCommand = new AddOrRemoveLikeCommand(id, userId, Like: added);
 
             var result = await _mediator.Send(productStatusCommand);
 

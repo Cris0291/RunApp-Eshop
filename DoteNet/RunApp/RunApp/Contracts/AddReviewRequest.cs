@@ -3,7 +3,7 @@
 //Moved here because the contracts prject could not accept a reference to the Api project
 namespace Contracts.Reviews.Requests
 {
-    public record AddReviewRequest(string? comment, double numOfStars, [EnumValidator]ReviewDescriptions reviewDescription);
+    public record AddReviewRequest(string? comment, [EnumValidator]ReviewDescriptions reviewDescription);
     
     
 }

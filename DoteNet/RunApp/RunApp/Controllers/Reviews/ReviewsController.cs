@@ -1,15 +1,15 @@
 ﻿using Contracts.Reviews.Requests;
 using Microsoft.AspNetCore.Mvc;
 using RunApp.Api.Routes;
-using RunApp.Domain.ProductAggregate.Reviews.Common;
 using RunApp.Api.Mappers.Reviews;
 using MediatR;
 using ErrorOr;
-using RunApp.Domain.ProductAggregate.Reviews;
 using RunnApp.Application.Reviews.Commands.DeleteReview;
 using RunApp.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using RunnApp.Application.Reviews.Commands.CreateReview;
+using RunApp.Domain.ReviewAggregate;
+using RunApp.Domain.ReviewAggregate.ReviewEnum;
 
 
 namespace RunApp.Api.Controllers.Reviews
@@ -38,10 +38,10 @@ namespace RunApp.Api.Controllers.Reviews
 
         [Authorize]
         [HttpDelete(ApiEndpoints.Products.DeleteReview)]
-        public async Task<IActionResult> DeleteReview([FromRoute] Guid ProductId, CancellationToken cancellationToken)
+        public async Task<IActionResult> DeleteReview([FromRoute] Guid ProductId)
         {
             Guid userId = HttpContext.GetUserId();
-            ErrorOr<Success> errorOr = await _mediator.Send(new DeleteReviewCommand(userId, ProductId), cancellationToken);
+            ErrorOr<Success> errorOr = await _mediator.Send(new DeleteReviewCommand(userId, ProductId));
             return errorOr.MatchFirst(value =>Ok(), Problem);
         }
     }

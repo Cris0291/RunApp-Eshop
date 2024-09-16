@@ -1,6 +1,6 @@
 ﻿using Contracts.Reviews.Requests;
 using System.ComponentModel.DataAnnotations;
-using RunApp.Domain.ProductAggregate.Reviews.Common;
+using RunApp.Domain.ReviewAggregate.ReviewEnum;
 
 namespace RunApp.Api.CustomValidators
 {

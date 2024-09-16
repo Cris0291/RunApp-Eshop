@@ -1,5 +1,5 @@
 ﻿using Contracts.Reviews.Requests;
-using RunApp.Domain.ProductAggregate.Reviews.Common;
+using RunApp.Domain.ReviewAggregate.ReviewEnum;
 using RunnApp.Application.Reviews.Commands.CreateReview;
 
 namespace RunApp.Api.Mappers.Reviews
@@ -8,7 +8,7 @@ namespace RunApp.Api.Mappers.Reviews
     {
         public static CreateReviewCommand ReviewRequestToReviewCommand(this AddReviewRequest reviewRequest, Guid ProductId, ReviewDescriptionEnums reviewEnum, Guid userId)
         {
-            return new CreateReviewCommand(ProductId, userId, reviewRequest.comment, reviewRequest.numOfStars, reviewEnum);
+            return new CreateReviewCommand(ProductId, userId, reviewRequest.comment, reviewEnum);
         }
     }
 }

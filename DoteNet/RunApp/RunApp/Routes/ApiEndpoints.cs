@@ -19,7 +19,8 @@
             public const string AddPriceWithDiscount = $"{ProductBase}/{{id:guid}}/discounts";
             public const string DeletePriceWithDiscount = $"{ProductBase}/{{id:guid}}/discounts";
 
-            public const string AddProductStatus = $"{ProductBase}/{{id:guid}}/status";
+            public const string AddOrRemoveProductLike = $"{ProductBase}/{{id:guid}}/likes/like";
+            public const string AddOrRemoveProductDislike = $"{ProductBase}/{{id:guid}}/likes/Dislike";
 
         }
         public static class Account
@@ -35,6 +36,7 @@
             private const string StoreOwnerProfileBase = $"{Base}/storeprofiles";
             public const string CreateStoreOwnerProfile = $"{StoreOwnerProfileBase}";
             public const string AddStock = $"{StoreOwnerProfileBase}/stocks";
+            public const string RemoveStock = $"{StoreOwnerProfileBase}/stocks";
         }
     }
 }
