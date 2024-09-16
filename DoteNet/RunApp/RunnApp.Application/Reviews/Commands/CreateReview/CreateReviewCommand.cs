@@ -1,9 +1,9 @@
 ﻿using ErrorOr;
 using MediatR;
-using RunApp.Domain.ProductAggregate.Reviews;
-using RunApp.Domain.ProductAggregate.Reviews.Common;
+using RunApp.Domain.ReviewAggregate;
+using RunApp.Domain.ReviewAggregate.ReviewEnum;
 
 namespace RunnApp.Application.Reviews.Commands.CreateReview
 {
-    public record CreateReviewCommand(Guid ProductId, Guid userId, string comment, double numOfStars, ReviewDescriptionEnums reviewDescriptionEnum) : IRequest<ErrorOr<Review>>;
+    public record CreateReviewCommand(Guid ProductId, Guid UserId, string Comment, ReviewDescriptionEnums ReviewDescriptionEnum) : IRequest<ErrorOr<Review>>;
 }

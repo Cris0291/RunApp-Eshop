@@ -9,6 +9,6 @@ using System.Threading.Tasks;
 
 namespace RunnApp.Application.Stocks.Commands.AddStock
 {
-    public record AddStockCommand(int AddedStock, string ProductName, string Brand, string ProductType, Guid ProductId, Guid StoreProfileId) : IRequest<ErrorOr<Stock>>;
+    public record AddStockCommand(int AddedStock, Guid ProductId, Guid StoreProfileId) : IRequest<ErrorOr<Stock>>;
     
 }

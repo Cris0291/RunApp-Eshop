@@ -1,12 +1,13 @@
 ﻿using RunApp.Domain.Products;
+using RunApp.Domain.ReviewAggregate;
 
 namespace RunnApp.Application.Common.Interfaces
 {
     public interface IReviewsRepository
     {
-        Task<Product?> GetProductWithReviews(Guid productId, CancellationToken cancellationToken);
-        Task<Product?> GetProductWithReviews(Guid productId, Guid userId, CancellationToken cancellationToken);
-        Task<bool> ExistReview(Guid userId, Guid productId, CancellationToken cancellationToken);
-        
+        Task AddReview(Review review);
+        Task<bool> ExistReview(Guid userId, Guid productId);
+        Task<Review?> GetReview(Guid userId, Guid productId);
+        Task RemoveReview(Review review);
     }
 }

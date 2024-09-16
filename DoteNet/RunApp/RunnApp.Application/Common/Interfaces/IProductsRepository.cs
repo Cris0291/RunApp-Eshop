@@ -11,6 +11,8 @@ namespace RunnApp.Application.Common.Interfaces
         Task CreateProduct(Product product);
         Task DeleteProduct(Guid id);
         Task<bool> ExistProduct(Guid id);
-       
+        Task<Product> GetProductWithNoDefault(Guid id);
+
+
     }
 }

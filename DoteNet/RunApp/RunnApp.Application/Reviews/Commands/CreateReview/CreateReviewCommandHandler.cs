@@ -1,33 +1,30 @@
 ﻿using MediatR;
 using ErrorOr;
-using RunApp.Domain.ProductAggregate.Reviews;
 using RunnApp.Application.Common.Interfaces;
-using RunApp.Domain.Products;
-using RunApp.Domain.CustomerProfileAggregate;
+using RunApp.Domain.ReviewAggregate;
+using RunApp.Domain.ReviewAggregate.ReviewErrors;
 
 namespace RunnApp.Application.Reviews.Commands.CreateReview
 {
-    public class CreateReviewCommandHandler(IReviewsRepository productsRepository, IUnitOfWorkPattern unitOfWorkPattern, ICustomerProfileRepository customerProfileRepository) : IRequestHandler<CreateReviewCommand, ErrorOr<Review>>
+    public class CreateReviewCommandHandler(IReviewsRepository reviewsRepository, IUnitOfWorkPattern unitOfWorkPattern, IProductsRepository productsRepository, ICustomerProfileRepository customerProfileRepository) : IRequestHandler<CreateReviewCommand, ErrorOr<Review>>
     {
-        private readonly IReviewsRepository _reviewsRepository = productsRepository;
+        private readonly IReviewsRepository _reviewsRepository = reviewsRepository;
+        IProductsRepository _productsRepository = productsRepository;
+        ICustomerProfileRepository _customerProfileRepository = customerProfileRepository;
         private readonly IUnitOfWorkPattern _unitOfWork = unitOfWorkPattern;
-        private readonly ICustomerProfileRepository _customerProfileRepository = customerProfileRepository;
         public async Task<ErrorOr<Review>> Handle(CreateReviewCommand request, CancellationToken cancellationToken)
         {
-            Product? product = await _reviewsRepository.GetProductWithReviews(request.ProductId, cancellationToken);
+            var existProduct = await _productsRepository.ExistProduct(request.ProductId);
+            if (!existProduct) return Error.NotFound(code: "ProductWasNotFoundWithGivenId", description: "Requested product was not found");
 
-            if (product == null) return Error.NotFound(code: "ProductWasNotFoundWithGivenId", description: "Requested product was not found");
+            bool existReview = await _reviewsRepository.ExistReview(request.UserId,request.ProductId);
+            if (existReview) return ReviewError.UserCannotAddMoreThanOneReviewPerproduct;
 
-            CustomerProfile? customerProfile = await _customerProfileRepository.GetCustomerProfile(request.userId);
-            if (customerProfile == null) return Error.NotFound(code: "CustomerProfileWasNotFoundWithGivenId", description: "Requested customer was not found");
-
-            ErrorOr<Review> errors = product.AddReview(request.comment, request.numOfStars, request.reviewDescriptionEnum, request.ProductId, customerProfile.CustomerProfileId);
-
-            if (errors.IsError) return errors.Errors;
+            var review  = Review.CreateReview(request.Comment, request.ReviewDescriptionEnum, request.ProductId, request.UserId);
 
             await _unitOfWork.CommitChangesAsync();
 
-            return errors.Value;
+            return review;
         }
     }
 }

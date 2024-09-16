@@ -1,27 +1,24 @@
 ﻿using ErrorOr;
 using MediatR;
-using RunApp.Domain.Products;
 using RunnApp.Application.Common.Interfaces;
 
 namespace RunnApp.Application.Reviews.Commands.DeleteReview
 {
     public class DeleteReviewCommandHandler(IReviewsRepository reviewsRepository, IUnitOfWorkPattern unitOfWorkPattern) : IRequestHandler<DeleteReviewCommand, ErrorOr<Success>>
     {
-        private readonly IReviewsRepository _reviewsRpository = reviewsRepository;
+        private readonly IReviewsRepository _reviewsRepository = reviewsRepository;
         private readonly IUnitOfWorkPattern _unitOfWorkPattern = unitOfWorkPattern;
         public async Task<ErrorOr<Success>> Handle(DeleteReviewCommand request, CancellationToken cancellationToken)
         {
-            bool existReview = await _reviewsRpository.ExistReview(request.userId, request.productId, cancellationToken);
+            var review = await _reviewsRepository.GetReview(request.UserId, request.ProductId);
+            if (review == null) return Error.NotFound(code: "ReviewWasNotFoundWithGivenId", description: "Requested review was not found");
 
-            if (!existReview) return Error.NotFound(code: "ReviewWasNotFoundWithGivenId", description: "Requested review was not found");
+            review.RemoveReview(review.ReviewId, request.ProductId, request.UserId);
 
-            Product? product = await _reviewsRpository.GetProductWithReviews(request.productId, request.userId, cancellationToken);
-            if (product == null) return Error.NotFound(code: "ProductWasNotFoundWithGivenId", description: "Requested product was not found");
+            await _reviewsRepository.RemoveReview(review);
 
-            ErrorOr<Success> errorOr = product.DeleteReview(request.userId, request.productId);
-            if (errorOr.IsError) return errorOr.Errors;
-
-            await _unitOfWorkPattern.CommitChangesAsync();
+            int wasDeleted = await _unitOfWorkPattern.CommitChangesAsync();
+            if (wasDeleted == 0) throw new InvalidOperationException("Review could not be deleted");
 
             return Result.Success;
         }

@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using RunApp.Domain.ProductAggregate.Reviews;
 
 namespace RunnApp.Application.Reviews.Commands.CreateReview
 {
@@ -7,8 +6,7 @@ namespace RunnApp.Application.Reviews.Commands.CreateReview
     {
         public CreateReviewCommnadValidator()
         {
-            RuleFor(command => command.comment).NotNull();
-            RuleFor(command => command.numOfStars).NotNull().GreaterThanOrEqualTo(0);
+            RuleFor(command => command.Comment).NotNull().NotEmpty();
         }
     }
 }
