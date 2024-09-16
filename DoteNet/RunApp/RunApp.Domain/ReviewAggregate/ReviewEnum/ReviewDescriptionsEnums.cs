@@ -1,6 +1,6 @@
 ﻿using Ardalis.SmartEnum;
 
-namespace RunApp.Domain.ProductAggregate.Reviews.Common
+namespace RunApp.Domain.ReviewAggregate.ReviewEnum
 {
     public sealed class ReviewDescriptionEnums : SmartEnum<ReviewDescriptionEnums>
     {

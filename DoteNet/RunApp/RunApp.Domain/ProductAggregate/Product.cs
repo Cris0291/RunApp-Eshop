@@ -1,14 +1,12 @@
-﻿using RunApp.Domain.ProductAggregate.Reviews;
-using RunApp.Domain.ProductAggregate.ValueType;
-using RunApp.Domain.ProductAggregate.Reviews.ReviewErrors;
+﻿using RunApp.Domain.ProductAggregate.ValueType;
 using ErrorOr;
 using RunApp.Domain.ProductAggregate.ProductErrors;
-using RunApp.Domain.ProductAggregate.Reviews.Common;
 using System.Runtime.CompilerServices;
 using RunApp.Domain.ProductAggregate.ValueTypes;
-using RunApp.Domain.CustomerProfileAggregate.ProductStatuses;
 using RunApp.Domain.Common;
 using RunApp.Domain.ProductAggregate.Events;
+using RunApp.Domain.ReviewAggregate;
+
 
 [assembly: InternalsVisibleTo("TestsUtilities")]
 namespace RunApp.Domain.Products
@@ -26,8 +24,10 @@ namespace RunApp.Domain.Products
             Description = description;
             PriceOffer = priceOffer;
             BulletPoints = bulletpoints;
-            Reviews = reviews;
         }
+        public List<Guid> Reviews { get; internal set; }
+        public List<Guid> Ratings { get; internal set; }
+        public List<Guid> Statuses { get; internal set; }
         public Guid ProductId { get; internal set; }
         public string Name { get;  internal set; }
         public decimal ActualPrice { get; internal set; }
@@ -36,7 +36,6 @@ namespace RunApp.Domain.Products
         public Characteristics Characteristic { get; internal set; }
         public ICollection<About> BulletPoints { get; internal set; }
 
-        public List<Review> Reviews { get; internal set; } 
 
         public static ErrorOr<Product> CreateProduct(string name, string description, decimal price, ICollection<string> bulletpoints, decimal? priceWithDiscount, string? promotionalText, string brand, string type, string color, double weight, Guid storeProfileId)
         {
@@ -97,28 +96,6 @@ namespace RunApp.Domain.Products
 
             return Result.Success;
         }
-        public ErrorOr<Review> AddReview(string comment, double numStars,ReviewDescriptionEnums reviewEnum, Guid productId, Guid userId)
-        {
-            double minNumOfStars = 1.0;
-            AddValidation(nameof(ReviewError.AllReviewsMustHaveAComment), () => string.IsNullOrEmpty(comment));
-            AddValidation(nameof(ReviewError.MinimumNunberOfStarsCannotBeLessThanOne),()=>numStars < minNumOfStars);
-            Validate();
-            if (HasError()) return Errors;
-
-            Review newReview = new Review { Comment = comment, NumOfStars = numStars, ReviewDescription = reviewEnum, ProductId = productId, Id = userId };
-            Reviews.Add(newReview);
-            return newReview;
-        }
-
-        public ErrorOr<Success> DeleteReview(Guid userId, Guid productId)
-        {
-            Review? review = Reviews.SingleOrDefault(x => x.Id == userId && x.ProductId == productId);
-            if (review == null) return Error.NotFound(code: "ReviewWasNOtFound", description: "Review was not found with given id");
-
-            Reviews.Remove(review);
-
-            return Result.Success;
-        }
 
         public ErrorOr<Success> AddPriceWithDiscount(decimal priceWithDiscount, string promotionalText)
         {
@@ -140,6 +117,17 @@ namespace RunApp.Domain.Products
         {
             PriceOffer = null;
             
+        }
+        public void AddReview(Guid reviewId)
+        {
+            if (Reviews.Contains(reviewId)) throw new InvalidOperationException("Cannot add more than one review per user");
+
+            Reviews.Add(reviewId);
+        }
+        public void DeleteReview(Guid reviewId)
+        {
+            var wasRemoved = Reviews.Remove(reviewId);
+            if(!wasRemoved) throw new InvalidOperationException("Review was not removerd");
         }
     }
 }

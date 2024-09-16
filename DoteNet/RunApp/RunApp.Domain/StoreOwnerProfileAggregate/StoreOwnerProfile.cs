@@ -3,6 +3,7 @@ using RunApp.Domain.Common;
 using RunApp.Domain.Products;
 using RunApp.Domain.StoreOwnerProfileAggregate.Sales;
 using RunApp.Domain.StoreOwnerProfileAggregate.Stocks;
+using RunApp.Domain.StoreOwnerProfileAggregate.Stocks.LogsStock;
 using RunApp.Domain.StoreOwnerProfileAggregate.StoreOwnerProfileErrors;
 using RunApp.Domain.StoreOwnerProfileAggregate.ValueTypes;
 
@@ -16,6 +17,7 @@ namespace RunApp.Domain.StoreOwnerProfileAggregate
         public int TotalProductsSold { get; private set; }
         public decimal TotalSalesInCash { get; private set; }
         public int TotalStock { get; private set; }
+        public int TotalRemovedStock { get; private set; }
         public bool IsAccountPaid { get; private set; }
         public decimal InitialInvestment { get; private set; }
         public Address BussinesAdress { get; private set; }
@@ -71,7 +73,8 @@ namespace RunApp.Domain.StoreOwnerProfileAggregate
             var stock =  new Stock()
             {
                 ProductName = product.Name,
-                AddedStock = 0,
+                TotalQuantity = 0,
+                SoldQuantity = 0,
                 Brand = product.Characteristic.Brand,
                 ProductType = product.Characteristic.Type,
                 StockProductId = product.ProductId
@@ -80,19 +83,58 @@ namespace RunApp.Domain.StoreOwnerProfileAggregate
             Stocks.Add(stock);
             return Result.Success;
         }
-        public ErrorOr<Stock> AddStock(int addedStock, string productName, string brand, string productType, Guid stockProductId)
+        public ErrorOr<Stock> AddStock(int addedStock, Guid stockProductId)
         {
-            var stock = new Stock()
-            {
-                AddedStock = addedStock,
-                ProductName = productName,
-                Brand = brand,
-                ProductType = productType,
-                StockProductId = stockProductId
-            };
-            Stocks.Add(stock);
-            TotalStock += 1;
+            var errorOrStock = FindStock(stockProductId);
+            if (errorOrStock.IsError) return errorOrStock.Errors;
+
+            var stock = errorOrStock.Value;
+
+            stock.TotalQuantity += addedStock;
+            TotalStock += addedStock;
+
+            var log = CreateLog(nameof(Log.AddedStock), addedStock);
+
+            stock.Logs.Add(log);
+
+            
             return stock;
+        }
+
+        public ErrorOr<Success> RemoveStock(int removedStock, Guid stockProductId)
+        {
+            var errorOrStock = FindStock(stockProductId);
+            if (errorOrStock.IsError) return errorOrStock.Errors;
+
+            var stock = errorOrStock.Value;
+
+            stock.RemovedQuantity += removedStock;
+            stock.TotalQuantity -= removedStock;
+
+            TotalStock -= removedStock;
+            TotalRemovedStock += removedStock;
+
+            var log = CreateLog(nameof(Log.RemovedStock),removedStock);
+
+            stock.Logs.Add(log);
+
+            return Result.Success;
+        }
+
+        private ErrorOr<Stock> FindStock(Guid stockProductId)
+        {
+            var stock = Stocks.SingleOrDefault(x => x.StockProductId == stockProductId);
+            if (stock == null) return Error.NotFound(code: "StockWasNotFound", description: "Stock was not found");
+            return stock;
+        }
+        private Log CreateLog(string kindOfLog, int quantity)
+        {
+            return kindOfLog switch
+            {
+                nameof(Log.AddedStock) => new Log() { AddedStock = quantity},
+                nameof(Log.RemovedStock) => new Log() { RemovedStock = quantity },
+                nameof(Log.SoldStock) => new Log() { SoldStock = quantity },
+            };
         }
     }
 }

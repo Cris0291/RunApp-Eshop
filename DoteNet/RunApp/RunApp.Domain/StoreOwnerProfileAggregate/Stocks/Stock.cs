@@ -1,4 +1,4 @@
-﻿using RunApp.Domain.Products;
+﻿using RunApp.Domain.StoreOwnerProfileAggregate.Stocks.LogsStock;
 
 namespace RunApp.Domain.StoreOwnerProfileAggregate.Stocks
 {
@@ -6,15 +6,14 @@ namespace RunApp.Domain.StoreOwnerProfileAggregate.Stocks
     {
         internal Stock() { }
         public Guid StockId { get; internal set; }
-        public int? AddedStock { get; internal set; }
-        public int? SoldStock { get; internal set; }
+        public int TotalQuantity { get; internal set; }
+        public int SoldQuantity { get; internal set; }
+        public int RemovedQuantity { get; internal set; }
         public string ProductName { get; internal set; }
         public string Brand { get; internal set; }
         public string  ProductType { get; internal set; }
-        public DateTime? StockAddedDate { get; internal set; }
-        public DateTime? StockRemoveDate { get; internal set; }
-        public DateTime StockDate { get; internal set; }
         public Guid StockProductId { get; internal set; }
         public Guid StoreOwnerProfileId { get; internal set; }
+        public List<Log> Logs { get; internal set; }
     }
 }

@@ -1,4 +1,0 @@
-﻿1.- Email should not be null or empty.
-2.- Name should not be null or empty.
-3.- NickName should not be null or empty.
-4.- Email should have a valid format.

@@ -1,8 +1,8 @@
 ﻿using ErrorOr;
 using RunApp.Domain.CustomerProfileAggregate.CustomerProfileErrors;
-using RunApp.Domain.CustomerProfileAggregate.ProductStatuses.ProductStatusErrors;
 using RunApp.Domain.ProductAggregate.ProductErrors;
-using RunApp.Domain.ProductAggregate.Reviews.ReviewErrors;
+using RunApp.Domain.ProductStatusAggregate.ProductStatusErrors;
+using RunApp.Domain.ReviewAggregate.ReviewErrors;
 using RunApp.Domain.StoreOwnerProfileAggregate.StoreOwnerProfileErrors;
 
 namespace RunApp.Domain.Common
