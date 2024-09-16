@@ -19,22 +19,6 @@ namespace RunApp.Infrastructure.CustomerProfiles.Persistence
             var customerProfile = await _appStoreDbContext.CustomerProfiles.SingleOrDefaultAsync(x => x.Id == id);
             return customerProfile;
         }
-
-        public async Task<CustomerProfile?> GetCustomerProfileWithStatuses(Guid id, Guid? productId = null)
-        {
-            if (productId == null)
-            {
-                var customerProfile = await _appStoreDbContext.CustomerProfiles
-                    .Include(x => x.Statuses)
-                    .SingleOrDefaultAsync(x => x.Id == id);
-                return customerProfile;
-            }
-
-            var customerProfileWithStatus = await _appStoreDbContext.CustomerProfiles
-                   .Include(x => x.Statuses.Where(y => y.ProductId == productId.Value))
-                   .SingleOrDefaultAsync(x => x.Id == id);
-            return customerProfileWithStatus;
-        }
         public async Task<bool> ExistCustomerProfile(Guid id)
         {
             bool isUser = await _appStoreDbContext.CustomerProfiles.AnyAsync(x => x.Id == id);

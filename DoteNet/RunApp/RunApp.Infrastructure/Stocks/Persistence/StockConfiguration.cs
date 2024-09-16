@@ -8,16 +8,9 @@ namespace RunApp.Infrastructure.Stocks.Persistence
     {
         public void Configure(EntityTypeBuilder<Stock> builder)
         {
-            builder.Property(x => x.StockAddedDate)
-                .HasComputedColumnSql(@"case when [AddedStock] is not null then [StockDate]
-                                              else null end", stored: true);
-
-            builder.Property(x => x.StockRemoveDate)
-                .HasComputedColumnSql(@"case when [SoldStock] is not null then [StockDate]
-                                              else null end", stored: true);
-
-            builder.Property(x => x.StockDate)
-                .HasDefaultValueSql("getutcdate()");
+            builder.HasMany(x => x.Logs)
+                .WithOne()
+                .HasForeignKey(x => x.StockId);
         }
     }
 }

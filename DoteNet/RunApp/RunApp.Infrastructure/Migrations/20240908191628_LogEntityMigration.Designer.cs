@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RunApp.Infrastructure.Common.Persistence;
 
@@ -11,9 +12,11 @@ using RunApp.Infrastructure.Common.Persistence;
 namespace RunApp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppStoreDbContext))]
-    partial class AppStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240908191628_LogEntityMigration")]
+    partial class LogEntityMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -184,37 +187,6 @@ namespace RunApp.Infrastructure.Migrations
                     b.ToTable("ProductStatus");
                 });
 
-            modelBuilder.Entity("RunApp.Domain.ProductAggregate.Ratings.Rating", b =>
-                {
-                    b.Property<Guid>("RatingId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CustomerProfileId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("DateOfRate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.Property<decimal>("NumOfStars")
-                        .HasPrecision(2, 1)
-                        .HasColumnType("decimal");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("RatingId");
-
-                    b.HasIndex("CustomerProfileId")
-                        .IsUnique();
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("Rating");
-                });
-
             modelBuilder.Entity("RunApp.Domain.ProductAggregate.Reviews.Review", b =>
                 {
                     b.Property<Guid>("ProductId")
@@ -231,6 +203,10 @@ namespace RunApp.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("getutcdate()");
+
+                    b.Property<double>("NumOfStars")
+                        .HasPrecision(2, 1)
+                        .HasColumnType("float(2)");
 
                     b.Property<string>("ReviewDescription")
                         .IsRequired()
@@ -307,9 +283,6 @@ namespace RunApp.Infrastructure.Migrations
                     b.Property<int?>("AddedStock")
                         .HasColumnType("int");
 
-                    b.Property<int?>("RemovedStock")
-                        .HasColumnType("int");
-
                     b.Property<int?>("SoldStock")
                         .HasColumnType("int");
 
@@ -327,11 +300,6 @@ namespace RunApp.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("StockRemoveDate")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2")
-                        .HasComputedColumnSql("case when [RemovedStock] is not null then [StockDate]\r\n                                              else null end", true);
-
-                    b.Property<DateTime?>("StockSoldDate")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
                         .HasComputedColumnSql("case when [SoldStock] is not null then [StockDate]\r\n                                              else null end", true);
@@ -360,9 +328,6 @@ namespace RunApp.Infrastructure.Migrations
                     b.Property<string>("ProductType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RemovedQuantity")
-                        .HasColumnType("int");
 
                     b.Property<int>("SoldQuantity")
                         .HasColumnType("int");
@@ -413,9 +378,6 @@ namespace RunApp.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TotalProductsSold")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalRemovedStock")
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalSalesInCash")
@@ -637,21 +599,6 @@ namespace RunApp.Infrastructure.Migrations
 
                     b.HasOne("RunApp.Domain.Products.Product", null)
                         .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("RunApp.Domain.ProductAggregate.Ratings.Rating", b =>
-                {
-                    b.HasOne("RunApp.Domain.CustomerProfileAggregate.CustomerProfile", null)
-                        .WithOne()
-                        .HasForeignKey("RunApp.Domain.ProductAggregate.Ratings.Rating", "CustomerProfileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RunApp.Domain.Products.Product", null)
-                        .WithMany("Ratings")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -887,8 +834,6 @@ namespace RunApp.Infrastructure.Migrations
 
             modelBuilder.Entity("RunApp.Domain.Products.Product", b =>
                 {
-                    b.Navigation("Ratings");
-
                     b.Navigation("Reviews");
                 });
 

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using RunApp.Domain.ProductAggregate.Reviews.Common;
+using RunApp.Domain.ReviewAggregate.ReviewEnum;
 
 namespace RunApp.Infrastructure.Reviews.Persistence
 {

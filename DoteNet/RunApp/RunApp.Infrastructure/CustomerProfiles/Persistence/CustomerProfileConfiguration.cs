@@ -9,7 +9,7 @@ namespace RunApp.Infrastructure.CustomerProfiles.Persistence
     {
         public void Configure(EntityTypeBuilder<CustomerProfile> builder)
         {
-            builder.HasKey(x => x.CustomerProfileId);
+            builder.HasKey(x => x.Id);
 
             builder.HasOne<AppUser>()
                 .WithOne()

@@ -23,11 +23,25 @@ namespace RunApp.Infrastructure.StoreOwnerProfiles.Persistence
            return await _appStoreDbContext.StoreOwnerProfiles.AnyAsync(x => x.Id == userId);
         }
 
-        public async Task<StoreOwnerProfile> GetStoreOwnerProfileWithStocks(Guid storeOwnerProfileId)
+        public async Task<StoreOwnerProfile?> GetStoreOwnerProfileWithStocks(Guid storeOwnerProfileId)
         {
            return  await _appStoreDbContext.StoreOwnerProfiles
                 .Include(x => x.Stocks)
-                .SingleAsync(x => x.StoreProfileId == storeOwnerProfileId);
+                .SingleOrDefaultAsync(x => x.StoreProfileId == storeOwnerProfileId);
+        }
+        public async Task<StoreOwnerProfile?> GetStoreOwnerProfileWithStocksAndLogs(Guid storeOwnerProfileId)
+        {
+            return await _appStoreDbContext.StoreOwnerProfiles
+                 .Include(x => x.Stocks)
+                 .ThenInclude(y => y.Logs)
+                 .SingleOrDefaultAsync(x => x.StoreProfileId == storeOwnerProfileId);
+        }
+        public async Task<StoreOwnerProfile?> GetStoreOwnerProfileWithStocksAndLogs(Guid storeOwnerProfileId, Guid productid)
+        {
+            return await _appStoreDbContext.StoreOwnerProfiles
+                 .Include(x => x.Stocks.Where(x => x.StockProductId == productid))
+                 .ThenInclude(y => y.Logs)
+                 .SingleOrDefaultAsync(x => x.StoreProfileId == storeOwnerProfileId);
         }
     }
 }

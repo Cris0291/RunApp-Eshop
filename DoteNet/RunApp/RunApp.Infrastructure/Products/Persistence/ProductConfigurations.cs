@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RunApp.Domain.CustomerProfileAggregate.ProductStatuses;
 using RunApp.Domain.Products;
 using RunApp.Domain.StoreOwnerProfileAggregate.Sales;
 using RunApp.Domain.StoreOwnerProfileAggregate.Stocks;
@@ -29,9 +28,10 @@ namespace RunApp.Infrastructure.Products.Persistence
                 .WithOne(x => x.ProductSold)
                 .HasForeignKey(x => x.ProductId);
 
-            builder.HasMany<Stock>()
+            builder.HasOne<Stock>()
                 .WithOne()
-                .HasForeignKey(x => x.StockProductId);
+                .HasForeignKey<Stock>(x => x.StockProductId);
+
 
            /* builder.HasData(new Product()
             {

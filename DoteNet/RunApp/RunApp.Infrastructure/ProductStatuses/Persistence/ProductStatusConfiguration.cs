@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RunApp.Domain.CustomerProfileAggregate;
-using RunApp.Domain.CustomerProfileAggregate.ProductStatuses;
 using RunApp.Domain.Products;
+using RunApp.Domain.ProductStatusAggregate;
 
 namespace RunApp.Infrastructure.ProductStatuses.Persistence
 {
@@ -13,12 +13,14 @@ namespace RunApp.Infrastructure.ProductStatuses.Persistence
             builder.HasKey(x => new { x.Id, x.ProductId });
 
             builder.HasOne<CustomerProfile>()
-                .WithMany(x => x.Statuses)
+                .WithMany()
                 .HasForeignKey(x => x.Id);
 
             builder.HasOne<Product>()
                 .WithMany()
                 .HasForeignKey(x => x.ProductId);
+
+            builder.HasAlternateKey(x => x.ProductStatusId);
         }
     }
 }

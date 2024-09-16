@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using RunApp.Infrastructure.Reviews.Persistence;
 using RunApp.Domain.UserAggregate;
 using RunApp.Domain.UserAggregate.Roles;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using RunApp.Infrastructure.CustomerProfiles.Persistence;
 using RunApp.Infrastructure.StoreOwnerProfiles.Persistence;

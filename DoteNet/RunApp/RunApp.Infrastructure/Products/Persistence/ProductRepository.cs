@@ -39,6 +39,11 @@ namespace RunApp.Infrastructure.Products.Persistence
             return requiredProduct;
         }
 
+        public async Task<Product> GetProductWithNoDefault(Guid id)
+        {
+            Product requiredProduct = await _appDbContext.Products.SingleAsync(product => product.ProductId == id);
+            return requiredProduct;
+        }
         public async Task<IEnumerable<Product>> GetProducts()
         {
             return await _appDbContext.Products.ToListAsync();

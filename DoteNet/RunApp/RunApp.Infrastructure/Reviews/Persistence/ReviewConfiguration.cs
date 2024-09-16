@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RunApp.Domain.CustomerProfileAggregate;
-using RunApp.Domain.ProductAggregate.Reviews;
 using RunApp.Domain.Products;
+using RunApp.Domain.ReviewAggregate;
 
 namespace RunApp.Infrastructure.Reviews.Persistence
 {
@@ -13,14 +13,11 @@ namespace RunApp.Infrastructure.Reviews.Persistence
             builder.Property(r => r.Date)
                 .HasDefaultValueSql("getutcdate()");
 
-            builder.Property(r => r.NumOfStars)
-                 .HasPrecision(2,1);
-
             builder.Property(r => r.ReviewDescription)
                  .HasConversion<ReviewEnumValueConverter>();
 
             builder.HasOne<Product>()
-                .WithMany(x => x.Reviews)
+                .WithMany()
                 .HasForeignKey(x => x.ProductId);
 
             builder.HasOne<CustomerProfile>()
@@ -28,6 +25,8 @@ namespace RunApp.Infrastructure.Reviews.Persistence
                 .HasForeignKey(x => x.Id);
 
             builder.HasKey(x => new {x.ProductId, x.Id});
+
+            builder.HasAlternateKey(x => x.ReviewId);
         }
     }
 }
