@@ -21,6 +21,8 @@ namespace RunApp.Infrastructure.ProductStatuses.Persistence
                 .HasForeignKey(x => x.ProductId);
 
             builder.HasAlternateKey(x => x.ProductStatusId);
+
+            builder.HasIndex(x => x.ProductStatusId);
         }
     }
 }

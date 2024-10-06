@@ -1,5 +1,4 @@
 ﻿using Contracts.Common;
-using Contracts.StoreOwnerProfiles.Response;
 using RunApp.Domain.StoreOwnerProfileAggregate;
 using RunApp.Domain.UserAggregate;
 

@@ -2,7 +2,6 @@
 using Contracts.Stocks.Response;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RunApp.Api.Routes;
 using RunApp.Api.Services;

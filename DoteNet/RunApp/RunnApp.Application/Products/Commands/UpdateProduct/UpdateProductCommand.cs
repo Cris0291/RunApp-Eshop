@@ -4,5 +4,6 @@ using RunApp.Domain.Products;
 
 namespace RunnApp.Application.Products.Commands.UpdateProduct
 {
-    public record UpdateProductCommand(Guid ProductId, string Name, string Description, decimal Price, ICollection<string> Bulletpoints, decimal PriceWithDiscount, string? PromotionalText) : IRequest<ErrorOr<Product>>;
+    public record UpdateProductCommand(string Name, string Description, decimal Price, ICollection<string> Bulletpoints, 
+        string Brand, string Type, string Color, double Weight, Guid ProductId) : IRequest<ErrorOr<Product>>;
 }

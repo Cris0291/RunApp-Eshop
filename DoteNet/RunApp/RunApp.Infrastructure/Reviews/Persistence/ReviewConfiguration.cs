@@ -27,6 +27,8 @@ namespace RunApp.Infrastructure.Reviews.Persistence
             builder.HasKey(x => new {x.ProductId, x.Id});
 
             builder.HasAlternateKey(x => x.ReviewId);
+
+            builder.HasIndex(x => x.ReviewId);
         }
     }
 }

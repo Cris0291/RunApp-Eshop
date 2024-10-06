@@ -8,7 +8,7 @@ namespace RunnApp.Application.Products.Commands.AddDiscount
         public AddDiscountCommandValidator()
         {
             RuleFor(d => d.PriceWithDiscount).GreaterThanOrEqualTo(0m);
-            RuleFor(d => d.PromotionalText).NotNull();
+            RuleFor(d => d.PromotionalText).NotNull().NotEmpty();
         }
     }
 }

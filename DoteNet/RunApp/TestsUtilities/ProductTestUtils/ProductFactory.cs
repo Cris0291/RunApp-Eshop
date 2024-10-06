@@ -1,7 +1,7 @@
 ﻿using RunApp.Domain.ProductAggregate.ValueType;
-using RunApp.Domain.ProductAggregate.Reviews;
 using RunApp.Domain.Products;
 using RunApp.Domain.ProductAggregate.ValueTypes;
+using RunApp.Domain.ReviewAggregate;
 
 
 namespace TestsUtilities.ProductTestUtils

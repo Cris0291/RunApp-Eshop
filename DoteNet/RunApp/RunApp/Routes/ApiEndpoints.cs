@@ -22,6 +22,8 @@
             public const string AddOrRemoveProductLike = $"{ProductBase}/{{id:guid}}/likes/like";
             public const string AddOrRemoveProductDislike = $"{ProductBase}/{{id:guid}}/likes/Dislike";
 
+            public const string AddRating = $"{ProductBase}/{{id:guid}}/rates";
+
         }
         public static class Account
         {
@@ -34,9 +36,23 @@
         public static class StoreOwnerProfiles
         {
             private const string StoreOwnerProfileBase = $"{Base}/storeprofiles";
-            public const string CreateStoreOwnerProfile = $"{StoreOwnerProfileBase}";
+            public const string CreateStoreOwnerProfile = StoreOwnerProfileBase;
             public const string AddStock = $"{StoreOwnerProfileBase}/stocks";
             public const string RemoveStock = $"{StoreOwnerProfileBase}/stocks";
+        }
+        public static class CustomerProfiles
+        {
+            private const string UserBase = $"{Base}/user";
+            public const string GetUserReviews = $"{UserBase}/reviews";
+            public const string GetUserRatings = $"{UserBase}/ratings";
+            public const string GetUserLikes = $"{UserBase}/likes";
+        }
+        public static class Orders
+        {
+            private const string OrderBase = $"{Base}/orders";
+            public const string Create = OrderBase;
+            public const string AddItem = $"{OrderBase}/{{id:guid}}/lineitems";
+            public const string DeleteItem = $"{OrderBase}/{{id:guid}}/lineitems";
         }
     }
 }
