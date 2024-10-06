@@ -2,12 +2,13 @@
 using RunApp.Domain.CustomerProfileAggregate;
 using RunApp.Domain.Products;
 using RunApp.Domain.RatingAggregate;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace RunApp.Infrastructure.Ratings.Persistence
 {
     public class RatingConfiguration : IEntityTypeConfiguration<Rating>
     {
-        public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<Rating> builder)
+        public void Configure(EntityTypeBuilder<Rating> builder)
         {
             builder.Property(x => x.NumOfStars)
                 .HasColumnType("decimal")
@@ -27,6 +28,8 @@ namespace RunApp.Infrastructure.Ratings.Persistence
             builder.HasKey(x => new { x.ProductId, x.Id});
 
             builder.HasAlternateKey(x => x.RatingId);
+
+            builder.HasIndex(x => x.RatingId);
         }
     }
 }

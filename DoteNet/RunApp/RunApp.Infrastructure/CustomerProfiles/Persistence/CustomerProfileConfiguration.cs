@@ -23,6 +23,8 @@ namespace RunApp.Infrastructure.CustomerProfiles.Persistence
             builder.OwnsOne(x => x.ShippingAdress, px => px.Property(y => y.HouseNumber).IsRequired(false));
             builder.OwnsOne(x => x.ShippingAdress, px => px.Property(y => y.Country).IsRequired(false));
             builder.OwnsOne(x => x.ShippingAdress, px => px.Property(y => y.AlternativeHouseNumber).IsRequired(false));
+
+            builder.OwnsOne(x => x.PaymentMethod);
         }
     }
 }

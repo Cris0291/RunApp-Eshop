@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
+using RunnApp.Application.Common.Authorization;
 using RunnApp.Application.Common.Behaviors;
 
 namespace RunnApp.Application
@@ -15,6 +17,8 @@ namespace RunnApp.Application
             });
 
             services.AddValidatorsFromAssemblyContaining(typeof(DependencyInjection));
+
+            services.AddScoped<IAuthorizationHandler, IsProductBoughtHandler>();
 
             return services;
         }

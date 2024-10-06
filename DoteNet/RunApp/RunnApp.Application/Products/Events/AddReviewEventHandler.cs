@@ -4,7 +4,7 @@ using RunnApp.Application.Common.Interfaces;
 
 namespace RunnApp.Application.Products.Events
 {
-    public class AddReviewEvetHandler(IUnitOfWorkPattern unitOfWorkPattern, IProductsRepository productsRepository) : INotificationHandler<AddReviewEvent>
+    public class AddReviewEventHandler(IUnitOfWorkPattern unitOfWorkPattern, IProductsRepository productsRepository) : INotificationHandler<AddReviewEvent>
     {
         private readonly IUnitOfWorkPattern _unitOfWorkPattern = unitOfWorkPattern;
         private readonly IProductsRepository _productsRepository = productsRepository;

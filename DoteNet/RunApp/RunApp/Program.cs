@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using RunApp.Api.Services;
 using RunApp.Infrastructure.Middleware;
-using RunApp.Infrastructure.Common.Persistence;
+using RunnApp.Application.Common.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +45,11 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy(
         "StoreProfile", 
         policyBuilder => policyBuilder.RequireClaim("StoreProfile", "true"));
+
+    options.AddPolicy(
+        "ProductMustBeBoughtInOrderToBeRated",
+        policyBuilder => policyBuilder.AddRequirements(new ProductMusBeBoughtRequirement())
+        );
 });
 
 var app = builder.Build();

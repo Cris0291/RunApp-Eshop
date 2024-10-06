@@ -6,10 +6,13 @@ namespace RunnApp.Application.Products.Commands.UpdateProduct
     {
         public UpdateProductCommandValidator()
         {
-            RuleFor(update => update.Name).NotNull();
-            RuleFor(update => update.Description).NotNull();
-            RuleFor(update => update.Price).GreaterThanOrEqualTo(0);
-            RuleFor(update => update.PriceWithDiscount).GreaterThanOrEqualTo(0m);
+            RuleFor(command => command.Name).NotNull().NotEmpty();
+            RuleFor(command => command.Description).NotNull().NotEmpty();
+            RuleFor(command => command.Price).GreaterThanOrEqualTo(0);
+            RuleFor(command => command.Brand).NotNull().NotEmpty();
+            RuleFor(command => command.Type).NotNull().NotEmpty();
+            RuleFor(command => command.Color).NotNull().NotEmpty();
+            RuleFor(command => command.Weight).GreaterThan(0);
         }
     }
 }

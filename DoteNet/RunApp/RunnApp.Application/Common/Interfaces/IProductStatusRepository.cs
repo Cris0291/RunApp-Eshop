@@ -1,4 +1,5 @@
-﻿using RunApp.Domain.ProductStatusAggregate;
+﻿using RunApp.Domain.Products;
+using RunApp.Domain.ProductStatusAggregate;
 
 namespace RunnApp.Application.Common.Interfaces
 {
@@ -7,5 +8,6 @@ namespace RunnApp.Application.Common.Interfaces
         Task AddProductStatus(ProductStatus productStatus);
         Task<ProductStatus?> GetProductStatus(Guid productId, Guid customerId);
         Task<bool> ExistProductStatus(Guid productId, Guid customerId);
+        
     }
 }

@@ -8,7 +8,7 @@ namespace RunnApp.Application.ProductStatuses.Commands.AddOrRemoveLike
     public class AddOrRemoveLikeCommandHandler(IProductStatusRepository productStatusRepository, IUnitOfWorkPattern unitOfWork) : IRequestHandler<AddOrRemoveLikeCommand, ErrorOr<Success>>
     {
 
-        private readonly IProductStatusRepository _productStatusRepository;
+        private readonly IProductStatusRepository _productStatusRepository = productStatusRepository;
         private readonly IUnitOfWorkPattern _unitOfWork = unitOfWork;
         public async Task<ErrorOr<Success>> Handle(AddOrRemoveLikeCommand request, CancellationToken cancellationToken)
         {
