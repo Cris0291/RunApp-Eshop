@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ErrorOr;
+using Microsoft.EntityFrameworkCore;
 using RunApp.Domain.Products;
 using RunApp.Infrastructure.Common.Persistence;
 using RunnApp.Application.Common.Interfaces;
-using RunnApp.Application.CustomerProfiles.Common;
-using RunnApp.Application.Products.Queries.GetProducts;
 
 namespace RunApp.Infrastructure.Products.Persistence
 {
@@ -23,6 +22,7 @@ namespace RunApp.Infrastructure.Products.Persistence
         public async Task DeleteProduct(Guid id)
         {
             Product product = await _appDbContext.Products
+                .Include(p => p.Reviews)
                 .SingleAsync(p => p.ProductId == id);
 
              _appDbContext.Products.Remove(product);
@@ -44,28 +44,11 @@ namespace RunApp.Infrastructure.Products.Persistence
             Product requiredProduct = await _appDbContext.Products.SingleAsync(product => product.ProductId == id);
             return requiredProduct;
         }
-        public async Task<IEnumerable<ProductForCard>> GetProducts(Guid userId)
+        public async Task<IEnumerable<Product>> GetProducts()
         {
-            return await _appDbContext.Products.Select(x => new ProductForCard
-            {
-                ProductId = x.ProductId,
-                Name  = x.Name,
-                ActualPrice = x.ActualPrice,
-                NumberOfReviews = x.NumberOfReviews,
-                AverageRatings = x.AverageRatings,
-                PriceWithDiscount = x.PriceOffer.PriceWithDiscount,
-                PromotionalText = x.PriceOffer.PromotionalText,
-                Discount = x.PriceOffer.Discount,
-                Statuses = x.Statuses.Where(x => x == userId).ToList(),
-                ProductStatus = null
-            }).ToListAsync();
+            return await _appDbContext.Products.ToListAsync();
         }
-        public async Task<List<ProductDto>> GetBoughtProducts(List<Guid> boughtProducts)
-        {
-            var boughtProductsSet = boughtProducts.ToHashSet();
 
-            return await _appDbContext.Products.Where(x => boughtProductsSet.Contains(x.ProductId)).Select(x => new ProductDto(x.ProductId, x.Name)).ToListAsync();
-        }
        
     }
 }

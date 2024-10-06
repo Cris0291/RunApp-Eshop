@@ -1,4 +1,4 @@
-﻿using RunApp.Domain.ReviewAggregate;
+﻿using RunApp.Domain.ProductAggregate.Reviews;
 
 namespace TestsUtilities.ProductTestUtils
 {

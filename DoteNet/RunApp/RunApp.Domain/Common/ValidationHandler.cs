@@ -1,5 +1,7 @@
 ﻿using ErrorOr;
+using RunApp.Domain.CustomerProfileAggregate.CustomerProfileErrors;
 using RunApp.Domain.ProductAggregate.ProductErrors;
+using RunApp.Domain.ProductStatusAggregate.ProductStatusErrors;
 using RunApp.Domain.ReviewAggregate.ReviewErrors;
 using RunApp.Domain.StoreOwnerProfileAggregate.StoreOwnerProfileErrors;
 
@@ -38,6 +40,7 @@ namespace RunApp.Domain.Common
                 nameof(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount) => ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount,
                 nameof(ReviewError.AllReviewsMustHaveAComment) => ReviewError.AllReviewsMustHaveAComment,
                 nameof(ReviewError.MinimumNunberOfStarsCannotBeLessThanOne) => ReviewError.MinimumNunberOfStarsCannotBeLessThanOne,
+                nameof(ProductStatusError.LikeAndDislikeStatusesCannotBeSetAtTheSameTime) => ProductStatusError.LikeAndDislikeStatusesCannotBeSetAtTheSameTime,
                 nameof(StoreOwnerprofileError.InitialInvestmentCannotBeLowerThan5000) => StoreOwnerprofileError.InitialInvestmentCannotBeLowerThan5000
             };
 

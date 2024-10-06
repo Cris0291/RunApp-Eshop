@@ -1,7 +1,9 @@
 ﻿using ErrorOr;
+using FluentValidation.Results;
 using MediatR;
 using RunApp.Domain.Products;
 using RunnApp.Application.Common.Interfaces;
+using RunnApp.Application.Products.Commands.CreateProduct;
 
 
 namespace RunnApp.Application.Products.Commands.CreateProduct

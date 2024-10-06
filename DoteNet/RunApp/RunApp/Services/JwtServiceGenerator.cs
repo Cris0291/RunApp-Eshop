@@ -1,12 +1,13 @@
-﻿
-
-using Contracts.Common;
+﻿using Contracts.Common;
+using Contracts.StoreOwnerProfiles.Response;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using RunApp.Domain.StoreOwnerProfileAggregate;
 using RunApp.Domain.UserAggregate;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+
 
 namespace RunApp.Api.Services
 {

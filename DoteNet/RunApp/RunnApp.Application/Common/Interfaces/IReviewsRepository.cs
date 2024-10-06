@@ -9,7 +9,5 @@ namespace RunnApp.Application.Common.Interfaces
         Task<bool> ExistReview(Guid userId, Guid productId);
         Task<Review?> GetReview(Guid userId, Guid productId);
         Task RemoveReview(Review review);
-        Task<List<Review>> GetReviewsForProduct(Guid productId);
-        Task<List<Review>> GetReviewsForCustomer(List<Guid> reviews);
     }
 }

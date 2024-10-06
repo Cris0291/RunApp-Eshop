@@ -1,5 +1,4 @@
 ﻿using RunApp.Domain.Common;
-using RunApp.Domain.ProductStatusAggregate.Events;
 
 namespace RunApp.Domain.ProductStatusAggregate
 {
@@ -13,30 +12,21 @@ namespace RunApp.Domain.ProductStatusAggregate
         public bool? Viewed { get; internal set; }
         public bool? Bought { get; internal set; }
         public Guid Id { get; internal set; }
-        public Guid? ProductId { get; internal set; }
+        public Guid ProductId { get; internal set; }
 
-        public static ProductStatus CreateStatus(Guid productId, Guid customerId)
+        public static ProductStatus CreateStatus(Guid productId, Guid CustomerId)
         {
-            var productStatus =  new ProductStatus()
+            return new ProductStatus()
             {
                 ProductStatusId = Guid.NewGuid(),
                 ProductId = productId,
-                Id = customerId,
+                Id = CustomerId,
             };
-
-            productStatus.RaiseEvent(new AddProductStatusEvent(productId, customerId, productStatus.ProductStatusId));
-
-            return productStatus;
         }
         public void AddOrRemoveLike(bool like)
         {
             Like = like;
-            Dislike = null;
-        }
-        public void AddOrRemoveDislike(bool dislike)
-        {
-            Dislike = dislike;
-            Like = null;
+            RaiseEvent();
         }
     }
 }

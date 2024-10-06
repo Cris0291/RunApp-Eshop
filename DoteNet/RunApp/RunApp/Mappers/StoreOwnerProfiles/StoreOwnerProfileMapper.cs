@@ -4,6 +4,7 @@ using RunApp.Domain.StoreOwnerProfileAggregate;
 using RunApp.Domain.StoreOwnerProfileAggregate.ValueTypes;
 using RunnApp.Application.StoreOwnerProfiles.Commands.CreateStoreOwnerProfile;
 
+
 namespace RunApp.Api.Mappers.StoreOwnerProfiles
 {
     public static class StoreOwnerProfileMapper

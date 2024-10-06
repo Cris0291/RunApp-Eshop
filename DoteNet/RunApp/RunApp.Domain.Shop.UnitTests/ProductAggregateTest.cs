@@ -1,12 +1,12 @@
 using AutoFixture;
 using ErrorOr;
+using RunApp.Domain.ProductAggregate.Reviews;
+using RunApp.Domain.ProductAggregate.Reviews.Common;
 using RunApp.Domain.Products;
 using TestsUtilities.ProductTestUtils;
 using TestsUtilities.ReviewTestUtils;
 using FluentAssertions;
 using Xunit.Abstractions;
-using RunApp.Domain.ReviewAggregate;
-using RunApp.Domain.ReviewAggregate.ReviewEnum;
 
 
 
@@ -43,12 +43,10 @@ namespace RunApp.Domain.Shop.UnitTests
             reviews.Add(reviewToTest);
 
             //Act
-            // List<ErrorOr<Review>> errorOrReviews = reviews.Select(review => productToTest.AddReview(review.Comment, review.ReviewDescription)).ToList();
-            //Pending
-            List<ErrorOr<Review>> errorOrReviews = default;
+            List<ErrorOr<Review>> errorOrReviews = reviews.Select(review => productToTest.AddReview(review.Comment, review.NumOfStars, review.ReviewDescription)).ToList();
 
-             //Assert
-             var allButLast = errorOrReviews[..^1];
+            //Assert
+            var allButLast = errorOrReviews[..^1];
             var last = errorOrReviews[^1];
 
             allButLast.Should().AllSatisfy(r => r.IsError.Should().BeFalse());
@@ -70,11 +68,8 @@ namespace RunApp.Domain.Shop.UnitTests
                 .Create();
 
             //Act
-            //ErrorOr<Review> validResult =productToTest.AddReview(validReview.Comment, validReview.ReviewDescription);
-            //ErrorOr<Review> invalidResult = productToTest.AddReview(invalidReview.Comment, invalidReview.ReviewDescription);
-            //Pending
-            ErrorOr<Review> validResult = default;
-            ErrorOr<Review> invalidResult = default;
+            ErrorOr<Review> validResult =productToTest.AddReview(validReview.Comment, validReview.NumOfStars, validReview.ReviewDescription);
+            ErrorOr<Review> invalidResult = productToTest.AddReview(invalidReview.Comment, invalidReview.NumOfStars, invalidReview.ReviewDescription);
 
             //Assert
             validResult.Value.Comment.Should().Be(validReview.Comment);
@@ -132,9 +127,7 @@ namespace RunApp.Domain.Shop.UnitTests
             ICollection<string> points = product.BulletPoints.Select(P => P.BulletPoint).ToList();
 
             //Act
-            //ErrorOr<Product> errorOrProduct =  Product.CreateProduct("", product.Description, product.ActualPrice, points,product.PriceOffer.PriceWithDiscount, product.PriceOffer.PromotionalText);
-            //Pending
-            ErrorOr<Product> errorOrProduct = default;
+           ErrorOr<Product> errorOrProduct =  Product.CreateProduct("", product.Description, product.ActualPrice, points,product.PriceOffer.PriceWithDiscount, product.PriceOffer.PromotionalText);
 
             //Assert
             errorOrProduct.IsError.Should().BeTrue();
@@ -152,9 +145,7 @@ namespace RunApp.Domain.Shop.UnitTests
             ICollection<string> points = product.BulletPoints.Select(P => P.BulletPoint).ToList();
 
             //Act
-            //ErrorOr<Product> errorOrProduct = Product.CreateProduct(product.Name, product.Description, product.ActualPrice, points, product.PriceOffer.PriceWithDiscount, promotionalText);
-            //Pending
-            ErrorOr<Product> errorOrProduct = default;
+            ErrorOr<Product> errorOrProduct = Product.CreateProduct(product.Name, product.Description, product.ActualPrice, points, product.PriceOffer.PriceWithDiscount, promotionalText);
 
             //Assert
             errorOrProduct.IsError.Should().BeTrue();
@@ -170,10 +161,8 @@ namespace RunApp.Domain.Shop.UnitTests
             var product = CustomizeAndCreateProduct();
             string description = "";
             ICollection<string> points = product.BulletPoints.Select(P => P.BulletPoint).ToList();
-            //Act
-            //ErrorOr<Product> errorOrProduct = Product.CreateProduct(product.Name, description, product.ActualPrice, points, product.PriceOffer.PriceWithDiscount, product.PriceOffer.PromotionalText);
-            //Pending
-            ErrorOr<Product> errorOrProduct = default;
+              //Act
+            ErrorOr<Product> errorOrProduct = Product.CreateProduct(product.Name, description, product.ActualPrice, points, product.PriceOffer.PriceWithDiscount, product.PriceOffer.PromotionalText);
 
             //Assert
             errorOrProduct.IsError.Should().BeTrue();

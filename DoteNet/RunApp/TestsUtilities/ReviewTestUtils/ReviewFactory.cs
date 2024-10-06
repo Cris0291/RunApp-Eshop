@@ -1,5 +1,5 @@
-﻿using RunApp.Domain.ReviewAggregate;
-using RunApp.Domain.ReviewAggregate.ReviewEnum;
+﻿using RunApp.Domain.ProductAggregate.Reviews;
+using RunApp.Domain.ProductAggregate.Reviews.Common;
 
 namespace TestsUtilities.ReviewTestUtils
 {
@@ -10,8 +10,8 @@ namespace TestsUtilities.ReviewTestUtils
                                          ReviewDescriptionEnums? reviewDescription = null, Guid? productId =null)
         {
             return new Review(id ?? Constants.Review.id, comment ?? Constants.Review.Comment,
-                              date ?? Constants.Review.Date,reviewDescription ?? Constants.Review.ReviewDesccription, 
-                              productId ?? Constants.Review.ProductId);
+                              numOfStars ?? Constants.Review.NumOfStars, date ?? Constants.Review.Date,
+                              reviewDescription ?? Constants.Review.ReviewDesccription, productId ?? Constants.Review.ProductId);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using AutoFixture;
 using AutoFixture.Kernel;
+using RunApp.Domain.ProductAggregate.Reviews.Common;
 using RunApp.Domain.Products;
-using RunApp.Domain.ReviewAggregate.ReviewEnum;
 using System.Reflection;
 
 namespace TestsUtilities.Common

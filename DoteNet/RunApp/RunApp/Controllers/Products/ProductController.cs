@@ -37,20 +37,21 @@ namespace RunApp.Api.Controllers.Products
             
            var productQuery = new GetProductQuery(id);
 
-            ErrorOr<ProductWithReviews> queryResponse = await _mediator.Send(productQuery);
+            ErrorOr<Product> queryResponse = await _mediator.Send(productQuery);
 
-            return queryResponse.MatchFirst(product => Ok(product.ProductWithReviewToProductWithReviewsResponse()),
+            return queryResponse.MatchFirst(product => Ok(product.ProductToProductResponse()),
             Problem);
+            
+            
         }
 
         [Authorize]
         [HttpGet(ApiEndpoints.Products.GetProducts)]
         public async Task<IActionResult> GetAll()
         {
-            Guid userId = HttpContext.GetUserId();
-            GetProductsQuery getProductsQuery = new GetProductsQuery(userId);
+            GetProductsQuery getProductsQuery = new GetProductsQuery();
 
-            IEnumerable<ProductForCard> products = await _mediator.Send(getProductsQuery);
+            IEnumerable<Product> products = await _mediator.Send(getProductsQuery);
            return Ok(products.AllProductsToProductsResponse());
         }
 
@@ -70,7 +71,7 @@ namespace RunApp.Api.Controllers.Products
         [HttpPut(ApiEndpoints.Products.UpdateProduct)]
         public async Task<IActionResult> UpdateProduct([FromRoute] Guid id, UpdateProductRequest updateProduct)
         {
-            var productCommand = updateProduct.ProductRequestToProductCommand(id);
+            var productCommand = updateProduct.UpdateProductRequestToUpdateProdcutCommand(id);
 
            var updatedProductResult =  await _mediator.Send(productCommand);
 

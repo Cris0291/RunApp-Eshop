@@ -25,7 +25,6 @@ namespace RunApp.Domain.Products
             PriceOffer = priceOffer;
             BulletPoints = bulletpoints;
         }
-        private int _totalRatings;
         public List<Guid> Reviews { get; internal set; }
         public List<Guid> Ratings { get; internal set; }
         public List<Guid> Statuses { get; internal set; }
@@ -33,8 +32,6 @@ namespace RunApp.Domain.Products
         public string Name { get;  internal set; }
         public decimal ActualPrice { get; internal set; }
         public string Description { get; internal set; }
-        public int? NumberOfReviews { get; internal set; }
-        public double? AverageRatings { get; internal set; }
         public PriceOffer PriceOffer { get; internal set; }
         public Characteristics Characteristic { get; internal set; }
         public ICollection<About> BulletPoints { get; internal set; }
@@ -44,6 +41,8 @@ namespace RunApp.Domain.Products
         {
             decimal maximumDiscount = 0.7m;
             AddValidation(nameof(ProductError.DiscountPricesMustBeMaximum70Percent), () => priceWithDiscount < price - (price * maximumDiscount));
+            AddValidation(nameof(ProductError.AllProductsMustHaveAName), () => string.IsNullOrEmpty(name));
+            AddValidation(nameof(ProductError.AllProductsMustHaveADescription), () => string.IsNullOrEmpty(description));
             AddValidation(nameof(ProductError.BulletPointsCollectionShoulNotBeEmpty), () => !bulletpoints.Any());
             AddValidation(nameof(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount),() => priceWithDiscount.HasValue && price < priceWithDiscount.Value);
             AddValidation(nameof(ProductError.AllPricesWithDiscountMustHaveAPromotionalText), () => priceWithDiscount != null && string.IsNullOrEmpty(promotionalText));
@@ -58,23 +57,21 @@ namespace RunApp.Domain.Products
                 Description = description,
                 BulletPoints = bulletpoints.Select(point => new About() { BulletPoint = point }).ToList(),
                 PriceOffer = new PriceOffer {PriceWithDiscount = priceWithDiscount.Value, PromotionalText = promotionalText },
-                Characteristic = new Characteristics() { Brand = brand, Type = type, Color = color, Weight = weight},
-                Reviews = new(),
-                Ratings = new(),
-                Statuses = new(),
+                Characteristic = new Characteristics() { Brand = brand, Type = type, Color = color, Weight = weight}
             };
 
             result.RaiseEvent(new CreateStockEvent(result, storeProfileId));
             return result;
         }
 
-        public ErrorOr<Success> UpdateProduct(string name, string description, decimal price, ICollection<string> bulletpoints, string brand, string type, string color, double weight)
+        public ErrorOr<Success> UpdateProduct(string name, string description, decimal price, ICollection<string> bulletpoints)
         {
             decimal maximumDiscount = 0.7m;
+            AddValidation(nameof(ProductError.AllProductsMustHaveAName), () => string.IsNullOrEmpty(name));
+            AddValidation(nameof(ProductError.AllProductsMustHaveADescription),() => string.IsNullOrEmpty(description));
             AddValidation(nameof(ProductError.BulletPointsCollectionShoulNotBeEmpty), () =>!bulletpoints.Any());
             AddValidation(nameof(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount), () => PriceOffer.PriceWithDiscount.HasValue && price < PriceOffer.PriceWithDiscount.Value);
             AddValidation(nameof(ProductError.DiscountPricesMustBeMaximum70Percent), () => PriceOffer.PriceWithDiscount.HasValue && PriceOffer.PriceWithDiscount.Value < price - (price * maximumDiscount));
-            AddValidation(nameof(ProductError.ProductWeightCannotBeGreaterThan200Kilograms), () => weight > 200);
             Validate();
             if (HasError()) return Errors;
 
@@ -82,7 +79,6 @@ namespace RunApp.Domain.Products
             ActualPrice = price;
             Description = description;
             BulletPoints = bulletpoints.Select(point => new About() { BulletPoint = point }).ToList();
-            Characteristic = new Characteristics() { Brand = brand, Type = type, Color = color, Weight = weight };
 
             return Result.Success;
         }
@@ -105,6 +101,7 @@ namespace RunApp.Domain.Products
         {
             decimal maximumDiscount = 0.7m;
             AddValidation(nameof(ProductError.DiscountPricesMustBeMaximum70Percent),() =>priceWithDiscount < ActualPrice - (ActualPrice * maximumDiscount));
+            AddValidation(nameof(ProductError.AllPricesWithDiscountMustHaveAPromotionalText), () =>string.IsNullOrEmpty(promotionalText));
             AddValidation(nameof(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount), () => ActualPrice < priceWithDiscount);
             Validate();
             if (HasError()) return Errors;
@@ -124,29 +121,13 @@ namespace RunApp.Domain.Products
         public void AddReview(Guid reviewId)
         {
             if (Reviews.Contains(reviewId)) throw new InvalidOperationException("Cannot add more than one review per user");
-            Reviews.Add(reviewId);
 
-            NumberOfReviews = Reviews.Count() + 1;
+            Reviews.Add(reviewId);
         }
         public void DeleteReview(Guid reviewId)
         {
             var wasRemoved = Reviews.Remove(reviewId);
-            NumberOfReviews = Reviews.Count() - 1;
-            if (!wasRemoved) throw new InvalidOperationException("Review was not removerd");
-        }
-        public void AddProductStatus(Guid productStatusId)
-        {
-            if(Statuses.Contains(productStatusId)) throw new InvalidOperationException("Cannot add more than one like or dislike per user");
-
-            Statuses.Add(productStatusId);
-        }
-        public void AddRating(Guid raitingId, int rating)
-        {
-            if (Ratings.Contains(raitingId)) throw new InvalidOperationException("Cannot rate twice a product");
-            Ratings.Add(raitingId);
-
-            _totalRatings += rating;
-            AverageRatings = _totalRatings / Ratings.Count();
+            if(!wasRemoved) throw new InvalidOperationException("Review was not removerd");
         }
     }
 }

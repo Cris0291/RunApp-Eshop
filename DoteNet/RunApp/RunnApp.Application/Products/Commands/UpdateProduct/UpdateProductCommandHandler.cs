@@ -15,8 +15,7 @@ namespace RunnApp.Application.Products.Commands.UpdateProduct
 
             if (product == null) return Error.NotFound(code: "ProductWasNotFoundWithGivenId", description: "Product was not found");
 
-           ErrorOr<Success> wasUpdated = product.UpdateProduct(request.Name, request.Description, request.Price, request.Bulletpoints,
-                                                               request.Brand, request.Type, request.Color, request.Weight);
+           ErrorOr<Success> wasUpdated = product.UpdateProduct(request.Name,request.Description,request.Price,request.Bulletpoints);
 
             if (wasUpdated.IsError) return wasUpdated.Errors;
 
