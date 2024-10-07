@@ -53,6 +53,9 @@
             public const string Create = OrderBase;
             public const string AddItem = $"{OrderBase}/{{id:guid}}/lineitems";
             public const string DeleteItem = $"{OrderBase}/{{id:guid}}/lineitems";
+            public const string ChangeItemQuantity = $"{OrderBase}/{{id:guid}}/lineitems";
+            public const string ModifyOrderAddress = $"{OrderBase}/{{id:guid}}/address";
+            public const string ModifyPaymentMethod = $"{OrderBase}/{{id:guid}}/paymentmethod";
         }
     }
 }

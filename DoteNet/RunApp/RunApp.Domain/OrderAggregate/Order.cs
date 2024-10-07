@@ -74,5 +74,25 @@ namespace RunApp.Domain.OrderAggregate
         {
             return LineItems.Single(x => x.ProductId == productId);
         }
+        public ErrorOr<LineItem> ChangeItemQuantity(int quantity, Guid productId)
+        {
+            var item = LineItems.SingleOrDefault(x => x.ProductId == productId);
+            if (item == null) return Error.NotFound(code: "ItemWasNotFound", description: "Requested item was not found in your order");
+
+            item.Quantity = quantity;
+            return item;
+        }
+        public void ModifyAddress(string ZipCode, string Street, string City,
+                                     int BuildingNumber, string Country, string? AlternativeStreet,
+                                     int? AlternativeBuildingNumber)
+        {
+            Address.ZipCode = ZipCode;
+            Address.Street = Street;
+            Address.City = City;
+            Address.HouseNumber = BuildingNumber;
+            Address.Country = Country;
+            Address.AlternativeStreet = AlternativeStreet;
+            Address.AlternativeHouseNumber = AlternativeBuildingNumber;
+        }
     }
 }

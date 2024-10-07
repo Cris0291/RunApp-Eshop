@@ -1,4 +1,5 @@
-﻿using Contracts.Orders.Request;
+﻿using Contracts.Common;
+using Contracts.Orders.Request;
 using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -7,6 +8,8 @@ using RunApp.Api.Mappers.Orders;
 using RunApp.Api.Routes;
 using RunApp.Api.Services;
 using RunnApp.Application.Orders.Commands.CreateOrder;
+using RunnApp.Application.Orders.Commands.ModifyAddress;
+using RunnApp.Application.Orders.Commands.ModifyPaymentMethod;
 
 namespace RunApp.Api.Controllers.Orders
 {
@@ -32,6 +35,24 @@ namespace RunApp.Api.Controllers.Orders
             {
                 return Ok(value.FromOrderToOrderDto());
             }, Problem);
+        }
+
+        [Authorize]
+        [HttpPut(ApiEndpoints.Orders.ModifyOrderAddress)]
+        public async Task<IActionResult> ModifyOrderAddress([FromRoute] Guid orderId, [FromBody] AddressRequest address)
+        {
+            var result = await _mediator.Send(new ModifyAddressCommand(orderId, address.ZipCode, address.Street,address.City, address.BuildingNumber,
+                                                                    address.Country, address.AlternativeStreet,
+                                                                    address.AlternativeBuildingNumber));
+
+            return result.Match(value => Ok(value.FromAddressToAddressDto()), Problem);
+        }
+
+        [Authorize]
+        [HttpPut(ApiEndpoints.Orders.ModifyPaymentMethod)]
+        public async Task<IActionResult> ModifyPaymentMethod([FromRoute]Guid orderId, [FromBody] CardRequest card)
+        {
+            await _mediator.Send(new ModifyPaymentMethodCommand(orderId, card.HoldersName, card.CardNumber, card.CVV, card.ExpiryDate));
         }
     }
 }

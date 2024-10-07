@@ -18,6 +18,10 @@ namespace RunApp.Infrastructure.Orders.Persistence
         {
             return await _appDbContext.Orders.Include(x => x.LineItems).SingleOrDefaultAsync(x => x.OrderId == orderId);
         }
+        public async Task<Order?> GetOrderWithoutItems(Guid orderId)
+        {
+            return await _appDbContext.Orders.SingleOrDefaultAsync(x => x.OrderId == orderId);
+        }
         public void DeleteItem(LineItem item)
         {
             _appDbContext.Remove(item);

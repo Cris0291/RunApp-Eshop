@@ -37,10 +37,12 @@ namespace RunApp.Api.Controllers.LineItems
         }
 
         [Authorize]
-        [HttpPut]
+        [HttpPut(ApiEndpoints.Orders.ChangeItemQuantity)]
         public async Task<IActionResult> ChangeQuatity([FromRoute] Guid orderId, [FromBody] ChangeQuantityRequestDto changeQuantity)
         {
-            await _mediator.Send(new ChangeItemQuantityCommand(orderId, changeQuantity.ProductId, changeQuantity.Quantity));
+            var result = await _mediator.Send(new ChangeItemQuantityCommand(orderId, changeQuantity.ProductId, changeQuantity.Quantity));
+
+            return result.Match(value => Ok(value.FromLineItemToLineItemDtoResponse()), Problem);
         }
 
     }
