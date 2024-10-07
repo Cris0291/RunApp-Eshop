@@ -11,7 +11,15 @@ namespace RunnApp.Application.LineItems.Commands.ChangeItemQuantity
         private readonly IUnitOfWorkPattern _unitOfWorkPattern = unitOfWorkPattern; 
         public async Task<ErrorOr<LineItem>> Handle(ChangeItemQuantityCommand request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var order = await _orderRepository.GetOrder(request.OrderId);
+            if (order == null) throw new InvalidOperationException("Order was not found in the database");
+
+            var result = order.ChangeItemQuantity(request.Quantity, request.ProductId);
+            if (result.IsError) return result.Errors;
+
+            await _unitOfWorkPattern.CommitChangesAsync();
+
+            return result.Value;
         }
     }
 }
