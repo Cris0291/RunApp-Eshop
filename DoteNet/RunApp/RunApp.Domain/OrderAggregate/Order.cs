@@ -1,6 +1,7 @@
 ﻿using ErrorOr;
 using RunApp.Domain.Common;
 using RunApp.Domain.Common.ValueType;
+using RunApp.Domain.OrderAggregate.Events;
 using RunApp.Domain.OrderAggregate.LineItems;
 using RunApp.Domain.ProductAggregate.ProductErrors;
 
@@ -11,6 +12,7 @@ namespace RunApp.Domain.OrderAggregate
     {
         internal Order() { }
         public Guid OrderId { get; private set; }
+        public Guid Id { get; private set; }
         public bool IsPaid { get; private set;}
         public DateTime DateOfPayment { get; private set; }
         public decimal TotalPrice { get; private set; }
@@ -18,7 +20,7 @@ namespace RunApp.Domain.OrderAggregate
         public Card PaymentMethod { get; private set; }
         public List<LineItem> LineItems { get; private set;}
 
-        public static Order CreateOrder(string ZipCode, string Street, string City,
+        public static Order CreateOrder(Guid userId, string ZipCode, string Street, string City,
                                      int BuildingNumber, string Country, string? AlternativeStreet,
                                      int? AlternativeBuildingNumber, string HoldersName,
                                      string CardNumber, string CVV, DateTime ExpiryDate)
@@ -43,6 +45,7 @@ namespace RunApp.Domain.OrderAggregate
                     ExpityDate = ExpiryDate
                 },
                 IsPaid = false,
+                Id = userId,
             };
         }
         public ErrorOr<LineItem> AddItem(Guid productId, string productName, int quantity, decimal price, decimal? priceWithDiscount, decimal? discount)
@@ -93,6 +96,17 @@ namespace RunApp.Domain.OrderAggregate
             Address.Country = Country;
             Address.AlternativeStreet = AlternativeStreet;
             Address.AlternativeHouseNumber = AlternativeBuildingNumber;
+        }
+        public void ModifyPaymentMethod(string HoldersName, string CardNumber, string CVV, DateTime ExpiryDate)
+        {
+            PaymentMethod.HoldersName = HoldersName;
+            PaymentMethod.CardNumber = CardNumber;
+            PaymentMethod.CVV = CVV;
+            PaymentMethod.ExpityDate = ExpiryDate;
+        }
+        public void CommunicateToUserOrderCreation()
+        {
+            RaiseEvent(new CreateOrderEvent(Id, OrderId));
         }
     }
 }

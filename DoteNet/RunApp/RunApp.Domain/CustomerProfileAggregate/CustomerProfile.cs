@@ -14,6 +14,7 @@ namespace RunApp.Domain.CustomerProfileAggregate
         public List<Guid> Ratings { get; internal set; } = new();
         public List<Guid> Statuses { get; internal set; } = new();
         public List<Guid> BoughtProducts { get; internal set; } = new();
+        public List<Guid> Orders { get; internal set; } = new();
         public string Name { get; private set; }
         public string Email { get; private set; }
         public string NickName { get; private set; }
@@ -35,8 +36,38 @@ namespace RunApp.Domain.CustomerProfileAggregate
                 Ratings = new(),
                 Statuses = new(),
                 BoughtProducts = new(),
+                Orders = new(),
             };
 
+        }
+        public Address AddAddress(string ZipCode, string Street, string City,
+                                     int BuildingNumber, string Country, 
+                                     string? AlternativeStreet, int? AlternativeBuildingNumber)
+        {
+            ShippingAdress = new Address
+            {
+                ZipCode = ZipCode,
+                Street = Street,
+                City = City,
+                HouseNumber = BuildingNumber,
+                Country = Country,
+                AlternativeStreet = AlternativeStreet,
+                AlternativeHouseNumber = AlternativeBuildingNumber,
+            };
+
+            return ShippingAdress;
+        }
+        public Card AddPaymentMethod(string HoldersName, string CardNumber, string CVV, DateTime ExpiryDate)
+        {
+            PaymentMethod = new Card
+            {
+                CVV = CVV,
+                HoldersName = HoldersName,
+                CardNumber = CardNumber,
+                ExpityDate = ExpiryDate
+            };
+
+            return PaymentMethod;
         }
         public bool IsProductBought(Guid productId)
         {
@@ -64,6 +95,11 @@ namespace RunApp.Domain.CustomerProfileAggregate
         {
             if (Ratings.Contains(raitingId)) throw new InvalidOperationException("Cannot rate twice a product");
             Ratings.Add(raitingId);
+        }
+        public void AddOrder(Guid orderId)
+        {
+            if(Orders.Contains(orderId)) throw new InvalidOperationException("Cannot add the same order twice");
+            Orders.Add(orderId);
         }
     }
 }
