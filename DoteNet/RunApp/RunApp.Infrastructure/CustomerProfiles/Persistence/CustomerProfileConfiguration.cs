@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RunApp.Domain.CustomerProfileAggregate;
+using RunApp.Domain.OrderAggregate;
 using RunApp.Domain.UserAggregate;
 
 namespace RunApp.Infrastructure.CustomerProfiles.Persistence
@@ -15,6 +16,10 @@ namespace RunApp.Infrastructure.CustomerProfiles.Persistence
                 .WithOne()
                 .HasForeignKey<CustomerProfile>(x => x.Id)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany<Order>()
+                .WithOne()
+                .HasForeignKey(x => x.Id);
 
             builder.OwnsOne(x => x.ShippingAdress, px => px.Property(y => y.ZipCode).IsRequired(false));
             builder.OwnsOne(x => x.ShippingAdress, px => px.Property(y => y.Street).IsRequired(false));
