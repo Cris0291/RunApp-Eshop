@@ -2,10 +2,6 @@
 using MediatR;
 using RunApp.Domain.OrderAggregate;
 using RunnApp.Application.Common.Interfaces;
-using RunnApp.Application.LineItems.Commands.AddItem;
-using System.Diagnostics.Metrics;
-using System.IO;
-using System.Reflection.Emit;
 
 namespace RunnApp.Application.Orders.Commands.CreateOrder
 {
@@ -16,7 +12,7 @@ namespace RunnApp.Application.Orders.Commands.CreateOrder
         public async Task<ErrorOr<Order>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
             List<List<Error>> errors = new();
-            var order = Order.CreateOrder(request.ZipCode, request.Street, request.City,
+            var order = Order.CreateOrder(request.UserId, request.ZipCode, request.Street, request.City,
                                      request.BuildingNumber, request.Country, request.AlternativeStreet,
                                      request.AlternativeBuildingNumber, request.HoldersName,
                                      request.CardNumber, request.CVV, request.ExpiryDate);
@@ -32,6 +28,7 @@ namespace RunnApp.Application.Orders.Commands.CreateOrder
             if (errors.Count > 0) return errors.SelectMany(x => x).ToList();
 
             await _orderRepository.CreateOrder(order);
+            order.CommunicateToUserOrderCreation();
 
             int rowsChanged = await _unitOfWorkPattern.CommitChangesAsync();
             if (rowsChanged == 0) throw new InvalidOperationException("Order could not be added to the database");
