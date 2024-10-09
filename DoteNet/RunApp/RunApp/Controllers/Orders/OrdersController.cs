@@ -10,6 +10,7 @@ using RunApp.Api.Services;
 using RunnApp.Application.Orders.Commands.CreateOrder;
 using RunnApp.Application.Orders.Commands.ModifyAddress;
 using RunnApp.Application.Orders.Commands.ModifyPaymentMethod;
+using RunnApp.Application.Orders.Commands.PayOrder;
 
 namespace RunApp.Api.Controllers.Orders
 {
@@ -52,7 +53,17 @@ namespace RunApp.Api.Controllers.Orders
         [HttpPut(ApiEndpoints.Orders.ModifyPaymentMethod)]
         public async Task<IActionResult> ModifyPaymentMethod([FromRoute]Guid orderId, [FromBody] CardRequest card)
         {
-            await _mediator.Send(new ModifyPaymentMethodCommand(orderId, card.HoldersName, card.CardNumber, card.CVV, card.ExpiryDate));
+            var result = await _mediator.Send(new ModifyPaymentMethodCommand(orderId, card.HoldersName, card.CardNumber, card.CVV, card.ExpiryDate));
+            return result.Match(value => Ok(value.FromCardToCardDto()), Problem);
+        }
+
+        [Authorize]
+        [HttpPatch(ApiEndpoints.Orders.PayOrder)]
+        public async Task<IActionResult> PayOrder([FromRoute] Guid orderId, [FromBody] PayOrderRequest payOrder)
+        {
+            Guid userId = HttpContext.GetUserId();
+
+            await _mediator.Send(new PayOrderCommand(userId, payOrder.PriceToPay));
         }
     }
 }
