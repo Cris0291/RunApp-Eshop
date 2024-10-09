@@ -46,6 +46,7 @@
             public const string GetUserReviews = $"{UserBase}/reviews";
             public const string GetUserRatings = $"{UserBase}/ratings";
             public const string GetUserLikes = $"{UserBase}/likes";
+            public const string AddAddress = $"{UserBase}/address";
         }
         public static class Orders
         {
@@ -56,6 +57,7 @@
             public const string ChangeItemQuantity = $"{OrderBase}/{{id:guid}}/lineitems";
             public const string ModifyOrderAddress = $"{OrderBase}/{{id:guid}}/address";
             public const string ModifyPaymentMethod = $"{OrderBase}/{{id:guid}}/paymentmethod";
+            public const string PayOrder = $"{OrderBase}/{{id:guid}}/checkout";
         }
     }
 }

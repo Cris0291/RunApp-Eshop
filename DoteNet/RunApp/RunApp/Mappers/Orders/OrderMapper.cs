@@ -18,7 +18,7 @@ namespace RunApp.Api.Mappers.Orders
         {
             return new AddressDto(address.ZipCode, address.Street, address.City, address.HouseNumber, address.Country, address.AlternativeStreet, address.AlternativeHouseNumber);
         }
-        private static CardDto FromCardToCardDto(this Card card)
+        public static CardDto FromCardToCardDto(this Card card)
         {
             return new CardDto(card.HoldersName, card.CardNumber, card.CVV, card.ExpityDate);
         }
