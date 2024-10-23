@@ -24,6 +24,9 @@
 
             public const string AddRating = $"{ProductBase}/{{id:guid}}/rates";
 
+            public const string AddTag = $"{ProductBase}/{{id:guid}}/tags";
+            public const string DeleteTag = $"{ProductBase}/{{Productid:guid}}/tags/{{Tagid:guid}}";
+
         }
         public static class Account
         {

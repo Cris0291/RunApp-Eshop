@@ -59,11 +59,13 @@ namespace RunApp.Api.Controllers.Orders
 
         [Authorize]
         [HttpPatch(ApiEndpoints.Orders.PayOrder)]
-        public async Task<IActionResult> PayOrder([FromRoute] Guid orderId, [FromBody] PayOrderRequest payOrder)
+        public async Task<IActionResult> PayOrder([FromRoute] Guid orderId)
         {
             Guid userId = HttpContext.GetUserId();
 
-            await _mediator.Send(new PayOrderCommand(userId, payOrder.PriceToPay));
+            var result = await _mediator.Send(new PayOrderCommand(userId, orderId));
+
+            return result.MatchFirst(value => Ok(value.FromOrderToOrderDto()), Problem);
         }
     }
 }

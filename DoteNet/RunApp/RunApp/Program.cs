@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
-builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("DefaultConnection"));
+builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("DefaultConnection"), builder.Configuration);
 builder.Services.AddApplicationLayer();
 builder.Services.AddTransient<IJwtServiceGenerator, JwtServiceGenerator>();
 builder.Logging.AddConsole();

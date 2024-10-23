@@ -1,7 +1,6 @@
 ﻿using Contracts.StoreOwnerProfiles.Request;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RunApp.Api.Mappers.StoreOwnerProfiles;
 using RunApp.Api.Routes;

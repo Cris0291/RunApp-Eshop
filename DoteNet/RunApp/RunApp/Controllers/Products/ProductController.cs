@@ -13,6 +13,11 @@ using RunnApp.Application.Products.Commands.AddDiscount;
 using RunnApp.Application.Products.Commands.RemoveDiscount;
 using Microsoft.AspNetCore.Authorization;
 using RunApp.Api.Services;
+using RunApp.Api.CustomValidators;
+using Contracts.Tags.Request;
+using RunnApp.Application.Products.Commands.AddTag;
+using RunApp.Api.Mappers.Tags;
+using RunnApp.Application.Products.Commands.DeleteTag;
 
 
 
@@ -45,13 +50,17 @@ namespace RunApp.Api.Controllers.Products
 
         [Authorize]
         [HttpGet(ApiEndpoints.Products.GetProducts)]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] GetAllProductsRequestDto getAllProducts)
         {
             Guid userId = HttpContext.GetUserId();
-            GetProductsQuery getProductsQuery = new GetProductsQuery(userId);
 
-            IEnumerable<ProductForCard> products = await _mediator.Send(getProductsQuery);
-           return Ok(products.AllProductsToProductsResponse());
+            var options  = getAllProducts.SortingValueAndType.ConverToEnum(getAllProducts.filterType);
+            if (options.IsError) return Problem(options.Errors);
+
+            GetProductsQuery getProductsQuery = new GetProductsQuery(userId, options.Value.Item1, options.Value.Item2, getAllProducts.filterValue, getAllProducts.PageSize, getAllProducts.pageNumZeroBased);
+
+            var products = await _mediator.Send(getProductsQuery);
+            return products.Match(value => Ok(value.AllProductsToProductsResponse()), Problem);
         }
 
         [Authorize("StoreProfile")]
@@ -105,6 +114,22 @@ namespace RunApp.Api.Controllers.Products
           var deletedDiscount = await _mediator.Send(new RemoveDiscountCommand(id));
 
             return deletedDiscount.MatchFirst(result =>Ok(), Problem);
+        }
+
+        [Authorize("StoreProfile")]
+        [HttpPost(ApiEndpoints.Products.AddTag)]
+        public async Task<IActionResult> AddTag([FromRoute] Guid id, [FromBody] TagRequest tagRequest)
+        {
+            var result = await _mediator.Send(new AddTagCommand(id, tagRequest.Tag));
+            return result.MatchFirst(value => Ok(value.TagToTagResponse()), Problem);
+        }
+
+        [Authorize("StoreProfile")]
+        [HttpDelete(ApiEndpoints.Products.DeleteTag)]
+        public async Task<IActionResult> DeleteTag([FromRoute] DeleteTagRequest deleteTag)
+        {
+            var result = await _mediator.Send(new DeleteTagCommand(deleteTag.ProductId, deleteTag.TagId));
+            return result.MatchFirst(value => Ok(), Problem);
         }
     }
 }

@@ -32,7 +32,6 @@ namespace RunApp.Api.Controllers.Reviews
 
             ErrorOr<Review> reviewsOrError = await _mediator.Send(reviewCommand, cancellationToken);
 
-            //Should include the user id in order to return created at and not ok
             return reviewsOrError.Match( Ok, Problem);
         }
 
@@ -42,7 +41,7 @@ namespace RunApp.Api.Controllers.Reviews
         {
             Guid userId = HttpContext.GetUserId();
             ErrorOr<Success> errorOr = await _mediator.Send(new DeleteReviewCommand(userId, ProductId));
-            return errorOr.MatchFirst(value =>Ok(), Problem);
+            return errorOr.MatchFirst(value => Ok(), Problem);
         }
     }
 }
