@@ -15,34 +15,45 @@ import { Label } from "@/components/ui/label";
 import { AlertCircle, User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import useRegisterUser from "./useRegisterUser";
+import { FormValues } from "./contracts";
+import { useRouter } from 'next/navigation'
+import Spinner from "@/app/ui/Spinner";
+
 
 function Register() {
+  const {register, getValues, handleSubmit, formState: {errors}} = useForm<FormValues>();
+  const {mutate, isPending, isSuccess} = useRegisterUser()
+  const router = useRouter();
+
   const [name, setName] = useState("");
+  const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<string[]>([]);
+  const [submittedErrors, setSubmittedErrors] = useState<(string | undefined)[]>([])
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const newErrors = [];
-
-    if (!name) newErrors.push("Name is required");
-    if (!email) newErrors.push("Email is required");
-    if (!/\S+@\S+\.\S+/.test(email)) newErrors.push("Email is invalid");
-    if (!password) newErrors.push("Password is required");
-    if (password.length < 8)
-      newErrors.push("Password must be at least 8 characters");
-    if (password! == confirmPassword) newErrors.push("Passwords do not match");
-
-    setErrors(newErrors);
-
-    if (newErrors.length === 0) {
-      console.log("Registration data:", { name, email, password });
-      alert("Registration successful!");
-    }
+  const onSubmit: SubmitHandler<FormValues> = (data) => {  
+    mutate(data, {
+      onSuccess(){
+        router.push("/")
+      }
+    })
+    
   };
+
+  const onError = () => {
+    const newErrors: (string | undefined)[] = [];
+    const values = Object.values(errors);
+
+    values.forEach(element => {
+      newErrors.push(element.message);
+    });
+
+    setSubmittedErrors(newErrors);
+  }
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
@@ -61,7 +72,7 @@ function Register() {
           </h1>
         </div>
       </div>
-      <div className="md:w-1/2 flex items-center justify-center p-8">
+      {isPending ? <Spinner/> : <div className="md:w-1/2 flex items-center justify-center p-8">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="text-2xl font-bold">
@@ -70,7 +81,7 @@ function Register() {
             <CardDescription>Enter your details to register</CardDescription>
           </CardHeader>
           <CardContent>
-            <form className="space-y-4" onSubmit={handleSubmit}>
+            <form className="space-y-4" onSubmit={handleSubmit(onSubmit, onError)}>
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium">
                   Name
@@ -83,8 +94,33 @@ function Register() {
                   <Input
                     id="name"
                     type="text"
+                    {...register("name", {
+                      required: "Name is required"
+                    })}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    placeholder="John Doe"
+                    className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="username" className="text-sm font-medium">
+                  User Name
+                </Label>
+                <div className="relative">
+                  <User
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    size={18}
+                  />
+                  <Input
+                    id="username"
+                    type="text"
+                    {...register("username", {
+                      required: "User name is required"
+                    })}
+                    value={userName}
+                    onChange={(e) => setUserName(e.target.value)}
                     placeholder="John Doe"
                     className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                   />
@@ -102,6 +138,10 @@ function Register() {
                   <Input
                     id="email"
                     type="email"
+                    {...register("email", {required: "Email is required", pattern: {
+                      value: /\S+@\S+\.\S+/,
+                      message: "Email is invalid"
+                    }})}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="john@example.com"
@@ -121,6 +161,10 @@ function Register() {
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
+                    {...register("password", {required: "Password is required", min: {
+                      value: 8,
+                      message: "Password must be at least 8 characters"
+                    }})}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="********"
@@ -137,7 +181,7 @@ function Register() {
               </div>
               <div className="space-y-2">
                 <Label
-                  htmlFor="confirm-password"
+                  htmlFor="confirm"
                   className="text-sm font-medium"
                 >
                   Confirm Password
@@ -148,8 +192,11 @@ function Register() {
                     size={18}
                   />
                   <Input
-                    id="confirm-password"
+                    id="confirm"
                     type={showPassword ? "text" : "password"}
+                    {...register("confirm", {required: "Password is required", 
+                      validate: (value) => value === getValues("password") || "Passwords do not match"
+                    })}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="********"
@@ -157,11 +204,11 @@ function Register() {
                   />
                 </div>
               </div>
-              {errors.length > 0 && (
+              {submittedErrors.length > 0 && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    {errors.map((error, index) => (
+                    {submittedErrors.map((error, index) => (
                       <p key={index}>{error}</p>
                     ))}
                   </AlertDescription>
@@ -184,7 +231,7 @@ function Register() {
             </p>
           </CardFooter>
         </Card>
-      </div>
+      </div>}
     </div>
   );
 }
