@@ -101,5 +101,12 @@ namespace RunApp.Domain.CustomerProfileAggregate
             if(Orders.Contains(orderId)) throw new InvalidOperationException("Cannot add the same order twice");
             Orders.Add(orderId);
         }
+        public void AddBoughtProducts(IEnumerable<Guid> boughtProducts)
+        {
+            foreach (var product in boughtProducts)
+            {
+                BoughtProducts.Add(product);
+            }
+        }
     }
 }

@@ -108,5 +108,12 @@ namespace RunApp.Domain.OrderAggregate
         {
             RaiseEvent(new CreateOrderEvent(Id, OrderId));
         }
+        public void PayOrder(Guid userId)
+        {
+            IsPaid = true;
+
+            var boughtProducts = LineItems.Select(x => x.ProductId);
+            RaiseEvent(new AddBoughtProductsEvent(userId, boughtProducts));
+        }
     }
 }

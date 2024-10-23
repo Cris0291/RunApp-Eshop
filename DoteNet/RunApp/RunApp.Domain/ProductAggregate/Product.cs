@@ -6,6 +6,7 @@ using RunApp.Domain.ProductAggregate.ValueTypes;
 using RunApp.Domain.Common;
 using RunApp.Domain.ProductAggregate.Events;
 using RunApp.Domain.ReviewAggregate;
+using RunApp.Domain.ProductAggregate.Tags;
 
 
 [assembly: InternalsVisibleTo("TestsUtilities")]
@@ -34,10 +35,11 @@ namespace RunApp.Domain.Products
         public decimal ActualPrice { get; internal set; }
         public string Description { get; internal set; }
         public int? NumberOfReviews { get; internal set; }
-        public double? AverageRatings { get; internal set; }
-        public PriceOffer PriceOffer { get; internal set; }
+        public double AverageRatings { get; internal set; }
+        public PriceOffer? PriceOffer { get; internal set; }
         public Characteristics Characteristic { get; internal set; }
         public ICollection<About> BulletPoints { get; internal set; }
+        public ICollection<Tag> Tags { get; internal set; }
 
 
         public static ErrorOr<Product> CreateProduct(string name, string description, decimal price, ICollection<string> bulletpoints, decimal? priceWithDiscount, string? promotionalText, string brand, string type, string color, double weight, Guid storeProfileId)
@@ -50,14 +52,19 @@ namespace RunApp.Domain.Products
             AddValidation(nameof(ProductError.ProductWeightCannotBeGreaterThan200Kilograms), () => weight > 200);
             Validate();
             if (HasError()) return Errors;
-            
+
+            PriceOffer? priceOffer = null;
+
+            if (priceWithDiscount != null && promotionalText != null) priceOffer = new PriceOffer { PriceWithDiscount = priceWithDiscount.Value, PromotionalText = promotionalText };
+
+
             var result =  new Product
             {
                 Name = name,
                 ActualPrice = price,
                 Description = description,
                 BulletPoints = bulletpoints.Select(point => new About() { BulletPoint = point }).ToList(),
-                PriceOffer = new PriceOffer {PriceWithDiscount = priceWithDiscount.Value, PromotionalText = promotionalText },
+                PriceOffer = priceOffer,
                 Characteristic = new Characteristics() { Brand = brand, Type = type, Color = color, Weight = weight},
                 Reviews = new(),
                 Ratings = new(),
@@ -72,8 +79,8 @@ namespace RunApp.Domain.Products
         {
             decimal maximumDiscount = 0.7m;
             AddValidation(nameof(ProductError.BulletPointsCollectionShoulNotBeEmpty), () =>!bulletpoints.Any());
-            AddValidation(nameof(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount), () => PriceOffer.PriceWithDiscount.HasValue && price < PriceOffer.PriceWithDiscount.Value);
-            AddValidation(nameof(ProductError.DiscountPricesMustBeMaximum70Percent), () => PriceOffer.PriceWithDiscount.HasValue && PriceOffer.PriceWithDiscount.Value < price - (price * maximumDiscount));
+            AddValidation(nameof(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount), () => PriceOffer != null && PriceOffer.PriceWithDiscount.HasValue && price < PriceOffer.PriceWithDiscount.Value);
+            AddValidation(nameof(ProductError.DiscountPricesMustBeMaximum70Percent), () => PriceOffer != null && PriceOffer.PriceWithDiscount.HasValue && PriceOffer.PriceWithDiscount.Value < price - (price * maximumDiscount));
             AddValidation(nameof(ProductError.ProductWeightCannotBeGreaterThan200Kilograms), () => weight > 200);
             Validate();
             if (HasError()) return Errors;
@@ -104,7 +111,7 @@ namespace RunApp.Domain.Products
         public ErrorOr<Success> AddPriceWithDiscount(decimal priceWithDiscount, string promotionalText)
         {
             decimal maximumDiscount = 0.7m;
-            AddValidation(nameof(ProductError.DiscountPricesMustBeMaximum70Percent),() =>priceWithDiscount < ActualPrice - (ActualPrice * maximumDiscount));
+            AddValidation(nameof(ProductError.DiscountPricesMustBeMaximum70Percent),() => priceWithDiscount < ActualPrice - (ActualPrice * maximumDiscount));
             AddValidation(nameof(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount), () => ActualPrice < priceWithDiscount);
             Validate();
             if (HasError()) return Errors;
@@ -126,12 +133,12 @@ namespace RunApp.Domain.Products
             if (Reviews.Contains(reviewId)) throw new InvalidOperationException("Cannot add more than one review per user");
             Reviews.Add(reviewId);
 
-            NumberOfReviews = Reviews.Count() + 1;
+            NumberOfReviews = Reviews.Count();
         }
         public void DeleteReview(Guid reviewId)
         {
             var wasRemoved = Reviews.Remove(reviewId);
-            NumberOfReviews = Reviews.Count() - 1;
+            NumberOfReviews = Reviews.Count();
             if (!wasRemoved) throw new InvalidOperationException("Review was not removerd");
         }
         public void AddProductStatus(Guid productStatusId)
@@ -147,6 +154,22 @@ namespace RunApp.Domain.Products
 
             _totalRatings += rating;
             AverageRatings = _totalRatings / Ratings.Count();
+        }
+        public ErrorOr<Tag> AddTag(string tag)
+        {
+            if (!Tag.validTags.Contains(tag)) return Error.Validation(code: "TagWasNotValid", description: "Tag was not valid");
+            if (Tags.Where(x => x.TagName == tag).Count() > 0) return Error.Validation(code: "TagWasAlreadyAdded", description: "Cannot add the same tag more than one time");
+
+            var tagToAdd = new Tag { TagName = tag };
+            Tags.Add(tagToAdd);
+            return tagToAdd;
+        }
+        public ErrorOr<Tag> DeleteTag(Guid tagId)
+        {
+            if (Tags.Count == 0) return Error.NotFound(code: "TagWsNotFound", description: "Tag was not found");
+            if (Tags.Count > 1) throw new InvalidOperationException("Cannot repeat tags");
+
+            return Tags.First();
         }
     }
 }
