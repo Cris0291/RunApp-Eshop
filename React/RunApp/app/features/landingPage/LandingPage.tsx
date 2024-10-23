@@ -1,3 +1,5 @@
+"use client"
+
 import Header from "@/app/ui/Header";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Truck, Award } from "lucide-react";
