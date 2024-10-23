@@ -7,13 +7,45 @@ import { Button } from "@/components/ui/button";
 import { EyeOff, Eye } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { LoginFormValues } from "./contracts";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle} from "lucide-react";
+import useLoginUser from "./userLoginUser";
+import { useRouter } from 'next/navigation'
 
 function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [submittedErrors, setSubmittedErrors] = useState<(string | undefined)[]>([])
+
+  const {register, handleSubmit, formState: {errors}} = useForm<LoginFormValues>();
+  const {loginUser, isPending} = useLoginUser()
+
+  const router = useRouter()
 
   const toogglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  const onSubmit: SubmitHandler<LoginFormValues> = (data) => {
+    loginUser(data, {
+      onSuccess(){
+        router.push("/")
+      }
+    })
+  } 
+
+  const onError = () => {
+    const newErrors: (string | undefined)[] = []
+
+    const values = Object.values(errors)
+
+    values.forEach(value => newErrors.push(value.message))
+
+    setSubmittedErrors(newErrors)
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-purple-500 relative overflow-hidden">
@@ -36,28 +68,42 @@ function LoginPage() {
             Enter your credentials to access your account
           </p>
         </div>
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit(onSubmit, onError)}>
           <div className="sapce-y-2">
-            <Label htmlFor="email" className="text-gray-700">
+            <Label htmlFor="email" className="text-sm font-medium">
               Email
             </Label>
             <Input
               id="email"
+              {...register("email", {
+                required:"Email is required", pattern: {
+                  value: /\S+@\S+\.\S+/,
+                  message: "Email is invalid"
+                }
+              })}
               placeholder="m@example.com"
-              required
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="bg-white/50"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-gray-700">
+            <Label htmlFor="password" className="text-sm font-medium">
               Password
             </Label>
             <div className="relative">
               <Input
                 id="password"
-                required
+                {...register("password",{
+                  required: "Password is required", min: {
+                     value: 8,
+                     message: "Password must be at least 8 characters"
+                  }
+                })}
                 type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="bg-white/50 pr-10"
               />
               <button
@@ -84,10 +130,20 @@ function LoginPage() {
                 Remember me
               </label>
             </div>
-            <Link className="text-sm text-indifo-600 hover:underline" href="#">
+            <Link className="text-sm text-indigo-600 hover:underline" href="#">
               Forgot password
             </Link>
           </div>
+          {submittedErrors.length > 0 && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    {submittedErrors.map((error, index) => (
+                      <p key={index}>{error}</p>
+                    ))}
+                  </AlertDescription>
+                </Alert>
+              )}
           <Button
             className="w-full bg-indigo-600 hover:bg-indigo-700"
             type="submit"
