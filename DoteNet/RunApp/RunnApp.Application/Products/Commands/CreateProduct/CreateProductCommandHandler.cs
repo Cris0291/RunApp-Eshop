@@ -2,6 +2,7 @@
 using MediatR;
 using RunApp.Domain.Products;
 using RunnApp.Application.Common.Interfaces;
+using System.Reflection.Metadata.Ecma335;
 
 
 namespace RunnApp.Application.Products.Commands.CreateProduct
@@ -17,14 +18,22 @@ namespace RunnApp.Application.Products.Commands.CreateProduct
         }
         public async Task<ErrorOr<Product>> Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
+            List<Error> errors = new();
             ErrorOr<Product> productOrError = Product.CreateProduct(request.Name, request.Description, request.Price, request.Bulletpoints, 
                                                                     request.PriceWithDiscount, request.PromotionalText, request.Brand, request.Type, request.Color, request.Weight,request.StoreProfileId);
 
             if (productOrError.IsError) return productOrError.Errors;
 
+            foreach(var tag in request.Tags)
+            {
+                var errorOrTag = productOrError.Value.AddTag(tag);
+                if (errorOrTag.IsError) errors.Add(errorOrTag.Errors.First());
+            }
+            if (errors.Count > 0) return errors;
+
             await _productsRepository.CreateProduct(productOrError.Value);
 
-           int rowsChanged = await _unitOfWorkPattern.CommitChangesAsync();
+            int rowsChanged = await _unitOfWorkPattern.CommitChangesAsync();
 
             if (rowsChanged == 0 && productOrError.Value.ProductId == Guid.Empty) throw new InvalidOperationException("Product could not be added to the database");
 

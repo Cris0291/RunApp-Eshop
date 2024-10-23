@@ -14,7 +14,8 @@ namespace RunnApp.Application.Reviews.Commands.CreateReview
         public async Task<ErrorOr<Review>> Handle(CreateReviewCommand request, CancellationToken cancellationToken)
         {
             var customer = await _customerProfileRepository.GetCustomerProfile(request.UserId);
-            if (!customer.BoughtProducts.Contains(request.ProductId)) return Error.Forbidden(code: "CanReviewedOnlyProductsThatWereBought", description: "Only bought products can be reviewed");
+            if (customer == null) throw new InvalidOperationException("Something unexpected happened. User was not found");
+            if (!customer.IsProductBought(request.ProductId)) return Error.Forbidden(code: "CanReviewedOnlyProductsThatWereBought", description: "Only bought products can be reviewed");
 
             bool existReview = await _reviewsRepository.ExistReview(request.UserId,request.ProductId);
             if (existReview) return ReviewError.UserCannotAddMoreThanOneReviewPerproduct;

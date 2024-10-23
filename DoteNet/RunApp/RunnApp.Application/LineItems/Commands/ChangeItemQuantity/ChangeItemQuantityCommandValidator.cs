@@ -6,7 +6,7 @@ namespace RunnApp.Application.LineItems.Commands.ChangeItemQuantity
     {
         public ChangeItemQuantityCommandValidator()
         {
-            RuleFor(x => x.Quatity).GreaterThan(0);
+            RuleFor(x => x.Quantity).GreaterThan(0);
         }
     }
 }

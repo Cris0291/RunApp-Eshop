@@ -1,10 +1,10 @@
 ﻿using ErrorOr;
 using MediatR;
-using RunApp.Domain.Products;
+using RunnApp.Application.Common.SortingPagingFiltering;
 
 namespace RunnApp.Application.Products.Queries.GetProducts
 {
-    public record GetProductsQuery(Guid UserId) : IRequest<IEnumerable<ProductForCard>>;
+    public record GetProductsQuery(Guid UserId, OrderByOptions OrderByOptions, FilterByOptions FilterByOptions, string FilterValue, int PageSize, int PageNumZeroBased) : IRequest<ErrorOr<IEnumerable<ProductsJoin>>>;
     
     
 }

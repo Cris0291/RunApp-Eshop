@@ -11,6 +11,8 @@ namespace RunnApp.Application.Stocks.Events
         public async Task Handle(CreateStockEvent notification, CancellationToken cancellationToken)
         {
             var storeProfile = await _profileRepository.GetStoreOwnerProfileWithStocks(notification.StoreOwnerId);
+            if (storeProfile == null) throw new InvalidOperationException("Current user was not found");
+
             storeProfile.CreateStock(notification.Product);
 
             await _unitOfWorkPattern.CommitChangesAsync();

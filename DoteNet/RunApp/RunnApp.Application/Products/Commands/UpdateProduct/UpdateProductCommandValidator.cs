@@ -8,7 +8,7 @@ namespace RunnApp.Application.Products.Commands.UpdateProduct
         {
             RuleFor(command => command.Name).NotNull().NotEmpty();
             RuleFor(command => command.Description).NotNull().NotEmpty();
-            RuleFor(command => command.Price).GreaterThanOrEqualTo(0);
+            RuleFor(command => command.Price).GreaterThan(0);
             RuleFor(command => command.Brand).NotNull().NotEmpty();
             RuleFor(command => command.Type).NotNull().NotEmpty();
             RuleFor(command => command.Color).NotNull().NotEmpty();

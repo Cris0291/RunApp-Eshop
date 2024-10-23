@@ -11,7 +11,14 @@ namespace RunnApp.Application.Orders.Commands.PayOrder
         private readonly IUnitOfWorkPattern _unitOfWorkPattern = unitOfWorkPattern;
         public async Task<ErrorOr<Order>> Handle(PayOrderCommand request, CancellationToken cancellationToken)
         {
-            
+            var order = await _orderRepository.GetOrder(request.OrderId);
+            if (order == null) throw new InvalidOperationException("Order was not found in the database");
+
+            order.PayOrder(request.UserId);
+
+            await _unitOfWorkPattern.CommitChangesAsync();
+
+            return order;
         }
     }
 }
