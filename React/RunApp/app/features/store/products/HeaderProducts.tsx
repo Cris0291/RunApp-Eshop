@@ -3,7 +3,12 @@ import { Input } from "@/components/ui/input";
 import { Dumbbell, Menu, Search, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 
-function HeaderProducts() {
+interface Props {
+  handleSearch: (search: string) => void,
+  search: string,
+}
+
+function HeaderProducts({handleSearch, search}: Props) {
   return (
     <header className="bg-white shadow-sm">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -18,6 +23,8 @@ function HeaderProducts() {
               className="pl-10 pr-4 py-2 w-full"
               placeholder="Search for fitness products..."
               type="search"
+              value={search}
+              onChange={(e) => handleSearch(e.target.value)}
             />
           </div>
         </div>
