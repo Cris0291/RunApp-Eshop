@@ -32,6 +32,11 @@ namespace RunApp.Infrastructure.Products.Persistence
                 .WithOne()
                 .HasForeignKey<Stock>(x => x.StockProductId);
 
+            builder.HasMany(x => x.Tags)
+                .WithMany();
+                
+              
+
 
            /* builder.HasData(new Product()
             {

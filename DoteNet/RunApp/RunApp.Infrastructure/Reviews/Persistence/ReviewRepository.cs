@@ -11,8 +11,7 @@ namespace RunApp.Infrastructure.Reviews.Persistence
         private readonly AppStoreDbContext _appStoreDbContext = appStoreDbContext;
         public async Task<bool> ExistReview(Guid userId, Guid productId)
         {
-            bool existReview = await _appStoreDbContext.Reviews.AnyAsync(r => r.Id == userId && r.ProductId == productId);
-            return existReview;
+            return await _appStoreDbContext.Reviews.AnyAsync(r => r.Id == userId && r.ProductId == productId);
         }
         public async Task<Review?> GetReview(Guid userId, Guid productId)
         {
@@ -25,6 +24,7 @@ namespace RunApp.Infrastructure.Reviews.Persistence
         public async Task RemoveReview(Review review)
         {
             _appStoreDbContext.Remove(review);
+            await Task.CompletedTask;
         }
         public async Task<List<Review>> GetReviewsForProduct(Guid productId)
         {

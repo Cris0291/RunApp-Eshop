@@ -12,12 +12,15 @@ using RunApp.Infrastructure.StoreOwnerProfiles.Persistence;
 using RunApp.Infrastructure.Ratings.Persistence;
 using RunApp.Infrastructure.ProductStatuses.Persistence;
 using RunApp.Infrastructure.Common.Queries.LeftJoinQuery;
+using RunApp.Infrastructure.Orders.Persistence;
+using RunApp.Infrastructure.Photos;
+using Microsoft.Extensions.Configuration;
 
 namespace RunApp.Infrastructure
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString, IConfiguration configuration)
         {
             services.AddScoped<IProductsRepository, ProductRepository>();
             services.AddDbContext<AppStoreDbContext>(options => options.UseSqlServer(connectionString));
@@ -28,6 +31,8 @@ namespace RunApp.Infrastructure
             services.AddScoped<IRatingsRepository, RatingsRepository>();
             services.AddScoped<IProductStatusRepository, ProductStatusRepository>();
             services.AddScoped<ILeftJoinRepository, LeftJoinRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.Configure<CloudinarySettings>(configuration.GetSection("Cloudinary"));
 
             services.AddIdentityCore<AppUser>(opt =>
             {
