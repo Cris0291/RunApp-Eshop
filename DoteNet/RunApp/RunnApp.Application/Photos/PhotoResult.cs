@@ -2,7 +2,7 @@
 {
     public class PhotoResult
     {
-        public string PublicId { get; set; }
+        public string PhotoId { get; set; }
         public string Url { get; set; }
     }
 }

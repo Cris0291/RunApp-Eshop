@@ -39,7 +39,7 @@ namespace RunApp.Infrastructure.Photos.Persistence
 
                 return new PhotoResult
                 {
-                    PublicId = uploadResult.PublicId,
+                    PhotoId = uploadResult.PublicId,
                     Url = uploadResult.SecureUrl.ToString()
                 };
             }

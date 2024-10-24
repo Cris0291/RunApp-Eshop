@@ -4,6 +4,6 @@
     {
         private Photo() { }
         public string PhotoId { get; set; }
-        public string URL { get; private set; }
+        public string Url { get; private set; }
     }
 }
