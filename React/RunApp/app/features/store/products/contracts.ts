@@ -1,6 +1,6 @@
 export type ProductsQuery = {
-    sortType: string
-    filterType: string
-    filterValue: string[]
-    pageSize: number
+    sortBy: string
+    search: string
+    categories: string[]
+    priceRange: number[]
 }

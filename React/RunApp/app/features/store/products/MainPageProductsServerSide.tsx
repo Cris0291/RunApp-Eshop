@@ -19,7 +19,9 @@ interface Props {
   handlePriceRange: (priceRange: number[]) => void,
   handleSortBy: (sortBy: string) => void,
   priceRange: number[],
-  sortBy: string 
+  sortBy: string ,
+  selectedCategories: string[],
+  handleSubmit: (e : React.FormEvent<HTMLFormElement>) => void
 }
 
 const products = [
@@ -97,8 +99,7 @@ const products = [
   },
 ];
 
-function MainPageProductsServerSide({handleSelectedCategories, handlePriceRange, handleSortBy, priceRange, sortBy} : Props) {
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+function MainPageProductsServerSide({handleSelectedCategories, handlePriceRange, handleSortBy, priceRange, sortBy, selectedCategories, handleSubmit} : Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 6;
 
@@ -134,16 +135,15 @@ function MainPageProductsServerSide({handleSelectedCategories, handlePriceRange,
                         checked={selectedCategories.includes(category)}
                         onChange={(e) => {
                           if (e.target.checked) {
-                            setSelectedCategories([
+                            handleSelectedCategories([
                               ...selectedCategories,
                               category,
                             ]);
                           } else {
-                            setSelectedCategories(
+                            handleSelectedCategories(
                               selectedCategories.filter((c) => c !== category)
                             );
                           }
-                          handleSelectedCategories(selectedCategories)
                         }}
                       />
                       <span className="text-gray-700 ml-2">{category}</span>
@@ -169,9 +169,11 @@ function MainPageProductsServerSide({handleSelectedCategories, handlePriceRange,
                 <span className="text-sm text-gray-600">${priceRange[1]}</span>
               </div>
             </div>
+            <form onSubmit={handleSubmit}>
             <Button className="bg-green-500 text-white hover:bg-green-600">
                Search
           </Button>
+          </form>
           </div>
         </aside>
         <div className="w-full md:w-3/4">
