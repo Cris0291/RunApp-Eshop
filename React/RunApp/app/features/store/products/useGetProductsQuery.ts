@@ -9,10 +9,10 @@ export default function useGetProductsQuery({sortBy ,search ,categories, priceRa
     const pathname = usePathname();
     const {replace} = useRouter();
     const params = new URLSearchParams(searchParams)
-    console.log("in custom query hook")
+    console.log(`in custom query hook ${sortBy} ${search} ${categories} ${priceRange}`)
     let queryParams = "";
-
-    replace(`${pathname}`)
+    
+    replace("/products");
 
     if(categories.length > 0){
         for(let i  = 0; i < categories.length; i++){
@@ -20,7 +20,7 @@ export default function useGetProductsQuery({sortBy ,search ,categories, priceRa
         }
       }
 
-      if(priceRange.length > 0 && priceRange[0] != 0 && priceRange[1] != 1){
+      if(priceRange.length > 0 && priceRange[0] != 0 && priceRange[1] != 0){
         for(let i = 0; i < priceRange.length; i++){
           params.set(`filterByPrice[${i}]`, priceRange[i].toString())
         }
@@ -35,6 +35,7 @@ export default function useGetProductsQuery({sortBy ,search ,categories, priceRa
       }
 
       queryParams = params.toString()
+      console.log(`${queryParams}`)
       replace(`${pathname}?${params.toString()}`)
 
     const {isLoading, data: products, refetch, error} = useQuery({

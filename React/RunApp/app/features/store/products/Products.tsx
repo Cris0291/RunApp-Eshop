@@ -5,16 +5,30 @@ import HeaderProducts from "./HeaderProducts";
 import MainPageProductsServerSide from "./MainPageProductsServerSide";
 import { useState } from "react";
 import useGetProductsQuery from "./useGetProductsQuery";
+import { getSearchQueryProduct } from "./productsQuerySlice";
+import { useAppSelector } from '@/app/hooks/reduxHooks'
 
 function Products() {
+  const searchTerm = useAppSelector(getSearchQueryProduct)
+  const [firstRefetch, setFirstRefetch] = useState<boolean>();
   const [priceRange, setPriceRange] = useState<number[]>([0,0]);
-  const [sortBy, setSortBy] = useState("");
-  const [search, setSearch] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState("");
+  const [search, setSearch] = useState(() => {
+    console.log("just a test")
+    setFirstRefetch(true)
+    return searchTerm
+  });
+  
 
   let queryValues : ProductsQuery = {sortBy, search, priceRange, categories: selectedCategories}
 
   const {isLoading, products, refetch, error} = useGetProductsQuery(queryValues);
+  if(firstRefetch){
+    console.log("executed once")
+    setFirstRefetch(false)
+    refetch()
+  }
 
   const handleSelectedCategories = (categories: string[]) => {
     setSelectedCategories(categories)
