@@ -6,6 +6,7 @@ using RunApp.Api.Routes;
 using RunnApp.Application.Photos.Commands.AddProductPhoto;
 using RunApp.Api.Services;
 using RunApp.Api.Mappers.Photos;
+using RunnApp.Application.Photos.Commands.RemoveProductPhoto;
 
 namespace RunApp.Api.Controllers.Photos
 {
@@ -21,6 +22,15 @@ namespace RunApp.Api.Controllers.Photos
             var result = await _mediator.Send(new AddProductPhotoCommand(photoRequest.ProductId, storeOwnerId, photoRequest.photo));
 
             return result.MatchFirst(value => Ok(value.PhotoResultToPhotoResponse()), Problem);
+        }
+        [Authorize("StoreProfile")]
+        [HttpDelete(ApiEndpoints.Products.RemovePhoto)]
+        public async Task<IActionResult> RemovePhoto([FromRoute] Guid productId, [FromRoute] string photoId)
+        {
+            Guid storeOwnerId = HttpContext.GetStoreOwnerId();
+            var result = await _mediator.Send(new RemoveProductPhotoCommand(productId, storeOwnerId, photoId));
+
+            return result.MatchFirst(value => Ok(), Problem);
         }
     }
 }

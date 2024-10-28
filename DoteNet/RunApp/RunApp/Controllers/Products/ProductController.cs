@@ -54,10 +54,10 @@ namespace RunApp.Api.Controllers.Products
         {
             Guid userId = HttpContext.GetUserId();
 
-            var options  = getAllProducts.SortingValueAndType.ConverToEnum(getAllProducts.filterType);
+            var options  = getAllProducts.SortingType.ConverToEnum();
             if (options.IsError) return Problem(options.Errors);
 
-            GetProductsQuery getProductsQuery = new GetProductsQuery(userId, options.Value.Item1, options.Value.Item2, getAllProducts.filterValue, getAllProducts.PageSize, getAllProducts.pageNumZeroBased);
+            GetProductsQuery getProductsQuery = new GetProductsQuery(userId, options.Value, getAllProducts.filterByLikes, getAllProducts.filterByStars, getAllProducts.Categories, getAllProducts.PriceRange, getAllProducts.search);
 
             var products = await _mediator.Send(getProductsQuery);
             return products.Match(value => Ok(value.AllProductsToProductsResponse()), Problem);

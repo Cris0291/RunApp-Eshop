@@ -28,6 +28,7 @@
             public const string DeleteTag = $"{ProductBase}/{{Productid:guid}}/tags/{{Tagid:guid}}";
 
             public const string AddPhoto = $"{ProductBase}/{{id:guid}}/photos";
+            public const string RemovePhoto = $"{ProductBase}/{{productId:guid}}/photos/{{photoId:string}}";
 
         }
         public static class Account

@@ -5,15 +5,11 @@ namespace RunApp.Api.CustomValidators
 {
     public static class SortingAndFilteringEnumValidator
     {
-        public static ErrorOr<(OrderByOptions, FilterByOptions)> ConverToEnum(this string sortingValueAndType, string filterType)
+        public static ErrorOr<OrderByOptions> ConverToEnum(this string sortingType)
         {
-            List<Error> errors = new();
-
-            if (!Enum.TryParse(sortingValueAndType, out OrderByOptions orderBy)) errors.Add(Error.Validation(code: "SortingValueDidNotMatchSortingOptions", description: "Sorting value did not match sorting options"));
-            if (!Enum.TryParse(filterType, out FilterByOptions filterBy)) errors.Add(Error.Validation(code: "FilterValuDidNotMathFilterOptions", description: "Filter value did not match filtering options"));
-            if (errors.Count > 0) return errors;
-
-            return (orderBy, filterBy);
+            if (!Enum.TryParse(sortingType, out OrderByOptions orderBy)) return Error.Validation(code: "SortingValueDidNotMatchSortingOptions", description: "Sorting value did not match sorting options");
+            
+            return orderBy;
         }
     }
 }
