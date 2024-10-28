@@ -96,6 +96,10 @@ export default function ProductDisplay() {
   const [quantity, setQuantity] = useState(1)
   const [mainImage, setMainImage] = useState(productTest.images[0])
 
+  const handleAddTocartState = () => {
+
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-pink-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -178,7 +182,7 @@ export default function ProductDisplay() {
 
                 {/* Add to Cart and Wishlist Buttons */}
                 <div className="flex space-x-4">
-                  <Button className="flex-1 bg-pink-500 text-white hover:bg-pink-600 transition-colors duration-300 transform hover:scale-105">
+                  <Button className="flex-1 bg-pink-500 text-white hover:bg-pink-600 transition-colors duration-300 transform hover:scale-105" onClick={handleAddTocartState}>
                     Add to Cart
                   </Button>
                   <Button variant="outline" className="flex items-center justify-center w-12 flex-shrink-0 hover:bg-pink-50 transition-colors duration-300 transform hover:scale-105">
