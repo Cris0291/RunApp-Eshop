@@ -15,6 +15,7 @@ using RunApp.Infrastructure.Common.Queries.LeftJoinQuery;
 using RunApp.Infrastructure.Orders.Persistence;
 using RunApp.Infrastructure.Photos;
 using Microsoft.Extensions.Configuration;
+using RunApp.Infrastructure.Photos.Persistence;
 
 namespace RunApp.Infrastructure
 {
@@ -32,6 +33,8 @@ namespace RunApp.Infrastructure
             services.AddScoped<IProductStatusRepository, ProductStatusRepository>();
             services.AddScoped<ILeftJoinRepository, LeftJoinRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IPhotoAccessor, PhotoAccessor>();
+            services.AddScoped<IPhotoRepository, PhotoRepository>();
             services.Configure<CloudinarySettings>(configuration.GetSection("Cloudinary"));
 
             services.AddIdentityCore<AppUser>(opt =>

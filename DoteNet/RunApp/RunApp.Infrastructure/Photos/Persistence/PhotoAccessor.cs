@@ -21,7 +21,6 @@ namespace RunApp.Infrastructure.Photos.Persistence
 
             _cloudinary = new Cloudinary(account);
         }
-        
         public async Task<PhotoResult?> AddPhoto(IFormFile file)
         {
             if(file.Length > 0)
@@ -46,12 +45,11 @@ namespace RunApp.Infrastructure.Photos.Persistence
 
             return null;
         }
-
-        public async Task<ErrorOr<string>> DeletePhoto(string publicId)
+        public async Task<ErrorOr<Success>> DeletePhoto(string publicId)
         {
             var deleteParams = new DeletionParams(publicId);
             var result = await _cloudinary.DestroyAsync(deleteParams);
-            return result.Result == "ok" ? result.Result : ErrorOr.Error.Unexpected(code: "ImageCouldNotBeDeleted", description: "Image could noot be deleted");
+            return result.Result == "ok" ? Result.Success : ErrorOr.Error.Unexpected(code: "ImageCouldNotBeDeleted", description: "Image could noot be deleted");
         }
     }
 }

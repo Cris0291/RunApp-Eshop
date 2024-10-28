@@ -22,6 +22,7 @@ using RunApp.Domain.ReviewAggregate;
 using RunApp.Domain.RatingAggregate;
 using RunApp.Domain.ProductStatusAggregate;
 using RunApp.Domain.OrderAggregate;
+using RunApp.Domain.PhotoAggregate;
 
 namespace RunApp.Infrastructure.Common.Persistence
 {
@@ -35,6 +36,7 @@ namespace RunApp.Infrastructure.Common.Persistence
         public DbSet<Rating> Ratings => Set<Rating>();
         public DbSet<ProductStatus> ProductStatuses => Set<ProductStatus>();
         public DbSet<Order> Orders => Set<Order>();
+        public DbSet<Photo> Photos => Set<Photo>();
         public AppStoreDbContext(DbContextOptions<AppStoreDbContext> options, IHttpContextAccessor httpContextAccessor) : base(options) 
         {
             _httpContextAccessor = httpContextAccessor;
