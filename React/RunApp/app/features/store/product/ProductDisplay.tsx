@@ -1,189 +1,296 @@
-"use client";
+"use client"
 
-import { AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar } from "@radix-ui/react-avatar";
-import { Check, ShoppingCart, Star, ThumbsUp } from "lucide-react";
-import Image from "next/image";
-import { useState } from "react";
+import { useState } from "react"
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Progress } from "@/components/ui/progress"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Star, Truck, RefreshCcw, Heart, ChevronRight, ThumbsUp, ThumbsDown, Watch, Droplet, Shield, Clock } from "lucide-react"
+import { usePathname } from "next/navigation"
+import useGetProductQuery from "./useGetProductQuery"
 
-const testReviews = [
-  {
-    name: "Alex Johnson",
-    avatar: "AJ",
-    date: "May 15, 2023",
-    rating: 5,
-    title: "Excellent quality and versatility!",
-    comment:
-      "I've been using these resistance bands for a month now, and I'm impressed with their quality and versatility. They've really helped me maintain my fitness routine at home.",
-    helpful: 24,
-  },
-  {
-    name: "Sarah Lee",
-    avatar: "SL",
-    date: "April 30, 2023",
-    rating: 4,
-    title: "Great for home workouts",
-    comment:
-      "These bands are perfect for my home workouts. They're easy to use and store. The only reason I didn't give 5 stars is that I wish they came with a workout guide.",
-    helpful: 18,
-  },
-  {
-    name: "Mike Thompson",
-    avatar: "MT",
-    date: "April 22, 2023",
-    rating: 5,
-    title: "Durable and effective",
-    comment:
-      "I was skeptical at first, but these resistance bands have exceeded my expectations. They're very durable and provide a great workout. Highly recommended!",
-    helpful: 31,
-  },
-];
-
-function ProductDisplay() {
-  const [quantity, setQuantity] = useState(1);
-
-  const incrementQuantity = () => setQuantity((prev) => prev + 1);
-  const decrementQuantity = () =>
-    setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
-
-  return (
-    <div className="conatiner mx-auto px-4 py-8 bg-white">
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="space-y-4">
-          <Image
-            src="https://images.unsplash.com/photo-1557461761-c7c2b7a5fa97?q=80&w=1530&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Name Of The Product"
-            width={400}
-            height={400}
-            className="w-full rounded-lg"
-          />
-          <div className="grid grid-cols-4 gap-2">
-            {[...Array(4)].map((_, i) => (
-              <Image
-                key={i}
-                src="https://images.unsplash.com/photo-1557461761-c7c2b7a5fa97?q=80&w=1530&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                alt={`Product thumbnail ${i + 1}`}
-                width={100}
-                height={100}
-                className="w- full rounded-lg cursor-pointer"
-              />
-            ))}
-          </div>
-        </div>
-        <div className="space-y-6">
-          <h1 className="text-3xl font-bold text-black">
-            Premium Resistance Bands Set
-          </h1>
-          <div className="flex items-center space-x-2">
-            <div className="flex">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className="w-5 h-5 fill-yellow-400 stroke-yellow-400"
-                />
-              ))}
-            </div>
-            <span className="text-sm text-gray-500">(128 reviews)</span>
-          </div>
-          <p className="text-xl font-bold text-black">$39.99</p>
-          <p className="text-green-600 flex items-center">
-            <Check className="w-5 h-5 mr-2" /> In Stock
-          </p>
-          <p className="text-gray-600">
-            Elevate your home workouts with our Premium Resistance Bands Set.
-            Perfect for all fitness levels, these durable latex bands offer
-            varying resistance levels to help you build strength, improve
-            flexibility, and achieve your fitness goals.
-          </p>
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center border rounded-md">
-              <button
-                onClick={decrementQuantity}
-                className="px-3 py-1 text-xl text-black"
-              >
-                -
-              </button>
-              <span className="px-3 py-1 border-x text-black">{quantity}</span>
-              <button
-                className="px-3 py-1 text-xl text-black"
-                onClick={incrementQuantity}
-              >
-                +
-              </button>
-            </div>
-            <Button className="flex items-center">
-              <ShoppingCart className="w-5 h-5 mr-2" />
-              AddTocart
-            </Button>
-          </div>
-          <Card>
-            <CardContent className="p-4">
-              <h3 className="font-semibold mb-2">Key Features:</h3>
-              <ul className="list-disc list-inside space-y-1">
-                <li>5 resistance levels for progressive training</li>
-                <li>Made from high-quality, durable latex</li>
-                <li>Includes door anchor and ankle straps</li>
-                <li>Compact and portable for workouts anywhere</li>
-                <li>Suitable for all fitness levels</li>
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-      <div className="mt-12">
-        <h2 className="text-2xl font-bold mb-4 text-black">Customer Reviews</h2>
-        <div className="space-y-6">
-          {testReviews.map((review, i) => (
-            <Card key={i}>
-              <CardContent className="p-6">
-                <div className="flex items-start space-x-4">
-                  <Avatar>
-                    <AvatarFallback>{review.avatar}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold">{review.name}</h3>
-                      <span className="text-sm text-gray-500">
-                        {review.date}
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2 mt-1">
-                      <div className="flex">
-                        {[...Array(5)].map((_, j) => (
-                          <Star
-                            key={j}
-                            className={`w-4 h-4 ${
-                              j < review.rating
-                                ? "fill-yellow-400 stroke-yellow-400"
-                                : "fill-gray-200 stroke-gray-200"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <Badge variant="secondary">{review.rating}/5</Badge>
-                    </div>
-                    <h4 className="font-medium mt-2">{review.title}</h4>
-                    <p className="text-sm text-gray-600 mt-2">
-                      {review.comment}
-                    </p>
-                    <div className="flex items-center space-x-2 mt-4">
-                      <Button variant="outline" size="sm">
-                        <ThumbsUp className="w-4 h-4 mr-2" />
-                        Helpful ({review.helpful})
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+const productTest = {
+  name: "Elegant Timepiece",
+  price: 299.99,
+  rating: 4.5,
+  reviews: 128,
+  description: "A sophisticated watch that combines classic design with modern functionality. Perfect for both casual and formal occasions.",
+  features: [
+    "Swiss movement",
+    "Sapphire crystal glass",
+    "Water-resistant up to 50 meters",
+    "Genuine leather strap",
+    "1-year warranty"
+  ],
+  categories: [
+    { name: "Analog", icon: Watch },
+    { name: "Water Resistant", icon: Droplet },
+    { name: "Durable", icon: Shield },
+    { name: "Precise", icon: Clock },
+  ],
+  images: [
+    "/placeholder.svg?height=400&width=400",
+    "/placeholder.svg?height=400&width=400",
+    "/placeholder.svg?height=400&width=400",
+    "/placeholder.svg?height=400&width=400"
+  ]
 }
 
-export default ProductDisplay;
+const reviews = [
+  {
+    id: 1,
+    author: "Alice Johnson",
+    avatar: "/placeholder.svg?height=40&width=40",
+    rating: 5,
+    date: "2023-05-15",
+    content: "This watch exceeded my expectations. The craftsmanship is impeccable, and it looks even better in person. Highly recommended!",
+    helpful: 24,
+    notHelpful: 2
+  },
+  {
+    id: 2,
+    author: "Bob Smith",
+    avatar: "/placeholder.svg?height=40&width=40",
+    rating: 4,
+    date: "2023-05-10",
+    content: "Great watch for the price. The only reason I'm not giving it 5 stars is because the strap took a while to break in. Otherwise, it's perfect.",
+    helpful: 18,
+    notHelpful: 1
+  },
+  {
+    id: 3,
+    author: "Charlie Brown",
+    avatar: "/placeholder.svg?height=40&width=40",
+    rating: 5,
+    date: "2023-05-05",
+    content: "I've been wearing this watch daily for a month now, and it's holding up beautifully. The timekeeping is precise, and I love the classic design.",
+    helpful: 30,
+    notHelpful: 0
+  }
+]
+
+function StarRating({ rating }: { rating: number }) {
+  return (
+    <div className="flex">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Star
+          key={star}
+          className={`h-5 w-5 ${
+            star <= rating
+              ? "text-yellow-400 fill-current"
+              : "text-gray-300"
+          }`}
+        />
+      ))}
+    </div>
+  )
+}
+
+export default function ProductDisplay() {
+  const pathname = usePathname();
+  const {isLoading, product, error} = useGetProductQuery(pathname)
+  const [quantity, setQuantity] = useState(1)
+  const [mainImage, setMainImage] = useState(productTest.images[0])
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-white to-pink-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <Card className="overflow-hidden bg-white shadow-xl hover:shadow-2xl transition-shadow duration-300">
+          <CardContent className="p-6 sm:p-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+              {/* Product Images */}
+              <div className="space-y-4">
+                <div className="aspect-square relative overflow-hidden rounded-lg bg-gray-100 group">
+                  <Image
+                    src={mainImage}
+                    alt={productTest.name}
+                    layout="fill"
+                    objectFit="cover"
+                    className="group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-300" />
+                </div>
+                <div className="grid grid-cols-4 gap-4">
+                  {productTest.images.map((img, index) => (
+                    <button
+                      key={index}
+                      className={`aspect-square relative overflow-hidden rounded-lg bg-gray-100 group ${
+                        img === mainImage ? 'ring-2 ring-pink-500' : ''
+                      }`}
+                      onClick={() => setMainImage(img)}
+                    >
+                      <Image
+                        src={img}
+                        alt={`${productTest.name} view ${index + 1}`}
+                        layout="fill"
+                        objectFit="cover"
+                        className="group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-300" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Product Details */}
+              <div className="space-y-6">
+                <h1 className="text-3xl font-bold text-gray-900 hover:text-pink-600 transition-colors duration-300">{productTest.name}</h1>
+                <div className="flex items-center space-x-2">
+                  <StarRating rating={productTest.rating} />
+                  <span className="text-sm text-gray-500 hover:text-pink-500 transition-colors duration-300">({productTest.reviews} reviews)</span>
+                </div>
+                <p className="text-3xl font-bold text-gray-900 hover:text-pink-600 transition-colors duration-300">${productTest.price.toFixed(2)}</p>
+                <p className="text-gray-600 hover:text-gray-800 transition-colors duration-300">{productTest.description}</p>
+
+                {/* Category Icons */}
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900 mb-3">Product Categories</h3>
+                  <div className="flex flex-wrap gap-4">
+                    {productTest.categories.map((category) => (
+                      <div key={category.name} className="flex flex-col items-center group">
+                        <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center group-hover:bg-pink-200 transition-colors duration-300">
+                          <category.icon className="w-6 h-6 text-pink-500" />
+                        </div>
+                        <span className="mt-1 text-xs text-gray-600 group-hover:text-pink-600 transition-colors duration-300">{category.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Quantity Selection */}
+                <div className="flex items-center space-x-3">
+                  <Label htmlFor="quantity" className="text-sm font-medium text-gray-900">
+                    Quantity
+                  </Label>
+                  <Input
+                    type="number"
+                    id="quantity"
+                    min="1"
+                    value={quantity}
+                    onChange={(e) => setQuantity(parseInt(e.target.value))}
+                    className="w-20 hover:border-pink-500 focus:border-pink-500 transition-colors duration-300"
+                  />
+                </div>
+
+                {/* Add to Cart and Wishlist Buttons */}
+                <div className="flex space-x-4">
+                  <Button className="flex-1 bg-pink-500 text-white hover:bg-pink-600 transition-colors duration-300 transform hover:scale-105">
+                    Add to Cart
+                  </Button>
+                  <Button variant="outline" className="flex items-center justify-center w-12 flex-shrink-0 hover:bg-pink-50 transition-colors duration-300 transform hover:scale-105">
+                    <Heart className="h-5 w-5 text-pink-500" />
+                    <span className="sr-only">Add to wishlist</span>
+                  </Button>
+                </div>
+
+                {/* Shipping and Returns */}
+                <div className="border-t border-gray-200 pt-4 space-y-2">
+                  <div className="flex items-center text-sm text-gray-500 hover:text-pink-500 transition-colors duration-300">
+                    <Truck className="h-5 w-5 mr-2" />
+                    Free shipping on orders over $50
+                  </div>
+                  <div className="flex items-center text-sm text-gray-500 hover:text-pink-500 transition-colors duration-300">
+                    <RefreshCcw className="h-5 w-5 mr-2" />
+                    Free 30-day returns
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Product Tabs */}
+            <Tabs defaultValue="features" className="mt-10">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="features" className="hover:bg-pink-50 transition-colors duration-300">Features</TabsTrigger>
+                <TabsTrigger value="specs" className="hover:bg-pink-50 transition-colors duration-300">Specifications</TabsTrigger>
+                <TabsTrigger value="reviews" className="hover:bg-pink-50 transition-colors duration-300">Reviews</TabsTrigger>
+              </TabsList>
+              <TabsContent value="features" className="mt-6">
+                <ul className="list-disc pl-5 space-y-2 text-gray-600">
+                  {productTest.features.map((feature, index) => (
+                    <li key={index} className="hover:text-pink-600 transition-colors duration-300">{feature}</li>
+                  ))}
+                </ul>
+              </TabsContent>
+              <TabsContent value="specs" className="mt-6">
+                <p className="text-gray-600 hover:text-pink-600 transition-colors duration-300">
+                  Detailed specifications for the {productTest.name} would be listed here.
+                </p>
+              </TabsContent>
+              <TabsContent value="reviews" className="mt-6">
+                <div className="space-y-8">
+                  {/* Review Summary */}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 hover:text-pink-600 transition-colors duration-300">Customer Reviews</h3>
+                      <div className="flex items-center mt-1">
+                        <StarRating rating={productTest.rating} />
+                        <span className="ml-2 text-sm text-gray-500 hover:text-pink-500 transition-colors duration-300">{productTest.rating} out of 5</span>
+                      </div>
+                    </div>
+                    <Button variant="outline" className="hover:bg-pink-50 hover:text-pink-600 transition-colors duration-300 transform hover:scale-105">Write a review</Button>
+                  </div>
+
+                  {/* Rating Distribution */}
+                  <div className="space-y-2">
+                    {[5, 4, 3, 2, 1].map((star) => (
+                      <div key={star} className="flex items-center group">
+                        <span className="text-sm text-gray-600 w-8 group-hover:text-pink-600 transition-colors duration-300">{star} star</span>
+                        <Progress value={star * 20} className="h-2 w-full mx-4 group-hover:bg-pink-100 transition-colors duration-300" />
+                        <span className="text-sm text-gray-600 w-12 group-hover:text-pink-600 transition-colors duration-300">{star * 20}%</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Individual Reviews */}
+                  <div className="space-y-6">
+                    {reviews.map((review) => (
+                      <div key={review.id} className="border-t border-gray-200 pt-6 group">
+                        <div className="flex items-center mb-4">
+                          <Avatar className="h-10 w-10 group-hover:ring-2 group-hover:ring-pink-500 transition-all duration-300">
+                            <AvatarImage src={review.avatar} alt={review.author} />
+                            <AvatarFallback>{review.author[0]}</AvatarFallback>
+                          </Avatar>
+                          <div className="ml-4">
+                            <h4 className="text-sm font-semibold text-gray-900 group-hover:text-pink-600 transition-colors duration-300">{review.author}</h4>
+                            <div className="flex items-center">
+                              <StarRating rating={review.rating} />
+                              <span className="ml-2 text-sm text-gray-500 group-hover:text-pink-500 transition-colors duration-300">{review.date}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-gray-600 mb-4 group-hover:text-gray-800 transition-colors duration-300">{review.content}</p>
+                        <div className="flex items-center space-x-4">
+                          <Button variant="outline" size="sm" className="text-gray-500 hover:bg-pink-50 hover:text-pink-600 transition-colors duration-300 transform hover:scale-105">
+                            <ThumbsUp className="h-4 w-4 mr-2" />
+                            Helpful ({review.helpful})
+                          </Button>
+                          <Button variant="outline" size="sm" className="text-gray-500 hover:bg-pink-50 hover:text-pink-600 transition-colors duration-300 transform hover:scale-105">
+                            <ThumbsDown className="h-4 w-4 mr-2" />
+                            Not Helpful ({review.notHelpful})
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Load More Reviews */}
+                
+                  <div className="text-center">
+                    <Button variant="outline" className="text-pink-500 hover:text-pink-600 hover:bg-pink-50 transition-colors duration-300 transform hover:scale-105">
+                      Load More Reviews
+                      <ChevronRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
