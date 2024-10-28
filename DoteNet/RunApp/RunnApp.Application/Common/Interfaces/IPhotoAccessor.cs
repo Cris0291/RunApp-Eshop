@@ -7,6 +7,6 @@ namespace RunnApp.Application.Common.Interfaces
     public interface IPhotoAccessor
     {
         Task<PhotoResult?> AddPhoto(IFormFile file);
-        Task<ErrorOr<string>> DeletePhoto(string publicId);
+        Task<ErrorOr<Success>> DeletePhoto(string publicId);
     }
 }
