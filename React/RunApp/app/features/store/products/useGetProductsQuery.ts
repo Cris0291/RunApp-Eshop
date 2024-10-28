@@ -12,15 +12,17 @@ export default function useGetProductsQuery({sortBy ,search ,categories, priceRa
     console.log(`in custom query hook ${sortBy} ${search} ${categories} ${priceRange}`)
     let queryParams = "";
     
-    replace("/products");
+    for(let i  = 0; i < 10; i++){
+      params.delete(`filterByCategory[${i}]`)
+    }
 
     if(categories.length > 0){
         for(let i  = 0; i < categories.length; i++){
-            params.set(`filterByCategory[${i}]`, categories[i])
+          params.set(`filterByCategory[${i}]`, categories[i])
         }
       }
 
-      if(priceRange.length > 0 && priceRange[0] != 0 && priceRange[1] != 0){
+      if(priceRange.length > 0){
         for(let i = 0; i < priceRange.length; i++){
           params.set(`filterByPrice[${i}]`, priceRange[i].toString())
         }
@@ -32,6 +34,9 @@ export default function useGetProductsQuery({sortBy ,search ,categories, priceRa
 
       if(search.length > 0){
         params.set("search", search)
+      }
+      else{
+        params.set("search", "all")
       }
 
       queryParams = params.toString()

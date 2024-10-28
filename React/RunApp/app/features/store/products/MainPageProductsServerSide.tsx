@@ -13,6 +13,7 @@ import { Slider } from "@/components/ui/slider";
 import { SelectValue } from "@radix-ui/react-select";
 import { ChevronLeft, ChevronRight, ShoppingCart, Star } from "lucide-react";
 import { useState } from "react";
+import Link from "next/link";
 
 interface Props {
   handleSelectedCategories: (categories: string[]) => void,
@@ -190,7 +191,7 @@ function MainPageProductsServerSide({handleSelectedCategories, handlePriceRange,
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>Options</SelectLabel>
-                  <SelectItem value="fetured">Featured</SelectItem>
+                  <SelectItem value="default">Default</SelectItem>
                   <SelectItem value="priceLowToHigh">
                     Price: Low to High
                   </SelectItem>
@@ -235,9 +236,11 @@ function MainPageProductsServerSide({handleSelectedCategories, handlePriceRange,
                       </span>
                     </div>
                   </div>
-                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
-                    Add to Cart
-                    <ShoppingCart className="ml-2 h-4 w-4" />
+                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white" asChild>
+                    <Link href={`products/${product.id}`}>
+                      Buy
+                      <ShoppingCart className="ml-2 h-4 w-4" />
+                    </Link>
                   </Button>
                 </div>
               </div>

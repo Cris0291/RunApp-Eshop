@@ -11,13 +11,13 @@ import { useAppSelector } from '@/app/hooks/reduxHooks'
 function Products() {
   const searchTerm = useAppSelector(getSearchQueryProduct)
   const [firstRefetch, setFirstRefetch] = useState<boolean>();
-  const [priceRange, setPriceRange] = useState<number[]>([0,0]);
+  const [priceRange, setPriceRange] = useState<number[]>([0,300]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState("");
+  const [sortBy, setSortBy] = useState("default");
   const [search, setSearch] = useState(() => {
     console.log("just a test")
     setFirstRefetch(true)
-    return searchTerm
+    return searchTerm.length == 0 ? "all" : searchTerm 
   });
   
 
