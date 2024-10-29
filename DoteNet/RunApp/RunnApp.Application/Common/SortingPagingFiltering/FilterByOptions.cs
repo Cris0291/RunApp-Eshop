@@ -2,9 +2,10 @@
 {
     public enum FilterByOptions
     {
-        ByVotes,
-        ByTag,
-        ByName,
-        NoFilter,
+        Likes,
+        Stars,
+        Categories,
+        Search,
+        PriceRange,
     }
 }
