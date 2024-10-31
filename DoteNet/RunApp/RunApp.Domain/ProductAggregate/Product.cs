@@ -6,7 +6,7 @@ using RunApp.Domain.ProductAggregate.ValueTypes;
 using RunApp.Domain.Common;
 using RunApp.Domain.ProductAggregate.Events;
 using RunApp.Domain.ReviewAggregate;
-using RunApp.Domain.ProductAggregate.Tags;
+using RunApp.Domain.ProductAggregate.Categories;
 
 
 [assembly: InternalsVisibleTo("TestsUtilities")]
@@ -39,7 +39,7 @@ namespace RunApp.Domain.Products
         public PriceOffer? PriceOffer { get; internal set; }
         public Characteristics Characteristic { get; internal set; }
         public ICollection<About> BulletPoints { get; internal set; }
-        public ICollection<Tag> Tags { get; internal set; }
+        public ICollection<Category> Categories { get; internal set; }
 
 
         public static ErrorOr<Product> CreateProduct(string name, string description, decimal price, ICollection<string> bulletpoints, decimal? priceWithDiscount, string? promotionalText, string brand, string type, string color, double weight, Guid storeProfileId)
@@ -155,16 +155,16 @@ namespace RunApp.Domain.Products
             _totalRatings += rating;
             AverageRatings = _totalRatings / Ratings.Count();
         }
-        public ErrorOr<Tag> AddTag(string tag)
+        public ErrorOr<Category> AddTag(string category)
         {
-            if (!Tag.validTags.Contains(tag)) return Error.Validation(code: "TagWasNotValid", description: "Tag was not valid");
-            if (Tags.Where(x => x.TagName == tag).Count() > 0) return Error.Validation(code: "TagWasAlreadyAdded", description: "Cannot add the same tag more than one time");
+            if (!Category.validCategories.Contains(category)) return Error.Validation(code: "CategoryWasNotValid", description: "Category was not valid");
+            if (Categories.Where(x => x.CategoryName == category).Count() > 0) return Error.Validation(code: "CategoryWasAlreadyAdded", description: "Cannot add the same category more than one time");
 
-            var tagToAdd = new Tag { TagName = tag };
+            var tagToAdd = new Category { TagName = tag };
             Tags.Add(tagToAdd);
             return tagToAdd;
         }
-        public ErrorOr<Tag> DeleteTag(Guid tagId)
+        public ErrorOr<Category> DeleteTag(Guid tagId)
         {
             if (Tags.Count == 0) return Error.NotFound(code: "TagWsNotFound", description: "Tag was not found");
             if (Tags.Count > 1) throw new InvalidOperationException("Cannot repeat tags");
