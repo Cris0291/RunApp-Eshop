@@ -3,5 +3,6 @@ export type ProductForCart = {
     quantity: number,
     price: number,
     priceWithDiscount: number | undefined,
-    totalPrice: number
+    totalPrice: number,
+    image: string
 }

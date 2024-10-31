@@ -12,6 +12,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Star, Truck, RefreshCcw, Heart, ChevronRight, ThumbsUp, ThumbsDown, Watch, Droplet, Shield, Clock } from "lucide-react"
 import { usePathname } from "next/navigation"
 import useGetProductQuery from "./useGetProductQuery"
+import { useAppDispatch } from "@/app/hooks/reduxHooks"
+import { addItem, deleteItem } from "../../payment/shoppingcart/cartSlice"
 
 const productTest = {
   name: "Elegant Timepiece",
@@ -92,12 +94,23 @@ function StarRating({ rating }: { rating: number }) {
 
 export default function ProductDisplay() {
   const pathname = usePathname();
-  const {isLoading, product, error} = useGetProductQuery(pathname)
+  const {isLoading, newProduct, error} = useGetProductQuery(pathname)
   const [quantity, setQuantity] = useState(1)
+  const [isAddedTocart, setIsAddedToCart] = useState(false);
   const [mainImage, setMainImage] = useState(productTest.images[0])
+  const dispatch = useAppDispatch();
+  
 
   const handleAddTocartState = () => {
+    const productForCart = {id: newProduct.id, quantity: quantity, price: newProduct.price, priceWithDiscount: newProduct.priceWithDiscount, 
+                            totalPrice: newProduct.price * quantity, image: ""}
+    dispatch(addItem(productForCart))
+    setIsAddedToCart(true)
+  }
 
+  const handleDeleteFromCartState = () => {
+    dispatch(deleteItem(newProduct.id))
+    setIsAddedToCart(false)
   }
 
   return (
@@ -182,13 +195,26 @@ export default function ProductDisplay() {
 
                 {/* Add to Cart and Wishlist Buttons */}
                 <div className="flex space-x-4">
-                  <Button className="flex-1 bg-pink-500 text-white hover:bg-pink-600 transition-colors duration-300 transform hover:scale-105" onClick={handleAddTocartState}>
-                    Add to Cart
-                  </Button>
-                  <Button variant="outline" className="flex items-center justify-center w-12 flex-shrink-0 hover:bg-pink-50 transition-colors duration-300 transform hover:scale-105">
-                    <Heart className="h-5 w-5 text-pink-500" />
-                    <span className="sr-only">Add to wishlist</span>
-                  </Button>
+                {
+                  isAddedTocart ?  <>
+                  <Button className="flex-1 bg-pink-500 text-white hover:bg-pink-600 transition-colors duration-300 transform hover:scale-105" onClick={handleDeleteFromCartState}>
+                   Delete from Cart
+                 </Button>
+                 <Button variant="outline" className="flex items-center justify-center w-12 flex-shrink-0 hover:bg-pink-50 transition-colors duration-300 transform hover:scale-105">
+                   <Heart className="h-5 w-5 text-pink-500" />
+                   <span className="sr-only">Add to wishlist</span>
+                 </Button>
+                </>  :  
+                <>
+                 <Button className="flex-1 bg-pink-500 text-white hover:bg-pink-600 transition-colors duration-300 transform hover:scale-105" onClick={handleAddTocartState}>
+                  Add to Cart
+                </Button>
+                <Button variant="outline" className="flex items-center justify-center w-12 flex-shrink-0 hover:bg-pink-50 transition-colors duration-300 transform hover:scale-105">
+                  <Heart className="h-5 w-5 text-pink-500" />
+                  <span className="sr-only">Add to wishlist</span>
+                </Button>
+               </> 
+                }
                 </div>
 
                 {/* Shipping and Returns */}

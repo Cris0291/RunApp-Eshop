@@ -1,4 +1,6 @@
 import "./globals.css";
+import ReactQueryProvider from "./utils/ReactQueryProvider";
+import StoreProvider from "./utils/StoreProvider";
 
 export default function RootLayout({
   children,
@@ -7,7 +9,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <StoreProvider>
+        <ReactQueryProvider>
+        {children}
+        </ReactQueryProvider>
+        </StoreProvider>
+        </body>
     </html>
   );
 }

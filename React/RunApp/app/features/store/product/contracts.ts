@@ -9,7 +9,8 @@ export type Product = {
     discount: number | undefined,
     numberOfreviews: number,
     averageRating: number,
-    reviews: Review[] 
+    reviews: Review[],
+    images: Image[],
 }
 
 export type Review = {
@@ -22,4 +23,9 @@ export type Review = {
 export type Rating = {
     numOfStars: number,
     dateOfRating: string
+}
+
+export type Image = {
+    id: string,
+    url: string
 }
