@@ -16,27 +16,31 @@ namespace RunnApp.Application.Products.Queries.GetProducts
         }
         public async Task<ErrorOr<IEnumerable<ProductsJoin>>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
         {
+            var filterMappinValues = new FilterMappingValues(request.Likes, request.Stars, request.Categories, request.PriceRange, request.Search);
+            var filterMappingOptions = GetFilterOptions(filterMappinValues);
+
             var productsQuery = _productsRepository.GetProducts()
                  .TransformQuery()
+                 .AddFiltering(filterMappinValues, filterMappingOptions)
                  .AddSortingBy(request.OrderByOptions);
-
-           var productsWithFiltering = FilterProducts(productsQuery, new FilterMappingValues(request.Likes, request.Stars, request.Categories, request.PriceRange, request.Search));     
 
             var productsAndStatus =  _leftJoinRepository.GetProductsAndStatusLeftJoin(request.UserId, productsQuery);
 
             return await _leftJoinRepository.ExecuteQuery(productsAndStatus);
         }
-        private IQueryable<ProductForCard> FilterProducts(IQueryable<ProductForCard> products, FilterMappingValues values)
+        public IEnumerable<FilterByOptions> GetFilterOptions(FilterMappingValues filterValues)
         {
-            IQueryable<ProductForCard> a;
+            List<FilterByOptions> filterOptions = new();
             var filterType = typeof(FilterMappingValues);
             var properties = filterType.GetProperties();
 
             foreach (var property in properties)
             {
-                if (!Enum.TryParse(property.Name, out FilterByOptions filterOptions)) throw new ArgumentException("I did something wrong");
-                
+                if (!Enum.TryParse(property.Name, out FilterByOptions option)) throw new ArgumentException("Filter option and value did not matched");
+                filterOptions.Add(option);
             }
+
+            return filterOptions;
         }
     }
 }

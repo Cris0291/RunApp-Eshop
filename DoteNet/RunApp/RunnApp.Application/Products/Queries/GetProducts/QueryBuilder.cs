@@ -14,9 +14,9 @@ namespace RunnApp.Application.Products.Queries.GetProducts
                 ActualPrice = x.ActualPrice,
                 NumberOfReviews = x.NumberOfReviews,
                 AverageRatings = x.AverageRatings,
-                PriceWithDiscount = x.PriceOffer.PriceWithDiscount,
-                PromotionalText = x.PriceOffer.PromotionalText,
-                Discount = x.PriceOffer.Discount,
+                PriceWithDiscount = x.PriceOffer == null ? null : x.PriceOffer.PriceWithDiscount,
+                PromotionalText = x.PriceOffer == null ? null : x.PriceOffer.PromotionalText,
+                Discount = x.PriceOffer == null ? null : x.PriceOffer.Discount,
                 TagNames = x.Tags.Select(x => x.TagName)
             });
         }
@@ -38,22 +38,31 @@ namespace RunnApp.Application.Products.Queries.GetProducts
                     return products.OrderByDescending(x => x.ProductId);
             }
         }
-        public static IQueryable<ProductForCard> AddFiltering(this IQueryable<ProductForCard> products, FilterByOptions filterByOptions, string filterValue)
+        public static IQueryable<ProductForCard> AddFiltering(this IQueryable<ProductForCard> products, FilterMappingValues filterValues, IEnumerable<FilterByOptions> options)
         {
-            switch (filterByOptions)
-            {
-                case FilterByOptions.NoFilter:
-                    return products;
-                case FilterByOptions.ByVotes:
-                    var value = int.Parse(filterValue);
-                    return products.Where(x => Math.Round(x.AverageRatings) >= value);
-                case FilterByOptions.ByName:
-                    return products.Where(x => x.Name.Contains(filterValue));
-                case FilterByOptions.ByTag:
-                    return products.Where(x => x.TagNames.Contains(filterValue));
-                default:
-                    return products;
+            IQueryable<ProductForCard> newProducts = products;
 
+            foreach (var option in options)
+            {
+                switch (option)
+                {
+                    case FilterByOptions.Likes:
+                        return products;
+                    case FilterByOptions.Categories:
+                        var value = int.Parse(filterValue);
+                        return products.Where(x => Math.Round(x.AverageRatings) >= value);
+                    case FilterByOptions.Search:
+                        newProducts =  newProducts.Where(x => x.Name.Contains(filterValues.Search));
+                        break;
+                    case FilterByOptions.PriceRange:
+                        newProducts = newProducts.Where(x => x.ActualPrice >= filterValues.PriceRange[0] && x <= filterValues.PriceRange[1]);
+                        break;
+                    case FilterByOptions.Stars:
+                        newProducts = newProducts.Where(x => Math.Round(x.AverageRatings) >= filterValues.FilterByStars);
+                        break;
+                    default:
+                        return products;
+                }
             }
         }
         public static IQueryable<T> AddPaging<T>(this IQueryable<T> query, int pageSize, int pageNumZeroStart)
