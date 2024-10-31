@@ -14,6 +14,8 @@ import { SelectValue } from "@radix-ui/react-select";
 import { ChevronLeft, ChevronRight, ShoppingCart, Star } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
+import FilterOptionsStars from "./FilterOptionsStars";
+import FilterOptionsLikes from "./FilterOptionsLikes";
 
 interface Props {
   handleSelectedCategories: (categories: string[]) => void,
@@ -110,12 +112,14 @@ function MainPageProductsServerSide({handleSelectedCategories, handlePriceRange,
 
   const pageNumbers: number[] = [];
 
-  for (
-    let i = 1;
-    i <= Math.ceil(filteredProducts.length / productsPerPage);
-    i++
-  ) {
-    pageNumbers.push(i);
+  const [activeFilters, setActiveFilters] = useState({ stars: [], likes: [] })
+
+  const handleFilterChange = (filters:{
+    stars: never[];
+    likes: never[];
+} ) => {
+    setActiveFilters(filters)
+    console.log("Active filters:", filters)
   }
 
   return (
@@ -169,6 +173,10 @@ function MainPageProductsServerSide({handleSelectedCategories, handlePriceRange,
                 <span className="txt-sm text-gray-600">${priceRange[0]}</span>
                 <span className="text-sm text-gray-600">${priceRange[1]}</span>
               </div>
+            </div>
+            <div className="flex items-center justify-between gap-2 w-full">
+              <FilterOptionsStars/>
+              <FilterOptionsLikes/>
             </div>
             <form onSubmit={handleSubmit}>
             <Button className="bg-green-500 text-white hover:bg-green-600">
