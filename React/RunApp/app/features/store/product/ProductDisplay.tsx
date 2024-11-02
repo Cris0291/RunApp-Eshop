@@ -14,6 +14,7 @@ import { usePathname } from "next/navigation"
 import useGetProductQuery from "./useGetProductQuery"
 import { useAppDispatch } from "@/app/hooks/reduxHooks"
 import { addItem, deleteItem } from "../../payment/shoppingcart/cartSlice"
+import ReviewForm from "./ReviewForm"
 
 const productTest = {
   name: "Elegant Timepiece",
@@ -111,6 +112,10 @@ export default function ProductDisplay() {
   const handleDeleteFromCartState = () => {
     dispatch(deleteItem(newProduct.id))
     setIsAddedToCart(false)
+  }
+
+  const onSubmit = async ({sentiment, content}: {sentiment: string, content: string}) => {
+    
   }
 
   return (
@@ -261,7 +266,7 @@ export default function ProductDisplay() {
                         <span className="ml-2 text-sm text-gray-500 hover:text-pink-500 transition-colors duration-300">{productTest.rating} out of 5</span>
                       </div>
                     </div>
-                    <Button variant="outline" className="hover:bg-pink-50 hover:text-pink-600 transition-colors duration-300 transform hover:scale-105">Write a review</Button>
+                    <ReviewForm onSubmit={onSubmit}/>
                   </div>
 
                   {/* Rating Distribution */}
