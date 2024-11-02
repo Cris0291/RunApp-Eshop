@@ -1,4 +1,4 @@
-﻿using RunApp.Domain.ProductAggregate.Tags;
+﻿using RunApp.Domain.ProductAggregate.Categories;
 using RunApp.Domain.Products;
 using RunnApp.Application.CustomerProfiles.Common;
 
@@ -13,8 +13,8 @@ namespace RunnApp.Application.Common.Interfaces
         Task<bool> ExistProduct(Guid id);
         Task<Product> GetProductWithNoDefault(Guid id);
         Task<List<ProductDto>> GetBoughtProducts(List<Guid> boughtProducts);
-        Task<Product?> GetProductWithTags(Guid productId);
-        Task<Product?> GetProductWithTags(Guid productId, Guid tagId);
-        Task DeleteTag(Tag tag);
+        Task<Product?> GetProductWithCategories(Guid productId);
+        Task<Product?> GetProductWithCategories(Guid productId, Guid categoryId);
+        Task DeleteCategory(Category category);
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RunApp.Domain.ProductAggregate.Tags;
+using RunApp.Domain.ProductAggregate.Categories;
 using RunApp.Domain.Products;
 using RunApp.Infrastructure.Common.Persistence;
 using RunnApp.Application.Common.Interfaces;
@@ -44,7 +44,7 @@ namespace RunApp.Infrastructure.Products.Persistence
         }
         public IQueryable<Product> GetProducts()
         {
-            return _appDbContext.Products.Include(x => x.Tags);
+            return _appDbContext.Products.Include(x => x.Categories);
         }
         public async Task<List<ProductDto>> GetBoughtProducts(List<Guid> boughtProducts)
         {
@@ -52,17 +52,17 @@ namespace RunApp.Infrastructure.Products.Persistence
 
             return await _appDbContext.Products.Where(x => boughtProductsSet.Contains(x.ProductId)).Select(x => new ProductDto(x.ProductId, x.Name)).ToListAsync();
         }
-        public async Task<Product?> GetProductWithTags(Guid productId, Guid tagId)
+        public async Task<Product?> GetProductWithCategories(Guid productId, Guid categoryId)
         {
-            return await _appDbContext.Products.Include(x => x.Tags.Where(x => x.TagId == tagId)).SingleOrDefaultAsync(x => x.ProductId == productId);
+            return await _appDbContext.Products.Include(x => x.Categories.Where(x => x.CategoryId == categoryId)).SingleOrDefaultAsync(x => x.ProductId == productId);
         }
-        public async Task<Product?> GetProductWithTags(Guid productId)
+        public async Task<Product?> GetProductWithCategories(Guid productId)
         {
-            return await _appDbContext.Products.Include(x => x.Tags).SingleOrDefaultAsync(x => x.ProductId == productId);
+            return await _appDbContext.Products.Include(x => x.Categories).SingleOrDefaultAsync(x => x.ProductId == productId);
         }
-        public async Task DeleteTag(Tag tag)
+        public async Task DeleteCategory(Category category)
         {
-            _appDbContext.Remove(tag);
+            _appDbContext.Remove(category);
             await Task.CompletedTask;
         }
        

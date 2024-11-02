@@ -155,21 +155,21 @@ namespace RunApp.Domain.Products
             _totalRatings += rating;
             AverageRatings = _totalRatings / Ratings.Count();
         }
-        public ErrorOr<Category> AddTag(string category)
+        public ErrorOr<Category> AddCategory(string category)
         {
             if (!Category.validCategories.Contains(category)) return Error.Validation(code: "CategoryWasNotValid", description: "Category was not valid");
             if (Categories.Where(x => x.CategoryName == category).Count() > 0) return Error.Validation(code: "CategoryWasAlreadyAdded", description: "Cannot add the same category more than one time");
 
-            var tagToAdd = new Category { TagName = tag };
-            Tags.Add(tagToAdd);
-            return tagToAdd;
+            var categoryToAdd = new Category { CategoryName = category };
+            Categories.Add(categoryToAdd);
+            return categoryToAdd;
         }
-        public ErrorOr<Category> DeleteTag(Guid tagId)
+        public ErrorOr<Category> DeleteCategory(Guid tagId)
         {
-            if (Tags.Count == 0) return Error.NotFound(code: "TagWsNotFound", description: "Tag was not found");
-            if (Tags.Count > 1) throw new InvalidOperationException("Cannot repeat tags");
+            if (Categories.Count == 0) return Error.NotFound(code: "CategoryWasNotFound", description: "Category was not found");
+            if (Categories.Count > 1) throw new InvalidOperationException("Cannot repeat categories");
 
-            return Tags.First();
+            return Categories.First();
         }
     }
 }

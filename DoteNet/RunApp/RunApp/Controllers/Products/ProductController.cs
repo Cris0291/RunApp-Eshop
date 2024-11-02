@@ -14,10 +14,10 @@ using RunnApp.Application.Products.Commands.RemoveDiscount;
 using Microsoft.AspNetCore.Authorization;
 using RunApp.Api.Services;
 using RunApp.Api.CustomValidators;
-using Contracts.Tags.Request;
-using RunnApp.Application.Products.Commands.AddTag;
-using RunApp.Api.Mappers.Tags;
-using RunnApp.Application.Products.Commands.DeleteTag;
+using Contracts.Categories.Request;
+using RunnApp.Application.Products.Commands.AddCategory;
+using RunApp.Api.Mappers.Categories;
+using RunnApp.Application.Products.Commands.DeleteCategory;
 
 
 
@@ -117,18 +117,18 @@ namespace RunApp.Api.Controllers.Products
         }
 
         [Authorize("StoreProfile")]
-        [HttpPost(ApiEndpoints.Products.AddTag)]
-        public async Task<IActionResult> AddTag([FromRoute] Guid id, [FromBody] TagRequest tagRequest)
+        [HttpPost(ApiEndpoints.Products.AddCategory)]
+        public async Task<IActionResult> AddTag([FromRoute] Guid id, [FromBody] CategoryRequest categoryRequest)
         {
-            var result = await _mediator.Send(new AddTagCommand(id, tagRequest.Tag));
+            var result = await _mediator.Send(new AddCategoryCommand(id, categoryRequest.Category));
             return result.MatchFirst(value => Ok(value.TagToTagResponse()), Problem);
         }
 
         [Authorize("StoreProfile")]
-        [HttpDelete(ApiEndpoints.Products.DeleteTag)]
-        public async Task<IActionResult> DeleteTag([FromRoute] DeleteTagRequest deleteTag)
+        [HttpDelete(ApiEndpoints.Products.DeleteCategory)]
+        public async Task<IActionResult> DeleteTag([FromRoute] DeleteCategoryRequest deleteTag)
         {
-            var result = await _mediator.Send(new DeleteTagCommand(deleteTag.ProductId, deleteTag.TagId));
+            var result = await _mediator.Send(new DeleteCategoryCommand(deleteTag.ProductId, deleteTag.TagId));
             return result.MatchFirst(value => Ok(), Problem);
         }
     }
