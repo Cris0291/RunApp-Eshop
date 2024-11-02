@@ -15,7 +15,6 @@ import { ChevronLeft, ChevronRight, ShoppingCart, Star } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import FilterOptionsStars from "./FilterOptionsStars";
-import FilterOptionsLikes from "./FilterOptionsLikes";
 
 interface Props {
   handleSelectedCategories: (categories: string[]) => void,
@@ -24,7 +23,9 @@ interface Props {
   priceRange: number[],
   sortBy: string ,
   selectedCategories: string[],
-  handleSubmit: (e : React.FormEvent<HTMLFormElement>) => void
+  handleSubmit: (e : React.FormEvent<HTMLFormElement>) => void,
+  handleStarFilterChange: (star: number) => void,
+  starFilters: number[]
 }
 
 const products = [
@@ -102,7 +103,7 @@ const products = [
   },
 ];
 
-function MainPageProductsServerSide({handleSelectedCategories, handlePriceRange, handleSortBy, priceRange, sortBy, selectedCategories, handleSubmit} : Props) {
+function MainPageProductsServerSide({handleSelectedCategories, handlePriceRange, handleSortBy, priceRange, sortBy, selectedCategories, handleSubmit, handleStarFilterChange, starFilters} : Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 6;
 
@@ -175,8 +176,7 @@ function MainPageProductsServerSide({handleSelectedCategories, handlePriceRange,
               </div>
             </div>
             <div className="flex items-center justify-between gap-2 w-full">
-              <FilterOptionsStars/>
-              <FilterOptionsLikes/>
+              <FilterOptionsStars handleStarFilterChange={handleStarFilterChange} starFilters={starFilters}/>
             </div>
             <form onSubmit={handleSubmit}>
             <Button className="bg-green-500 text-white hover:bg-green-600">

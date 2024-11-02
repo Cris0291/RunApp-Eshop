@@ -4,22 +4,22 @@ import { ProductsQuery } from "./contracts";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 
-export default function useGetProductsQuery({sortBy ,search ,categories, priceRange} : ProductsQuery){
+export default function useGetProductsQuery({sortBy ,search ,categories, priceRange, starFilters} : ProductsQuery){
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const {replace} = useRouter();
     const params = new URLSearchParams(searchParams)
     console.log(`in custom query hook ${sortBy} ${search} ${categories} ${priceRange}`)
-    let queryParams = "";
+    let queryParams = ""
+    let starsString = starFilters.join(",")
+    let categoriesString = categories.join(",");
     
-    for(let i  = 0; i < 10; i++){
-      params.delete(`filterByCategory[${i}]`)
-    }
-
+    
     if(categories.length > 0){
-        for(let i  = 0; i < categories.length; i++){
-          params.set(`filterByCategory[${i}]`, categories[i])
-        }
+        params.set(`filterByCategory`, categoriesString)
+      }
+      else{
+        params.delete(`filterByCategory`)
       }
 
       if(priceRange.length > 0){
@@ -37,6 +37,13 @@ export default function useGetProductsQuery({sortBy ,search ,categories, priceRa
       }
       else{
         params.set("search", "all")
+      }
+
+      if(starFilters.length > 0){
+        params.set("filterByStars", starsString)
+      }
+      else{
+        params.delete("filterByStars")
       }
 
       queryParams = params.toString()

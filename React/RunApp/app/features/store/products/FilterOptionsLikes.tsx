@@ -11,15 +11,12 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Sliders } from "lucide-react"
 
+interface Props{
+  handleLikeFilterChange: (likes: number) => void,
+  likeFilter: number
+}
 
-export default function FilterOptionsLikes() {
-  const [likeFilter, setLikeFilter] = useState<number>()
-
- 
-
-  const handleLikeFilterChange = (like: number) => {
-    setLikeFilter(like)
-  }
+export default function FilterOptionsLikes({handleLikeFilterChange, likeFilter}: Props) {
 
   return (
     <DropdownMenu>

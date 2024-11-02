@@ -11,16 +11,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Sliders, Star } from "lucide-react"
 
+interface Props{
+  handleStarFilterChange: (star: number) => void,
+  starFilters: number[]
+}
 
-export default function FilterOptionsStars() {
-  const [starFilter, setStarFilter] = useState<number>()
+export default function FilterOptionsStars({handleStarFilterChange, starFilters} : Props) {
   
-
-  const handleStarFilterChange = (star: number) => {
-    setStarFilter(star)
-  }
-
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -34,7 +31,7 @@ export default function FilterOptionsStars() {
         {[5, 4, 3, 2, 1].map((star) => (
           <DropdownMenuCheckboxItem
             key={`star-${star}`}
-            checked={star === starFilter}
+            checked={starFilters.includes(star)}
             onCheckedChange={() => handleStarFilterChange(star)}
           >
             <div className="flex items-center">

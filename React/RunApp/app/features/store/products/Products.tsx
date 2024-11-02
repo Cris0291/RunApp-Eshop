@@ -14,6 +14,7 @@ function Products() {
   const [priceRange, setPriceRange] = useState<number[]>([0,300]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("default");
+  const [starFilters, setStarFilters] = useState<number[]>([])
   const [search, setSearch] = useState(() => {
     console.log("just a test")
     setFirstRefetch(true)
@@ -21,7 +22,7 @@ function Products() {
   });
   
 
-  let queryValues : ProductsQuery = {sortBy, search, priceRange, categories: selectedCategories}
+  let queryValues : ProductsQuery = {sortBy, search, priceRange, categories: selectedCategories, starFilters}
 
   const {isLoading, products, refetch, error} = useGetProductsQuery(queryValues);
   if(firstRefetch){
@@ -49,14 +50,21 @@ function Products() {
   const handleSubmit = (e : React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-     queryValues = {sortBy, search, priceRange, categories: selectedCategories}
+     queryValues = {sortBy, search, priceRange, categories: selectedCategories, starFilters}
      refetch()
+  }
+
+  const handleStarFilterChange = (star: number) => {
+    const updatedStarFilters = starFilters.includes(star)
+      ? starFilters.filter((s) => s !== star)
+      : [...starFilters, star]
+    setStarFilters(updatedStarFilters)
   }
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <HeaderProducts handleSearch={handleSearch} search={search}  handleSubmit={handleSubmit}/>
-      <MainPageProductsServerSide handleSelectedCategories={handleSelectedCategories} handlePriceRange={handlePriceRange} handleSortBy={handleSortBy} priceRange={priceRange} sortBy={sortBy} selectedCategories={selectedCategories} handleSubmit={handleSubmit}/>
+      <MainPageProductsServerSide handleSelectedCategories={handleSelectedCategories} handlePriceRange={handlePriceRange} handleSortBy={handleSortBy} priceRange={priceRange} sortBy={sortBy} selectedCategories={selectedCategories} handleSubmit={handleSubmit} handleStarFilterChange={handleStarFilterChange} starFilters={starFilters}/>
     </div>
   );
 }
