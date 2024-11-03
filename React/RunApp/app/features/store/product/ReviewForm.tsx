@@ -28,6 +28,11 @@ interface ReviewFormData {
   content: string
 }
 
+interface Props {
+  onSubmit: (data: ReviewFormData) => void,
+  isSubmitting: boolean
+}
+
 const sentimentOptions = [
   { value: "excellent", label: "Excellent", icon: ThumbsUp },
   { value: "good", label: "Good", icon: Smile },
@@ -36,22 +41,18 @@ const sentimentOptions = [
   { value: "terrible", label: "Terrible", icon: ThumbsDown },
 ]
 
-export default function ReviewForm({ onSubmit }: { onSubmit: (data: ReviewFormData) => void }) {
+export default function ReviewForm({ onSubmit, isSubmitting }: Props) {
   const [sentiment, setSentiment] = useState("average")
   const [content, setContent] = useState("")
   const [isOpen, setIsOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
   
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit =  (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitting(true)
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    
     onSubmit({ sentiment, content })
     setSentiment("")
     setContent("")
-    setIsSubmitting(false)
     setIsOpen(false)
   }
 

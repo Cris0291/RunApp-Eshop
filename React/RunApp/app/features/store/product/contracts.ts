@@ -17,7 +17,7 @@ export type Review = {
     comment: string,
     date: string,
     reviewDescription: string,
-    rating: Rating
+    rating: Rating | undefined
 }
 
 export type Rating = {

@@ -12,9 +12,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Star, Truck, RefreshCcw, Heart, ChevronRight, ThumbsUp, ThumbsDown, Watch, Droplet, Shield, Clock } from "lucide-react"
 import { usePathname } from "next/navigation"
 import useGetProductQuery from "./useGetProductQuery"
-import { useAppDispatch } from "@/app/hooks/reduxHooks"
+import { useAppDispatch, useAppSelector } from "@/app/hooks/reduxHooks"
 import { addItem, deleteItem } from "../../payment/shoppingcart/cartSlice"
 import ReviewForm from "./ReviewForm"
+import useCreateReviewCommand from "./useCreateReviewCommand"
+import LoadingModal from "@/app/ui/LoadingModal"
+import { getUserId } from "../../registration/userSlice"
+import { useQueryClient } from "@tanstack/react-query"
 
 const productTest = {
   name: "Elegant Timepiece",
@@ -95,7 +99,10 @@ function StarRating({ rating }: { rating: number }) {
 
 export default function ProductDisplay() {
   const pathname = usePathname();
-  const {isLoading, newProduct, error} = useGetProductQuery(pathname)
+  const userId = useAppSelector(getUserId);
+  const {isLoading, newProduct, error} = useGetProductQuery(pathname);
+  const queryClient = useQueryClient()
+  const {isPending, mutate} = useCreateReviewCommand();
   const [quantity, setQuantity] = useState(1)
   const [isAddedTocart, setIsAddedToCart] = useState(false);
   const [mainImage, setMainImage] = useState(productTest.images[0])
@@ -114,15 +121,27 @@ export default function ProductDisplay() {
     setIsAddedToCart(false)
   }
 
-  const onSubmit = async ({sentiment, content}: {sentiment: string, content: string}) => {
-    
+  const onSubmit = ({sentiment, content}: {sentiment: string, content: string}) => {
+    //Todo: check whether the product has been bought
+    //Todo: check if i already have a review on this product
+    //Todo: handle errors like the ones mention above or could not submitt review
+
+    const reviewDto = {comment: content, reviewDescription: sentiment,  productId: newProduct.id, userId: userId}
+    mutate(reviewDto, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["product"]
+        })
+
+      }
+    })
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-pink-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <Card className="overflow-hidden bg-white shadow-xl hover:shadow-2xl transition-shadow duration-300">
-          <CardContent className="p-6 sm:p-10">
+          {isLoading? <LoadingModal/> : <CardContent className="p-6 sm:p-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
               {/* Product Images */}
               <div className="space-y-4">
@@ -266,7 +285,7 @@ export default function ProductDisplay() {
                         <span className="ml-2 text-sm text-gray-500 hover:text-pink-500 transition-colors duration-300">{productTest.rating} out of 5</span>
                       </div>
                     </div>
-                    <ReviewForm onSubmit={onSubmit}/>
+                    <ReviewForm onSubmit={onSubmit} isSubmitting={isPending}/>
                   </div>
 
                   {/* Rating Distribution */}
@@ -323,7 +342,7 @@ export default function ProductDisplay() {
                 </div>
               </TabsContent>
             </Tabs>
-          </CardContent>
+          </CardContent>}
         </Card>
       </div>
     </div>
