@@ -8,7 +8,8 @@ const initialState : ProductsQuery = {
     sortBy: "",
     search: "",
     categories: [],
-    priceRange: []
+    priceRange: [],
+    starFilters: []
 }
 
 export const productsQuerySlice = createSlice({
