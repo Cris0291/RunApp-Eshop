@@ -10,7 +10,8 @@ export type FormValues = {
     name: string,
     email: string,
     userName: string
-    token: string
+    token: string,
+    id: string,
   }
 
   export interface User {
@@ -18,4 +19,5 @@ export type FormValues = {
     email: string,
     userName: string
     token: string
+    id: string,
   }
