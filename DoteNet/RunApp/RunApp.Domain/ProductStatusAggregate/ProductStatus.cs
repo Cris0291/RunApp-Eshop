@@ -24,14 +24,14 @@ namespace RunApp.Domain.ProductStatusAggregate
                 Id = customerId,
             };
 
-            productStatus.RaiseEvent(new AddProductStatusEvent(productId, customerId, productStatus.ProductStatusId));
-
             return productStatus;
         }
         public void AddOrRemoveLike(bool like)
         {
             Like = like;
             Dislike = null;
+
+            RaiseEvent(new AddOrRemoveProductLike(ProductId!.Value, like));
         }
         public void AddOrRemoveDislike(bool dislike)
         {
