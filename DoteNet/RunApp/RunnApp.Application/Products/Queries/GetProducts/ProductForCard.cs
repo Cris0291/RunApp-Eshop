@@ -12,6 +12,6 @@ namespace RunnApp.Application.Products.Queries.GetProducts
         public decimal? PriceWithDiscount { get; set; }
         public string? PromotionalText { get; set; }
         public decimal? Discount { get; set; }
-        public IEnumerable<string> TagNames { get; set; }
+        public IEnumerable<string> CategoryNames { get; set; }
     }
 }
