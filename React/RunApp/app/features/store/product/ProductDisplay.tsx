@@ -19,6 +19,10 @@ import useCreateReviewCommand from "./useCreateReviewCommand"
 import LoadingModal from "@/app/ui/LoadingModal"
 import { getUserId } from "../../registration/userSlice"
 import { useQueryClient } from "@tanstack/react-query"
+import StarRatingComponent from "./StarRatingComponent"
+import useAddRatingCommand from "./useAddRatingCommand"
+import LikeButton from "@/app/ui/LikeButton"
+import useAddOrRemoveLikeHook from "@/app/hooks/useAddOrRemoveLikeQuery"
 
 const productTest = {
   name: "Elegant Timepiece",
@@ -48,6 +52,16 @@ const productTest = {
 }
 
 const reviews = [
+  {
+    id: 0,
+    author: "test",
+    avatar: "/placeholder.svg?height=40&width=40",
+    rating: 0,
+    date: "",
+    content: "This watch exceeded my expectations. The craftsmanship is impeccable, and it looks even better in person. Highly recommended!",
+    helpful: 24,
+    notHelpful: 2
+  },
   {
     id: 1,
     author: "Alice Johnson",
@@ -101,12 +115,13 @@ export default function ProductDisplay() {
   const pathname = usePathname();
   const userId = useAppSelector(getUserId);
   const {isLoading, newProduct, error} = useGetProductQuery(pathname);
-  const queryClient = useQueryClient()
-  const {isPending, mutate} = useCreateReviewCommand();
+  const {AddOrRemoveLikeMutation} = useAddOrRemoveLikeHook();
+  const {isPending, AddReview} = useCreateReviewCommand();
   const [quantity, setQuantity] = useState(1)
   const [isAddedTocart, setIsAddedToCart] = useState(false);
   const [mainImage, setMainImage] = useState(productTest.images[0])
   const dispatch = useAppDispatch();
+  const {addRating} = useAddRatingCommand();
   
 
   const handleAddTocartState = () => {
@@ -121,20 +136,21 @@ export default function ProductDisplay() {
     setIsAddedToCart(false)
   }
 
+  const handleRating = (rating: number) => {
+    addRating({rating, productId: newProduct.id})
+  }
+
+  const handleLike = (liked: boolean) => {
+    AddOrRemoveLikeMutation({liked, productId: newProduct.id});
+  }
+
   const onSubmit = ({sentiment, content}: {sentiment: string, content: string}) => {
     //Todo: check whether the product has been bought
     //Todo: check if i already have a review on this product
     //Todo: handle errors like the ones mention above or could not submitt review
 
-    const reviewDto = {comment: content, reviewDescription: sentiment,  productId: newProduct.id, userId: userId}
-    mutate(reviewDto, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["product"]
-        })
-
-      }
-    })
+    const reviewDto = {comment: content, reviewDescription: sentiment}
+    AddReview({reviewDto, productId: newProduct.id})
   }
 
   return (
@@ -224,21 +240,14 @@ export default function ProductDisplay() {
                   <Button className="flex-1 bg-pink-500 text-white hover:bg-pink-600 transition-colors duration-300 transform hover:scale-105" onClick={handleDeleteFromCartState}>
                    Delete from Cart
                  </Button>
-                 <Button variant="outline" className="flex items-center justify-center w-12 flex-shrink-0 hover:bg-pink-50 transition-colors duration-300 transform hover:scale-105">
-                   <Heart className="h-5 w-5 text-pink-500" />
-                   <span className="sr-only">Add to wishlist</span>
-                 </Button>
                 </>  :  
                 <>
                  <Button className="flex-1 bg-pink-500 text-white hover:bg-pink-600 transition-colors duration-300 transform hover:scale-105" onClick={handleAddTocartState}>
                   Add to Cart
                 </Button>
-                <Button variant="outline" className="flex items-center justify-center w-12 flex-shrink-0 hover:bg-pink-50 transition-colors duration-300 transform hover:scale-105">
-                  <Heart className="h-5 w-5 text-pink-500" />
-                  <span className="sr-only">Add to wishlist</span>
-                </Button>
                </> 
                 }
+                <LikeButton size="sm" onLikeChange={handleLike}/>
                 </div>
 
                 {/* Shipping and Returns */}
@@ -311,21 +320,22 @@ export default function ProductDisplay() {
                           <div className="ml-4">
                             <h4 className="text-sm font-semibold text-gray-900 group-hover:text-pink-600 transition-colors duration-300">{review.author}</h4>
                             <div className="flex items-center">
-                              <StarRating rating={review.rating} />
-                              <span className="ml-2 text-sm text-gray-500 group-hover:text-pink-500 transition-colors duration-300">{review.date}</span>
+                              {review.rating === 0 && review.date === "" ? <span className="ml-2 text-sm text-gray-500 group-hover:text-pink-500 transition-colors duration-300">Not Rated Yet</span> : <><StarRating rating={review.rating} />
+                              <span className="ml-2 text-sm text-gray-500 group-hover:text-pink-500 transition-colors duration-300">{review.date}</span></>}
                             </div>
                           </div>
                         </div>
                         <p className="text-gray-600 mb-4 group-hover:text-gray-800 transition-colors duration-300">{review.content}</p>
                         <div className="flex items-center space-x-4">
-                          <Button variant="outline" size="sm" className="text-gray-500 hover:bg-pink-50 hover:text-pink-600 transition-colors duration-300 transform hover:scale-105">
+                          {/*Todo: change below zero for userId*/}
+                          {review.id === 0 && review.rating === 0 && review.date === "" ? <StarRatingComponent onRatingChange={handleRating}/> : <><Button variant="outline" size="sm" className="text-gray-500 hover:bg-pink-50 hover:text-pink-600 transition-colors duration-300 transform hover:scale-105">
                             <ThumbsUp className="h-4 w-4 mr-2" />
                             Helpful ({review.helpful})
                           </Button>
                           <Button variant="outline" size="sm" className="text-gray-500 hover:bg-pink-50 hover:text-pink-600 transition-colors duration-300 transform hover:scale-105">
                             <ThumbsDown className="h-4 w-4 mr-2" />
                             Not Helpful ({review.notHelpful})
-                          </Button>
+                          </Button></>}
                         </div>
                       </div>
                     ))}

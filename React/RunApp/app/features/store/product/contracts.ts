@@ -31,8 +31,6 @@ export type Image = {
 }
 
 export type ReviewDto = {
-    productId: string,
-    userId: string,
     comment: string,
     reviewDescription: string,
 
