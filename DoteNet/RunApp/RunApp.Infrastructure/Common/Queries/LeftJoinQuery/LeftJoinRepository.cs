@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RunApp.Domain.PhotoAggregate;
 using RunApp.Domain.Products;
 using RunApp.Domain.ProductStatusAggregate;
 using RunApp.Infrastructure.Common.Persistence;
@@ -33,6 +34,15 @@ namespace RunApp.Infrastructure.Common.Queries.LeftJoinQuery
             Expression<Func<ProductForCard, ProductStatus?, ProductsJoin>> resultSelector = (productForCard, productStatus) => new ProductsJoin { Product = productForCard, ProductStatus = productStatus };
 
             return products.CreateOuterJoinQuery(productStatus, productKey, statusKey, resultSelector);
+        }
+        public IQueryable<ProductWithMainImage> GetProductsWithImage(IQueryable<Product> products)
+        {
+            IQueryable<Photo> photos = _appStoreDbContext.Photos.Where(x => x.IsMain);
+            Expression<Func<Product, Guid>> productKey = (product) => product.ProductId;
+            Expression<Func<Photo, Guid>> photoKey = (photo) => photo.ProductId;
+            Expression<Func<Product, Photo?, ProductWithMainImage>> resultSelector = (product, photo) => new ProductWithMainImage { Product = product, MainImage = photo };
+
+            return products.CreateOuterJoinQuery(photos, productKey, photoKey, resultSelector);
         }
         public async Task<List<T>> ExecuteQuery<T>(IQueryable<T> query)
         {

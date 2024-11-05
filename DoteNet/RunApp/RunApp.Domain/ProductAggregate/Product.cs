@@ -36,6 +36,7 @@ namespace RunApp.Domain.Products
         public string Description { get; internal set; }
         public int? NumberOfReviews { get; internal set; }
         public double AverageRatings { get; internal set; }
+        public int? NumberOfLikes { get; internal set; }
         public PriceOffer? PriceOffer { get; internal set; }
         public Characteristics Characteristic { get; internal set; }
         public ICollection<About> BulletPoints { get; internal set; }

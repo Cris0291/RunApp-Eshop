@@ -19,14 +19,20 @@ namespace RunnApp.Application.Products.Queries.GetProducts
             var filterMappinValues = new FilterMappingValues(request.Likes, request.Stars, request.Categories, request.PriceRange, request.Search);
             var filterMappingOptions = GetFilterOptions(filterMappinValues);
 
-            var productsQuery = _productsRepository.GetProducts()
-                 .TransformQuery()
+            var productsQuery = _productsRepository.GetProducts();
+
+            var productsWithMainImage = _leftJoinRepository.GetProductsWithImage(productsQuery);
+            var productForCardWithImage = productsWithMainImage.TransformProductWithImageQuery();
+
+            var productsAndStatus = _leftJoinRepository.GetProductsAndStatusLeftJoin(request.UserId, productForCardWithImage);
+
+            var finalProductsQuery = productsAndStatus
                  .AddFiltering(filterMappinValues, filterMappingOptions)
                  .AddSortingBy(request.OrderByOptions);
 
-            var productsAndStatus =  _leftJoinRepository.GetProductsAndStatusLeftJoin(request.UserId, productsQuery);
+            
 
-            return await _leftJoinRepository.ExecuteQuery(productsAndStatus);
+            return await _leftJoinRepository.ExecuteQuery(finalProductsQuery);
         }
         public IEnumerable<FilterByOptions> GetFilterOptions(FilterMappingValues filterValues)
         {
