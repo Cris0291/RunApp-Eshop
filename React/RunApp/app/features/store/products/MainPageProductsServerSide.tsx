@@ -15,6 +15,8 @@ import { ChevronLeft, ChevronRight, ShoppingCart, Star } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import FilterOptionsStars from "./FilterOptionsStars";
+import LikeButton from "@/app/ui/LikeButton";
+import useAddOrRemoveLikeHook from "@/app/hooks/useAddOrRemoveLikeQuery"
 
 interface Props {
   handleSelectedCategories: (categories: string[]) => void,
@@ -105,23 +107,17 @@ const products = [
 
 function MainPageProductsServerSide({handleSelectedCategories, handlePriceRange, handleSortBy, priceRange, sortBy, selectedCategories, handleSubmit, handleStarFilterChange, starFilters} : Props) {
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 6;
+  const {AddOrRemoveLikeMutation} = useAddOrRemoveLikeHook();
+
+  const handleLike = (liked: boolean, productId: string) => {
+    AddOrRemoveLikeMutation({liked, productId});
+  }
 
   const filteredProducts = products
 
   const currentproducts = filteredProducts
 
   const pageNumbers: number[] = [];
-
-  const [activeFilters, setActiveFilters] = useState({ stars: [], likes: [] })
-
-  const handleFilterChange = (filters:{
-    stars: never[];
-    likes: never[];
-} ) => {
-    setActiveFilters(filters)
-    console.log("Active filters:", filters)
-  }
 
   return (
     <main className="flex-1 container mx-auto px-4 py-8">
@@ -229,7 +225,10 @@ function MainPageProductsServerSide({handleSelectedCategories, handlePriceRange,
                   src="https://images.unsplash.com/photo-1594534475808-b18fc33b045e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 />
                 <div className="p-4">
-                  <h3 className="text-lg font-semibold mb-1">{product.name}</h3>
+                  <div className="flex justify-between items-center">
+                     <h3 className="text-lg font-semibold mb-1 text-gray-500">{product.name}</h3>
+                     <LikeButton size="sm" onLikeChange={(like) => handleLike(like, "")}/>
+                  </div>
                   <p className="text-sm text-gray-500 mb-2">
                     {product.category}
                   </p>
