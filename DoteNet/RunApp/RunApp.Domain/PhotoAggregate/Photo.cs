@@ -5,6 +5,8 @@
         private Photo() { }
         public string PhotoId { get; private set; }
         public string Url { get; private set; }
+        public bool IsMain { get; private set; }
+        public bool IsAvatar { get; private set;}
         public Guid ProductId { get; private set; }
         public Guid StoreOwnerProfileId { get; private set; }
 
