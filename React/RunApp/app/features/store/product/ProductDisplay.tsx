@@ -64,7 +64,7 @@ const reviews = [
   },
   {
     id: 1,
-    author: "Alice Johnson",
+    author: "A",
     avatar: "/placeholder.svg?height=40&width=40",
     rating: 5,
     date: "2023-05-15",
@@ -74,7 +74,7 @@ const reviews = [
   },
   {
     id: 2,
-    author: "Bob Smith",
+    author: "B",
     avatar: "/placeholder.svg?height=40&width=40",
     rating: 4,
     date: "2023-05-10",
@@ -84,7 +84,87 @@ const reviews = [
   },
   {
     id: 3,
-    author: "Charlie Brown",
+    author: "C",
+    avatar: "/placeholder.svg?height=40&width=40",
+    rating: 5,
+    date: "2023-05-05",
+    content: "I've been wearing this watch daily for a month now, and it's holding up beautifully. The timekeeping is precise, and I love the classic design.",
+    helpful: 30,
+    notHelpful: 0
+  },
+  {
+    id: 0,
+    author: "D",
+    avatar: "/placeholder.svg?height=40&width=40",
+    rating: 0,
+    date: "",
+    content: "This watch exceeded my expectations. The craftsmanship is impeccable, and it looks even better in person. Highly recommended!",
+    helpful: 24,
+    notHelpful: 2
+  },
+  {
+    id: 1,
+    author: "E",
+    avatar: "/placeholder.svg?height=40&width=40",
+    rating: 5,
+    date: "2023-05-15",
+    content: "This watch exceeded my expectations. The craftsmanship is impeccable, and it looks even better in person. Highly recommended!",
+    helpful: 24,
+    notHelpful: 2
+  },
+  {
+    id: 2,
+    author: "F",
+    avatar: "/placeholder.svg?height=40&width=40",
+    rating: 4,
+    date: "2023-05-10",
+    content: "Great watch for the price. The only reason I'm not giving it 5 stars is because the strap took a while to break in. Otherwise, it's perfect.",
+    helpful: 18,
+    notHelpful: 1
+  },
+  {
+    id: 3,
+    author: "G",
+    avatar: "/placeholder.svg?height=40&width=40",
+    rating: 5,
+    date: "2023-05-05",
+    content: "I've been wearing this watch daily for a month now, and it's holding up beautifully. The timekeeping is precise, and I love the classic design.",
+    helpful: 30,
+    notHelpful: 0
+  },
+  {
+    id: 0,
+    author: "H",
+    avatar: "/placeholder.svg?height=40&width=40",
+    rating: 0,
+    date: "",
+    content: "This watch exceeded my expectations. The craftsmanship is impeccable, and it looks even better in person. Highly recommended!",
+    helpful: 24,
+    notHelpful: 2
+  },
+  {
+    id: 1,
+    author: "I",
+    avatar: "/placeholder.svg?height=40&width=40",
+    rating: 5,
+    date: "2023-05-15",
+    content: "This watch exceeded my expectations. The craftsmanship is impeccable, and it looks even better in person. Highly recommended!",
+    helpful: 24,
+    notHelpful: 2
+  },
+  {
+    id: 2,
+    author: "J",
+    avatar: "/placeholder.svg?height=40&width=40",
+    rating: 4,
+    date: "2023-05-10",
+    content: "Great watch for the price. The only reason I'm not giving it 5 stars is because the strap took a while to break in. Otherwise, it's perfect.",
+    helpful: 18,
+    notHelpful: 1
+  },
+  {
+    id: 3,
+    author: "K",
     avatar: "/placeholder.svg?height=40&width=40",
     rating: 5,
     date: "2023-05-05",
@@ -122,7 +202,13 @@ export default function ProductDisplay() {
   const [mainImage, setMainImage] = useState(productTest.images[0])
   const dispatch = useAppDispatch();
   const {addRating} = useAddRatingCommand();
-  
+  const [currentReviewsPage, setCurrentReviewsPage] = useState(1);
+  const reviewsPerPage = 5;
+
+  const lastIndex = currentReviewsPage * reviewsPerPage;
+  const initialIndex = 0
+
+  const currentReviews = reviews.slice(initialIndex, lastIndex)
 
   const handleAddTocartState = () => {
     const productForCart = {id: newProduct.id, quantity: quantity, price: newProduct.price, priceWithDiscount: newProduct.priceWithDiscount, 
@@ -310,7 +396,7 @@ export default function ProductDisplay() {
 
                   {/* Individual Reviews */}
                   <div className="space-y-6">
-                    {reviews.map((review) => (
+                    {currentReviews.map((review) => (
                       <div key={review.id} className="border-t border-gray-200 pt-6 group">
                         <div className="flex items-center mb-4">
                           <Avatar className="h-10 w-10 group-hover:ring-2 group-hover:ring-pink-500 transition-all duration-300">
@@ -344,7 +430,7 @@ export default function ProductDisplay() {
                   {/* Load More Reviews */}
                 
                   <div className="text-center">
-                    <Button variant="outline" className="text-pink-500 hover:text-pink-600 hover:bg-pink-50 transition-colors duration-300 transform hover:scale-105">
+                    <Button variant="outline" className="text-pink-500 hover:text-pink-600 hover:bg-pink-50 transition-colors duration-300 transform hover:scale-105" onClick={() => setCurrentReviewsPage(prev => prev + 1)}>
                       Load More Reviews
                       <ChevronRight className="h-4 w-4 ml-2" />
                     </Button>
