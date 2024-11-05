@@ -175,12 +175,14 @@ function UserProfilePage() {
               <TabsTrigger
                 value="liked"
                 className="data-[state=active]:bg-pink-600 data-[state=active]:text-white"
+                onClick={() => {}}
               >
                 Liked Products
               </TabsTrigger>
               <TabsTrigger
                 value="reviewed"
                 className="data-[state=active]:bg-pink-600 data-[state=active]:text-white"
+                onClick={() => {}}
               >
                 Reviewd Products
               </TabsTrigger>
