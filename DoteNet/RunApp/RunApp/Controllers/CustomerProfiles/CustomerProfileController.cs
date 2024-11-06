@@ -49,6 +49,14 @@ namespace RunApp.Api.Controllers.CustomerProfiles
         }
 
         [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetBoughtProducts()
+        {
+            Guid userId = HttpContext.GetUserId();
+
+        }
+
+        [Authorize]
         [HttpPost(ApiEndpoints.CustomerProfiles.AddAddress)]
         public async Task<IActionResult> AddAddress([FromBody] AddressRequest addressRequest)
         {
