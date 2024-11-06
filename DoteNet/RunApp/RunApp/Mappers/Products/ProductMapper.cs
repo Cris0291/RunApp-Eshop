@@ -1,6 +1,5 @@
 ﻿using Contracts.Products.Requests;
 using Contracts.Products.Responses;
-using Contracts.ProductStatuses.Response;
 using Contracts.Rates.Response;
 using Contracts.Reviews.Responses;
 using RunApp.Domain.Products;
@@ -23,7 +22,7 @@ namespace RunApp.Api.Mappers.Products
             IEnumerable<string> bulletpoints = productWIthReviews.Product.BulletPoints.Select(bulletpoint => bulletpoint.BulletPoint);
             return new ProductWithReviewsResponse(productWIthReviews.Product.ProductId, productWIthReviews.Product.Name, productWIthReviews.Product.Description, 
                 productWIthReviews.Product.ActualPrice, bulletpoints, productWIthReviews.Product.PriceOffer.PriceWithDiscount, 
-                productWIthReviews.Product.PriceOffer.PromotionalText, productWIthReviews.Product.PriceOffer.Discount, productWIthReviews.Product.NumberOfReviews.Value, productWIthReviews.Product.AverageRatings ,productWIthReviews.Reviews.ReviewsToReviewResponses());
+                productWIthReviews.Product.PriceOffer.PromotionalText, productWIthReviews.Product.PriceOffer.Discount, productWIthReviews.Product.NumberOfReviews, productWIthReviews.Product.AverageRatings ,productWIthReviews.Reviews.ReviewsToReviewResponses());
         }
         public static ReviewResponse ReviewToReviewResponse(this ReviewDto review)
         {
@@ -34,25 +33,21 @@ namespace RunApp.Api.Mappers.Products
         {
            return reviews.Select(x => x.ReviewToReviewResponse());
         }
-        public static ProductsForCardResponse AllProductsToProductsResponse(this IEnumerable<ProductsJoin> products)
+        public static IEnumerable<ProductForCard> AllProductsToProductsResponse(this IEnumerable<ProductsJoin> productsJoin)
         {
-            IEnumerable<ProductForCardResponse> responses = products.Select(product => product.ProductForCardToProductForCardResponse()).ToList();
-            return new ProductsForCardResponse(responses);
-        }
-        public static ProductForCardResponse ProductForCardToProductForCardResponse(this ProductsJoin productForCard)
-        {
-            ProductStatusResponse? productStatusResponse = null;
-
-            if (productForCard.ProductStatus != null)
+            IEnumerable<ProductForCard> responses = productsJoin.Select(productJoin =>
             {
-                productStatusResponse = new ProductStatusResponse(productForCard.ProductStatus.Like, productForCard.ProductStatus.Dislike, productForCard.ProductStatus.Viewed, productForCard.ProductStatus.Bought);
-            }
-
-            
-
-            return new ProductForCardResponse(productForCard.Product.ProductId, productForCard.Product.Name, productForCard.Product.ActualPrice, 
-                                              productForCard.Product.NumberOfReviews, productForCard.Product.AverageRatings, productForCard.Product.PriceWithDiscount, 
-                                              productForCard.Product.PromotionalText, productForCard.Product.Discount, productStatusResponse);
+                if(productJoin.ProductStatus == null)
+                {
+                    productJoin.Product.UserLike = null;
+                }
+                else
+                {
+                    productJoin.Product.UserLike = productJoin.ProductStatus.Like;
+                }
+                return productJoin.Product;
+            }).ToList();
+            return responses;
         }
 
         public static CreateProductCommand ProductRequestToProductCommand(this CreateProductRequest createProduct, Guid storeProfileId)
