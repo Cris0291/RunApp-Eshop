@@ -29,14 +29,13 @@ namespace RunApp.Domain.Products
         private int _totalRatings;
         public List<Guid> Reviews { get; internal set; }
         public List<Guid> Ratings { get; internal set; }
-        public List<Guid> Statuses { get; internal set; }
         public Guid ProductId { get; internal set; }
         public string Name { get;  internal set; }
         public decimal ActualPrice { get; internal set; }
         public string Description { get; internal set; }
-        public int? NumberOfReviews { get; internal set; }
+        public int NumberOfReviews { get; internal set; }
         public double AverageRatings { get; internal set; }
-        public int? NumberOfLikes { get; internal set; }
+        public int NumberOfLikes { get; internal set; }
         public PriceOffer? PriceOffer { get; internal set; }
         public Characteristics Characteristic { get; internal set; }
         public ICollection<About> BulletPoints { get; internal set; }
@@ -69,7 +68,6 @@ namespace RunApp.Domain.Products
                 Characteristic = new Characteristics() { Brand = brand, Type = type, Color = color, Weight = weight},
                 Reviews = new(),
                 Ratings = new(),
-                Statuses = new(),
             };
 
             result.RaiseEvent(new CreateStockEvent(result, storeProfileId));
@@ -142,11 +140,9 @@ namespace RunApp.Domain.Products
             NumberOfReviews = Reviews.Count();
             if (!wasRemoved) throw new InvalidOperationException("Review was not removerd");
         }
-        public void AddProductStatus(Guid productStatusId)
+        public void AddProductLike(bool like)
         {
-            if(Statuses.Contains(productStatusId)) throw new InvalidOperationException("Cannot add more than one like or dislike per user");
-
-            Statuses.Add(productStatusId);
+            NumberOfLikes = like ? NumberOfLikes++ : NumberOfLikes == 0 ? NumberOfLikes : NumberOfLikes--;
         }
         public void AddRating(Guid raitingId, int rating)
         {
