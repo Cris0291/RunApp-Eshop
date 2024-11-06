@@ -3,10 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { getUserToken } from "../../registration/userSlice";
 import GetUserReviews from "@/app/services/apiUserProfle";
 
-export default function useGetUserProfileReview(){
+export default function useGetUserProfileReviews(){
     const token = useAppSelector(getUserToken)
-    useQuery({
+    const {data: userReviews, isLoading: loadingReviews} = useQuery({
         queryKey: ["userReviews"],
         queryFn: () => GetUserReviews(token)
     })
+
+    return {userReviews, loadingReviews}
 }

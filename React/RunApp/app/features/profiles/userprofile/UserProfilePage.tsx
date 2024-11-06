@@ -38,9 +38,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import useGetUserProfileReviews from "./useGetUserProfileReviews";
+import useGetUserProfileLikes from "./useGetUserProfileLikes";
+import SpinnerCard from "@/app/ui/SpinnerCard";
+import ReviewForm from "@/app/ui/ReviewForm";
 
 function UserProfilePage() {
   const [activeLink, setActiveLink] = useState("Dashboard");
+  const [activeForm, setActiveForm] = useState(false)
+  const {userReviews, loadingReviews} = useGetUserProfileReviews()
+  const {userLikes, loadingLikes} = useGetUserProfileLikes()
+  console.log(activeForm)
+
+  //TODOD: implement get bought products in asp.net
 
   const navItems = [
     { name: "Dashboard", icon: Home },
@@ -175,14 +185,12 @@ function UserProfilePage() {
               <TabsTrigger
                 value="liked"
                 className="data-[state=active]:bg-pink-600 data-[state=active]:text-white"
-                onClick={() => {}}
               >
                 Liked Products
               </TabsTrigger>
               <TabsTrigger
                 value="reviewed"
                 className="data-[state=active]:bg-pink-600 data-[state=active]:text-white"
-                onClick={() => {}}
               >
                 Reviewd Products
               </TabsTrigger>
@@ -197,7 +205,7 @@ function UserProfilePage() {
               value="liked"
               className="bg-white p-6 rounded-lg shadow-md"
             >
-              <Table>
+              {loadingLikes ? <SpinnerCard/> : <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="W-[100PX]">Image</TableHead>
@@ -235,13 +243,13 @@ function UserProfilePage() {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+              </Table>}
             </TabsContent>
             <TabsContent
               value="reviewed"
               className="bg-white p-6 rounded-lg shadow-md"
             >
-              <Table>
+              {loadingReviews ? <SpinnerCard/> : <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[100px]">Image</TableHead>
@@ -282,18 +290,14 @@ function UserProfilePage() {
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="border-pink-600 text-pink-600 hover:bg-pink-50"
-                        >
+                        <ReviewForm size="sm" className="border-pink-600 text-pink-600 hover:bg-pink-50" onSubmit={() => {}} isSubmitting={false}>
                           <Star className="mr-2 h-4 w-4" /> Edit Review
-                        </Button>
+                        </ReviewForm>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+              </Table>}
             </TabsContent>
             <TabsContent
               value="bought"
