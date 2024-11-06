@@ -24,6 +24,7 @@ namespace RunnApp.Application.ProductStatuses.Commands.AddOrRemoveLike
 
                 return Result.Success;
             }
+            if (productStatus.Like == request.Like) return Error.Validation(code: "ProductWasAlreadyLikeOrDislikeByCurrentUser", description: "Product was already like or dislike by current user");
 
             productStatus.AddOrRemoveLike(request.Like);
 
