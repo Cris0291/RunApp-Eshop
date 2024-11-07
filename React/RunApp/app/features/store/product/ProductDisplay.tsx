@@ -14,15 +14,14 @@ import { usePathname } from "next/navigation"
 import useGetProductQuery from "./useGetProductQuery"
 import { useAppDispatch, useAppSelector } from "@/app/hooks/reduxHooks"
 import { addItem, deleteItem } from "../../payment/shoppingcart/cartSlice"
-import ReviewForm from "./ReviewForm"
+import ReviewForm from "../../../ui/ReviewForm"
 import useCreateReviewCommand from "./useCreateReviewCommand"
 import LoadingModal from "@/app/ui/LoadingModal"
 import { getUserId } from "../../registration/userSlice"
-import { useQueryClient } from "@tanstack/react-query"
 import StarRatingComponent from "./StarRatingComponent"
 import useAddRatingCommand from "./useAddRatingCommand"
 import LikeButton from "@/app/ui/LikeButton"
-import useAddOrRemoveLikeHook from "@/app/hooks/useAddOrRemoveLikeQuery"
+import useAddOrRemoveLikeHook from "@/app/hooks/useAddOrRemoveLikeHook"
 
 const productTest = {
   name: "Elegant Timepiece",
