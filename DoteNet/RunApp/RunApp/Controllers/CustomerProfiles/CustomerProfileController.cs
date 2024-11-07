@@ -3,10 +3,12 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RunApp.Api.Mappers.Orders;
+using RunApp.Api.Mappers.Products;
 using RunApp.Api.Routes;
 using RunApp.Api.Services;
 using RunnApp.Application.CustomerProfiles.Commands.AddAddress;
 using RunnApp.Application.CustomerProfiles.Commands.AddPaymentMethod;
+using RunnApp.Application.CustomerProfiles.Queries.GetUserBoughtProducts;
 using RunnApp.Application.CustomerProfiles.Queries.GetUserLikes;
 using RunnApp.Application.CustomerProfiles.Queries.GetUserRatings;
 using RunnApp.Application.CustomerProfiles.Queries.GetUserReviews;
@@ -53,7 +55,9 @@ namespace RunApp.Api.Controllers.CustomerProfiles
         public async Task<IActionResult> GetBoughtProducts()
         {
             Guid userId = HttpContext.GetUserId();
+            var productWithImage =await _mediator.Send(new GetUserBoughtProductsQuery(userId));
 
+            return productWithImage.Match(value => Ok(value.ProductsWithImageToProductsResponse()), Problem);
         }
 
         [Authorize]

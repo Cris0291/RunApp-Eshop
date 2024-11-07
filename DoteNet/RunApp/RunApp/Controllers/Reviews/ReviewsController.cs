@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using RunnApp.Application.Reviews.Commands.CreateReview;
 using RunApp.Domain.ReviewAggregate;
 using RunApp.Domain.ReviewAggregate.ReviewEnum;
+using RunnApp.Application.Reviews.Commands.UpdateReview;
 
 
 namespace RunApp.Api.Controllers.Reviews
@@ -42,6 +43,17 @@ namespace RunApp.Api.Controllers.Reviews
             Guid userId = HttpContext.GetUserId();
             ErrorOr<Success> errorOr = await _mediator.Send(new DeleteReviewCommand(userId, ProductId));
             return errorOr.MatchFirst(value => Ok(), Problem);
+        }
+
+        [Authorize]
+        [HttpPut(ApiEndpoints.Products.UpdateReview)]
+        public async Task<IActionResult> UpdateReview([FromRoute] Guid id, AddReviewRequest reviewRequest)
+        {
+            Guid userId = HttpContext.GetUserId();
+
+            var reviewEnum = ReviewDescriptionEnums.FromName(reviewRequest.reviewDescription.ToString());
+
+            var result = await _mediator.Send(new UpdateReviewCommand(id, userId, reviewRequest.comment, reviewEnum));
         }
     }
 }
