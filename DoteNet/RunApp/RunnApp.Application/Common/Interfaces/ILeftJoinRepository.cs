@@ -9,6 +9,7 @@ namespace RunnApp.Application.Common.Interfaces
         IQueryable<ProductUserLikesDto> GetProductsAndStatusLeftJoin(Guid UserId);
         IQueryable<ProductsJoin> GetProductsAndStatusLeftJoin(Guid UserId, IQueryable<ProductForCard> products);
         IQueryable<ProductWithMainImage> GetProductsWithImage(IQueryable<Product> products);
+        IQueryable<ProductWithMainImage> GetBoughtProductWithImage(IEnumerable<Guid> boughtProducts);
         Task<List<T>> ExecuteQuery<T>(IQueryable<T> query);
     }
 }

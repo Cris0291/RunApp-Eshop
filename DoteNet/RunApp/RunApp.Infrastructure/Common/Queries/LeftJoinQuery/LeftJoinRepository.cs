@@ -44,6 +44,17 @@ namespace RunApp.Infrastructure.Common.Queries.LeftJoinQuery
 
             return products.CreateOuterJoinQuery(photos, productKey, photoKey, resultSelector);
         }
+        public IQueryable<ProductWithMainImage> GetBoughtProductWithImage(IEnumerable<Guid> boughtProducts)
+        {
+            var productsSet = boughtProducts.ToHashSet();
+            IQueryable<Product> products = _appStoreDbContext.Products.Where(x => productsSet.Contains(x.ProductId));
+            IQueryable<Photo> photos = _appStoreDbContext.Photos.Where(x => x.IsMain);
+            Expression<Func<Product, Guid>> productKey = (product) => product.ProductId;
+            Expression<Func<Photo, Guid>> photoKey = (photo) => photo.ProductId;
+            Expression<Func<Product, Photo?, ProductWithMainImage>> resultSelector = (product, photo) => new ProductWithMainImage { Product = product, MainImage = photo };
+
+            return products.CreateOuterJoinQuery(photos, productKey, photoKey, resultSelector);
+        }
         public async Task<List<T>> ExecuteQuery<T>(IQueryable<T> query)
         {
             return await query.ToListAsync();
