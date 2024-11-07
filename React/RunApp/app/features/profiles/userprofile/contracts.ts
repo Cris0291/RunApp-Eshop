@@ -18,3 +18,9 @@ export type UserLikes = {
     productPrice: number,
     likeId: string
 }
+
+export type userBoughtProducts = {
+    productId: string,
+    productImage: string,
+    productPrice: number
+}

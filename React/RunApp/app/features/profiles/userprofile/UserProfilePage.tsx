@@ -42,15 +42,28 @@ import useGetUserProfileReviews from "./useGetUserProfileReviews";
 import useGetUserProfileLikes from "./useGetUserProfileLikes";
 import SpinnerCard from "@/app/ui/SpinnerCard";
 import ReviewForm from "@/app/ui/ReviewForm";
+import useUpdateUserReview from "./useUpdateUserReview";
+import useGetuserBoughtProducts from "./useGetUserBoughtProducts";
+import useAddOrRemoveLikeHook from "@/app/hooks/useAddOrRemoveLikeHook";
 
 function UserProfilePage() {
   const [activeLink, setActiveLink] = useState("Dashboard");
   const [activeForm, setActiveForm] = useState(false)
   const {userReviews, loadingReviews} = useGetUserProfileReviews()
+  const {userBoughtProducts, loadingProducts} = useGetuserBoughtProducts()
   const {userLikes, loadingLikes} = useGetUserProfileLikes()
-  console.log(activeForm)
+  const {updateReviewsMutation, updatingReviews} = useUpdateUserReview()
+  const {AddOrRemoveLikeMutation} = useAddOrRemoveLikeHook()
 
-  //TODOD: implement get bought products in asp.net
+
+  const handleReviewUpdate = ({sentiment, reviewId, content}: {sentiment: string, reviewId: string, content: string}) => {
+    const reviewDto = {comment: content, reviewDescription: sentiment}
+    updateReviewsMutation({reviewDto, reviewId});
+  }
+
+  const handleLike = ({productId, like}: {productId: string, like: boolean}) => {
+    AddOrRemoveLikeMutation({liked: like, productId: productId})
+  }
 
   const navItems = [
     { name: "Dashboard", icon: Home },
@@ -235,6 +248,7 @@ function UserProfilePage() {
                           variant="outline"
                           size="sm"
                           className="border-pink-600 text-pink-600 hover:bg-pink-50"
+                          onClick={() => handleLike({productId: product.name, like: false})}
                         >
                           <Heart className="mr-2 h-4 w-4" />
                           Unlike
@@ -290,7 +304,7 @@ function UserProfilePage() {
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        <ReviewForm size="sm" className="border-pink-600 text-pink-600 hover:bg-pink-50" onSubmit={() => {}} isSubmitting={false}>
+                        <ReviewForm size="sm" className="border-pink-600 text-pink-600 hover:bg-pink-50" onSubmit={({sentiment, content}: {sentiment: string, content: string}) => handleReviewUpdate({sentiment, reviewId: product.name, content})} isSubmitting={updatingReviews}>
                           <Star className="mr-2 h-4 w-4" /> Edit Review
                         </ReviewForm>
                       </TableCell>
@@ -303,7 +317,7 @@ function UserProfilePage() {
               value="bought"
               className="bg-white p-6 rounded-lg shadow-md"
             >
-              <Table>
+              {loadingProducts ? <SpinnerCard/> : <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[]100px">Image</TableHead>
@@ -354,7 +368,7 @@ function UserProfilePage() {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+              </Table>}
             </TabsContent>
           </Tabs>
         </div>
