@@ -10,3 +10,12 @@ export async function CreateReview({reviewDto, productId, token}: {reviewDto: Re
         }
     }).then(response => response.data)
 }
+
+export async function UpdateReview({reviewDto, reviewId, token}: {reviewDto: ReviewDto, reviewId: string, token: string}){
+    return axios.put<Review>("Todo update review", reviewDto, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(response => response.data)
+
+} 
