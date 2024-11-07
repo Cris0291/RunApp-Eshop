@@ -63,5 +63,13 @@ namespace RunApp.Api.Mappers.Products
                 updateProduct.Price, updateProduct.Bulletpoints,updateProduct.Characteristics.Brand,
                 updateProduct.Characteristics.Type, updateProduct.Characteristics.Color, updateProduct.Characteristics.Weight, productId);
         }
+        public static IEnumerable<UserBoughtProductsResponse> ProductsWithImageToProductsResponse(this IEnumerable<ProductWithMainImage> productWithMainImages)
+        {
+            return productWithMainImages.Select(x => x.ProductWithImageToProductResponse()).ToList();
+        }
+        public static UserBoughtProductsResponse ProductWithImageToProductResponse(this ProductWithMainImage productWithMainImage)
+        {
+            return new UserBoughtProductsResponse(productWithMainImage.Product.ProductId, productWithMainImage.MainImage.Url, productWithMainImage.Product.ActualPrice, productWithMainImage.Product.Name);
+        }
     }
 }
