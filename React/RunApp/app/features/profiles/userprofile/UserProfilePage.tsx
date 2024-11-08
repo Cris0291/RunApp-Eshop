@@ -20,7 +20,7 @@ import {
   Heart,
   Home,
   LogOut,
-  Package,
+  ShoppingCart,
   Settings,
   ShoppingBag,
   Star,
@@ -45,9 +45,12 @@ import ReviewForm from "@/app/ui/ReviewForm";
 import useUpdateUserReview from "./useUpdateUserReview";
 import useGetuserBoughtProducts from "./useGetUserBoughtProducts";
 import useAddOrRemoveLikeHook from "@/app/hooks/useAddOrRemoveLikeHook";
+import MapCategories from "@/app/services/categoryMapper";
 
 function UserProfilePage() {
   const [activeLink, setActiveLink] = useState("Dashboard");
+  const [unliked, setUnliked] = useState(false);
+  const [key, setKey] = useState<string>()
   const [activeForm, setActiveForm] = useState(false)
   const {userReviews, loadingReviews} = useGetUserProfileReviews()
   const {userBoughtProducts, loadingProducts} = useGetuserBoughtProducts()
@@ -74,36 +77,40 @@ function UserProfilePage() {
 
   const products = [
     {
-      id: 1,
+      id: "1",
       name: "Wireless Earbuds",
       price: "$79.99",
       image: "/placeholder.svg?height=50&width=50",
       rating: 4,
       status: "Delivered",
+      categories: ["Yoga"]
     },
     {
-      id: 2,
+      id: "2",
       name: "Smart Watch",
       price: "$199.99",
       image: "/placeholder.svg?height=50&width=50",
       rating: 5,
       status: "Shipped",
+      categories: ["swimming"]
     },
     {
-      id: 3,
+      id: "3",
       name: "Bluetooth Speaker",
       price: "$59.99",
       image: "/placeholder.svg?height=50&width=50",
       rating: 3,
       status: "Processing",
+      categories: ["Running"]
     },
     {
-      id: 4,
+      id: "4",
       name: "Laptop Stand",
       price: "$29.99",
       image: "/placeholder.svg?height=50&width=50",
       rating: 4,
       status: "Delivered",
+      categories: ["test"]
     },
   ];
 
@@ -163,9 +170,9 @@ function UserProfilePage() {
       <main className="flex-1 overflow-y-auto p-6">
         <div className="container mx-auto space-y-6">
           <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-md">
-            <h1 className="text-3xl font-bold text-gray-800">User Dashboard</h1>
+            <h1 className="text-xl font-bold text-gray-800">User Dashboard</h1>
             <div className="flex items-center space-x-4">
-              <Input className="w-64" placeholder="Search..." type="search" />
+              <Input className="w-full" placeholder="Search..." type="search" />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Avatar className="cursor-pointer">
@@ -194,24 +201,24 @@ function UserProfilePage() {
           </div>
 
           <Tabs defaultValue="liked" className="space-y*4">
-            <TabsList className="bg-black p-1 rounded-lg shadow-md">
+            <TabsList className="bg-black p-1 rounded-lg shadow-md sm:w-full md:w-1/2">
               <TabsTrigger
                 value="liked"
-                className="data-[state=active]:bg-pink-600 data-[state=active]:text-white"
+                className="data-[state=active]:bg-pink-600 data-[state=active]:text-white w-full"
               >
-                Liked Products
+                Liked 
               </TabsTrigger>
               <TabsTrigger
                 value="reviewed"
-                className="data-[state=active]:bg-pink-600 data-[state=active]:text-white"
+                className="data-[state=active]:bg-pink-600 data-[state=active]:text-white w-full"
               >
-                Reviewd Products
+                Reviewed
               </TabsTrigger>
               <TabsTrigger
                 value="bought"
-                className="data-[state=active]:bg-pink-600 data-[state=active]:text-white"
+                className="data-[state=active]:bg-pink-600 data-[state=active]:text-white w-full"
               >
-                Bought Products
+                Bought 
               </TabsTrigger>
             </TabsList>
             <TabsContent
@@ -221,7 +228,7 @@ function UserProfilePage() {
               {loadingLikes ? <SpinnerCard/> : <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="W-[100PX]">Image</TableHead>
+                    <TableHead className="w-[100px]">Image</TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Price</TableHead>
                     <TableHead className="text-right">Action</TableHead>
@@ -247,8 +254,12 @@ function UserProfilePage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="border-pink-600 text-pink-600 hover:bg-pink-50"
-                          onClick={() => handleLike({productId: product.name, like: false})}
+                          className={`bg-pink-500 text-white hover:bg-pink-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${unliked && product.id === key ? "border-pink-600 bg-white text-pink-600 hover:bg-pink-50" : ""}`}
+                          onClick={() => {
+                            setKey(product.id)
+                            handleLike({productId: product.id, like: unliked})
+                            setUnliked(prev =>  !prev)
+                          }}
                         >
                           <Heart className="mr-2 h-4 w-4" />
                           Unlike
@@ -304,7 +315,7 @@ function UserProfilePage() {
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        <ReviewForm size="sm" className="border-pink-600 text-pink-600 hover:bg-pink-50" onSubmit={({sentiment, content}: {sentiment: string, content: string}) => handleReviewUpdate({sentiment, reviewId: product.name, content})} isSubmitting={updatingReviews}>
+                        <ReviewForm size="sm" className="border-pink-600 text-pink-600 hover:bg-pink-50" onSubmit={({sentiment, content}: {sentiment: string, content: string}) => handleReviewUpdate({sentiment, reviewId: product.id, content})} isSubmitting={updatingReviews}>
                           <Star className="mr-2 h-4 w-4" /> Edit Review
                         </ReviewForm>
                       </TableCell>
@@ -320,10 +331,10 @@ function UserProfilePage() {
               {loadingProducts ? <SpinnerCard/> : <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[]100px">Image</TableHead>
+                    <TableHead className="w-[100px]">Image</TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Price</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>Category</TableHead>
                     <TableHead className="text-right">Action</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -345,24 +356,23 @@ function UserProfilePage() {
                       <TableCell>
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                            product.status === "Delivered"
-                              ? "bg-green-100 text-green-800"
-                              : product.status === "Shipped"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-yellow-100 text-yellow-800"
+                            MapCategories(product.categories[0])
                           }`}
                         >
-                          {product.status}
+                          {product.categories[0]}
                         </span>
                       </TableCell>
                       <TableCell className="text-right">
                         <Button
                           variant="outline"
                           size="sm"
-                          className="border-pink-600 text-pink-600 hover:bg-pink-50"
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                          asChild
                         >
-                          <Package className="mr-2 h-4 w-4" />
-                          Track Order
+                          <Link href={`products/${product.id}`}>
+                             Buy Again
+                           <ShoppingCart className="ml-2 h-4 w-4" />
+                          </Link>
                         </Button>
                       </TableCell>
                     </TableRow>
