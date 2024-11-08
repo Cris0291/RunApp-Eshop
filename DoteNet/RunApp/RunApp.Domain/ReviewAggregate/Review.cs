@@ -34,5 +34,10 @@ namespace RunApp.Domain.ReviewAggregate
         {
             RaiseEvent(new DeleteReviewEvent(reviewId, productId, customerProfileId));
         }
+        public void UpdateReview(string comment, ReviewDescriptionEnums reviewDescription)
+        {
+            Comment = comment;
+            ReviewDescription = reviewDescription;
+        }
     }
 }

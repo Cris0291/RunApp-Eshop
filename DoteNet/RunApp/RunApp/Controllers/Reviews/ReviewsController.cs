@@ -54,6 +54,8 @@ namespace RunApp.Api.Controllers.Reviews
             var reviewEnum = ReviewDescriptionEnums.FromName(reviewRequest.reviewDescription.ToString());
 
             var result = await _mediator.Send(new UpdateReviewCommand(id, userId, reviewRequest.comment, reviewEnum));
+
+            return result.Match(value => Ok(), Problem);
         }
     }
 }
