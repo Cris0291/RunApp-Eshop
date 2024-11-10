@@ -1,30 +1,9 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import {
   Heart,
-  Home,
-  LogOut,
   ShoppingCart,
-  Settings,
-  ShoppingBag,
   Star,
-  User,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -46,9 +25,13 @@ import useUpdateUserReview from "./useUpdateUserReview";
 import useGetuserBoughtProducts from "./useGetUserBoughtProducts";
 import useAddOrRemoveLikeHook from "@/app/hooks/useAddOrRemoveLikeHook";
 import MapCategories from "@/app/services/categoryMapper";
+import SearchBar from "@/app/ui/SearchBar";
+import AnimatedButton from "@/app/ui/AnimatedButton";
+import { useAppDispatch } from "@/app/hooks/reduxHooks";
+import { setSearch } from "../../store/products/productsQuerySlice";
+import { useRouter } from "next/navigation";
 
-function UserProfilePage() {
-  const [activeLink, setActiveLink] = useState("Dashboard");
+function UserProfilePageHome() {
   const [unliked, setUnliked] = useState(false);
   const [key, setKey] = useState<string>()
   const [activeForm, setActiveForm] = useState(false)
@@ -57,6 +40,8 @@ function UserProfilePage() {
   const {userLikes, loadingLikes} = useGetUserProfileLikes()
   const {updateReviewsMutation, updatingReviews} = useUpdateUserReview()
   const {AddOrRemoveLikeMutation} = useAddOrRemoveLikeHook()
+  const dispatch = useAppDispatch();
+  const router = useRouter()
 
 
   const handleReviewUpdate = ({sentiment, reviewId, content, rating}: {sentiment: string, reviewId: string, content: string, rating: number}) => {
@@ -68,12 +53,11 @@ function UserProfilePage() {
     AddOrRemoveLikeMutation({liked: like, productId: productId})
   }
 
-  const navItems = [
-    { name: "Dashboard", icon: Home },
-    { name: "Liked", icon: Heart },
-    { name: "Reviewed", icon: Star },
-    { name: "Purchased", icon: ShoppingBag },
-  ];
+  const handleSearch = (searchTerm: string) => {
+    dispatch(setSearch({sortBy: "", search: searchTerm, categories: [], priceRange: [], starFilters: [],}))
+    router.push("/products")
+  }
+
 
   const products = [
     {
@@ -115,89 +99,10 @@ function UserProfilePage() {
   ];
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-100 to-gray-200">
-      <TooltipProvider>
-        <aside className="w-16 bg-black text-white">
-          <div className="flex flex-col h-full">
-            <div className="flex items-center justify-center h-16 border-b border-gray-800">
-              <User className="w-6 h-6 text-pink-600" />
-            </div>
-            <nav className="flex-1 overflow-y-auto">
-              <ul className="p-2 space-y-2">
-                {navItems.map((item) => (
-                  <li key={item.name}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Link
-                          href="#"
-                          className={`flex items-center justify-center p-2 rounded-lg transition-colors duration-200 ${
-                            activeLink === item.name
-                              ? "bg-pink-600 text-white"
-                              : "text-gray-400 hover:bg-gray-800 hover:text-white"
-                          }`}
-                          onClick={() => setActiveLink(item.name)}
-                        >
-                          <item.icon className="w-5 h-5" />
-                        </Link>
-                      </TooltipTrigger>
-                      <TooltipContent side="right">
-                        <p>{item.name}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-            <div className="p-4 border-t border-gray-800">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link
-                    className="flex items-center justify-center text-gray-400 hover:text-white transition-colors duration-200"
-                    href="#"
-                  >
-                    <Settings className="w-5 h-5" />
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  <p>Settings</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-          </div>
-        </aside>
-      </TooltipProvider>
-
-      <main className="flex-1 overflow-y-auto p-6">
         <div className="container mx-auto space-y-6">
           <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-md">
-            <h1 className="text-xl font-bold text-gray-800">User Dashboard</h1>
-            <div className="flex items-center space-x-4">
-              <Input className="w-full" placeholder="Search..." type="search" />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Avatar className="cursor-pointer">
-                    <AvatarImage src="" alt="@userimage" />
-                    <AvatarFallback>Us</AvatarFallback>
-                  </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+             <SearchBar onSearch={(search: string) => handleSearch(search)}/>
+              <AnimatedButton size="md"/>
           </div>
 
           <Tabs defaultValue="liked" className="space-y*4">
@@ -369,7 +274,7 @@ function UserProfilePage() {
                           className="bg-green-600 hover:bg-green-700 text-white"
                           asChild
                         >
-                          <Link href={`products/${product.id}`}>
+                          <Link href={`/products/${product.id}`}>
                              Buy Again
                            <ShoppingCart className="ml-2 h-4 w-4" />
                           </Link>
@@ -382,9 +287,7 @@ function UserProfilePage() {
             </TabsContent>
           </Tabs>
         </div>
-      </main>
-    </div>
   );
 }
 
-export default UserProfilePage;
+export default UserProfilePageHome;
