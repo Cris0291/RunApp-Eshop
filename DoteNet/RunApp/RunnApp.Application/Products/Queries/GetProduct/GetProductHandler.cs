@@ -5,31 +5,29 @@ using RunnApp.Application.Common.Interfaces;
 
 namespace RunnApp.Application.Products.Queries.GetProduct
 {
-    public class GetProductHandler : IRequestHandler<GetProductQuery, ErrorOr<ProductWithReviews>>
+    public class GetProductHandler : IRequestHandler<GetProductQuery, ErrorOr<ProductItemDto>>
     {
         private readonly IProductsRepository _productsRepository;
         private readonly IReviewsRepository _reviewRepository;
-        private readonly IRatingsRepository _ratingsRepository;
-        public GetProductHandler(IProductsRepository productsRepository, IReviewsRepository reviewsRepository, IRatingsRepository ratingsRepository)
+        private readonly IPhotoRepository _photoRepository;
+        public GetProductHandler(IProductsRepository productsRepository, IReviewsRepository reviewsRepository, IPhotoRepository photoRepository)
         {
             _productsRepository = productsRepository;
             _reviewRepository = reviewsRepository;
-            _ratingsRepository = ratingsRepository;
+            _photoRepository = photoRepository;
         }
-        public async Task<ErrorOr<ProductWithReviews>> Handle(GetProductQuery request, CancellationToken cancellationToken)
+        public async Task<ErrorOr<ProductItemDto>> Handle(GetProductQuery request, CancellationToken cancellationToken)
         {
-            Product? product =await _productsRepository.GetProduct(request.ProductId);
+            Product? product = await _productsRepository.GetProductWithCategories(request.ProductId);
             if(product is null) return Error.NotFound(code: "ProductWasNotFoundWithGivenId", description: $"Requested product was not found {request.ProductId}");
 
             var reviews = await _reviewRepository.GetReviewsForProduct(request.ProductId);
 
-            var ratings = await _ratingsRepository.GetRatingsForProduct(request.ProductId);
+            var photos = await _photoRepository.GetPhotosForProduct(request.ProductId);
 
-            var reviewsDto = reviews.MatchReviewsWithRatings(ratings);
+            var productItem = product.CreateProductItemDto(photos, reviews);
 
-            var productWithReviews = new ProductWithReviews(product, reviewsDto);
-
-            return productWithReviews;
+            return productItem;
         }
     }
 }
