@@ -11,11 +11,12 @@ namespace RunApp.Domain.ReviewAggregate
         internal Review() { }
         public Guid ReviewId { get; internal set; }
         public string Comment { get; internal set; }
+        public int Rating { get; internal set; }
         public DateTime Date { get; internal set; }
         public ReviewDescriptionEnums ReviewDescription { get; internal set; }
         public Guid? ProductId { get; internal set; }
         public Guid Id { get; internal set; }
-        public static Review CreateReview(string comment, ReviewDescriptionEnums reviewDescription, Guid productId, Guid customerProfileId)
+        public static Review CreateReview(string comment, int rating, ReviewDescriptionEnums reviewDescription, Guid productId, Guid customerProfileId)
         {
             var review = new Review()
             {
@@ -23,7 +24,8 @@ namespace RunApp.Domain.ReviewAggregate
                 Id = customerProfileId,
                 Comment = comment,
                 ReviewDescription = reviewDescription,
-                ProductId = productId
+                ProductId = productId,
+                Rating = rating,
             };
 
             review.RaiseEvent(new AddReviewEvent(review.ReviewId, productId, customerProfileId));
@@ -34,10 +36,11 @@ namespace RunApp.Domain.ReviewAggregate
         {
             RaiseEvent(new DeleteReviewEvent(reviewId, productId, customerProfileId));
         }
-        public void UpdateReview(string comment, ReviewDescriptionEnums reviewDescription)
+        public void UpdateReview(string comment, int rating, ReviewDescriptionEnums reviewDescription)
         {
             Comment = comment;
             ReviewDescription = reviewDescription;
+            Rating = rating;
         }
     }
 }
