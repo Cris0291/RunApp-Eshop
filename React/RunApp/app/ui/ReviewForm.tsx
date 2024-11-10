@@ -20,12 +20,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Pencil, ThumbsUp, ThumbsDown, Meh, Smile, Frown } from "lucide-react"
+import { Star, ThumbsUp, ThumbsDown, Meh, Smile, Frown } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
 interface ReviewFormData {
   sentiment: string
-  content: string
+  content: string,
+  rating: number,
 }
 
 interface Props {
@@ -47,16 +48,19 @@ const sentimentOptions = [
 export default function ReviewForm({ onSubmit, isSubmitting, size="sm", children, className = "bg-pink-500 text-white hover:bg-pink-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg" }: Props) {
   const [sentiment, setSentiment] = useState("average")
   const [content, setContent] = useState("")
+  const [rating, setRating] = useState(0)
+  const [hoverRating, setHoverRating] = useState(0)
   const [isOpen, setIsOpen] = useState(false)
 
   
   const handleSubmit =  (e: React.FormEvent) => {
     e.preventDefault()
     
-    onSubmit({ sentiment, content })
+    onSubmit({ sentiment, content, rating })
     setSentiment("")
     setContent("")
     setIsOpen(false)
+    setRating(0)
   }
  //<Pencil className="w-4 h-4 mr-2" /> Write a Review
           
@@ -86,6 +90,31 @@ export default function ReviewForm({ onSubmit, isSubmitting, size="sm", children
           transition={{ duration: 0.3 }}
         >
           <div className="space-y-4">
+          <div className="space-y-2">
+              <Label htmlFor="rating" className="text-sm font-medium text-gray-700">
+                Rating
+              </Label>
+              <div className="flex items-center">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    className="focus:outline-none"
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                    onClick={() => setRating(star)}
+                  >
+                    <Star
+                      className={`w-8 h-8 ${
+                        star <= (hoverRating || rating)
+                          ? "text-yellow-400 fill-yellow-400"
+                          : "text-gray-300"
+                      } transition-colors duration-200`}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="sentiment" className="text-sm font-medium text-gray-700">
                 Overall Experience
