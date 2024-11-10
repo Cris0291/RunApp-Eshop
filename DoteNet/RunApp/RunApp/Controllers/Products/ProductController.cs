@@ -42,9 +42,9 @@ namespace RunApp.Api.Controllers.Products
             
            var productQuery = new GetProductQuery(id);
 
-            ErrorOr<ProductWithReviews> queryResponse = await _mediator.Send(productQuery);
+            var queryResponse = await _mediator.Send(productQuery);
 
-            return queryResponse.MatchFirst(product => Ok(product.ProductWithReviewToProductWithReviewsResponse()),
+            return queryResponse.MatchFirst(product => Ok(queryResponse),
             Problem);
         }
 

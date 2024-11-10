@@ -17,22 +17,6 @@ namespace RunApp.Api.Mappers.Products
             IEnumerable<string> bulletpoints = product.BulletPoints.Select(bulletpoint => bulletpoint.BulletPoint);
             return new ProductResponse(product.ProductId, product.Name, product.Description, product.ActualPrice, bulletpoints, product.PriceOffer != null ? product.PriceOffer.PriceWithDiscount : null, product.PriceOffer != null ? product.PriceOffer.PromotionalText : null, product.PriceOffer != null ? product.PriceOffer.Discount : null);
         }
-        public static ProductWithReviewsResponse ProductWithReviewToProductWithReviewsResponse(this ProductWithReviews productWIthReviews)
-        {
-            IEnumerable<string> bulletpoints = productWIthReviews.Product.BulletPoints.Select(bulletpoint => bulletpoint.BulletPoint);
-            return new ProductWithReviewsResponse(productWIthReviews.Product.ProductId, productWIthReviews.Product.Name, productWIthReviews.Product.Description, 
-                productWIthReviews.Product.ActualPrice, bulletpoints, productWIthReviews.Product.PriceOffer.PriceWithDiscount, 
-                productWIthReviews.Product.PriceOffer.PromotionalText, productWIthReviews.Product.PriceOffer.Discount, productWIthReviews.Product.NumberOfReviews, productWIthReviews.Product.AverageRatings ,productWIthReviews.Reviews.ReviewsToReviewResponses());
-        }
-        public static ReviewResponse ReviewToReviewResponse(this ReviewDto review)
-        {
-            var ratingResponse = new RatingResponse(review.RatingDto.NumOfStars, review.RatingDto.DateOfRate);
-            return new ReviewResponse(review.Comment, review.Date, review.ReviewDescription, ratingResponse);
-        }
-        public static IEnumerable<ReviewResponse> ReviewsToReviewResponses(this IEnumerable<ReviewDto> reviews)
-        {
-           return reviews.Select(x => x.ReviewToReviewResponse());
-        }
         public static IEnumerable<ProductForCard> AllProductsToProductsResponse(this IEnumerable<ProductsJoin> productsJoin)
         {
             IEnumerable<ProductForCard> responses = productsJoin.Select(productJoin =>
