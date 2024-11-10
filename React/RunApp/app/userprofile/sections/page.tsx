@@ -1,5 +1,8 @@
 import SectionPage from "@/app/features/profiles/userprofile/sections/SectionsPage";
+import UserProfilePageLayout from "@/app/features/profiles/userprofile/UserProfilePageLayout";
 
 export default function AppSectionsPage(){
-    return <SectionPage/>
+    return <UserProfilePageLayout>
+        <SectionPage/>
+    </UserProfilePageLayout>
 }
