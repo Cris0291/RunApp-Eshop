@@ -6,7 +6,7 @@ using RunApp.Domain.ReviewAggregate.ReviewErrors;
 
 namespace RunnApp.Application.Reviews.Commands.CreateReview
 {
-    public class CreateReviewCommandHandler(IReviewsRepository reviewsRepository, IUnitOfWorkPattern unitOfWorkPattern, IProductsRepository productsRepository, ICustomerProfileRepository customerProfileRepository) : IRequestHandler<CreateReviewCommand, ErrorOr<Review>>
+    public class CreateReviewCommandHandler(IReviewsRepository reviewsRepository, IUnitOfWorkPattern unitOfWorkPattern, ICustomerProfileRepository customerProfileRepository) : IRequestHandler<CreateReviewCommand, ErrorOr<Review>>
     {
         private readonly IReviewsRepository _reviewsRepository = reviewsRepository;
         private readonly ICustomerProfileRepository _customerProfileRepository = customerProfileRepository;
@@ -20,7 +20,7 @@ namespace RunnApp.Application.Reviews.Commands.CreateReview
             bool existReview = await _reviewsRepository.ExistReview(request.UserId,request.ProductId);
             if (existReview) return ReviewError.UserCannotAddMoreThanOneReviewPerproduct;
 
-            var review  = Review.CreateReview(request.Comment, request.ReviewDescriptionEnum, request.ProductId, request.UserId);
+            var review  = Review.CreateReview(request.Comment, request.Rating, request.ReviewDescriptionEnum, request.ProductId, request.UserId);
 
             await _reviewsRepository.AddReview(review);
             await _unitOfWork.CommitChangesAsync();

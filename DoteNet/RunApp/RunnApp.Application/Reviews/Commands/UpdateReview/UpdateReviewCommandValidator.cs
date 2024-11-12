@@ -7,6 +7,7 @@ namespace RunnApp.Application.Reviews.Commands.UpdateReview
         public UpdateReviewCommandValidator()
         {
             RuleFor(x => x.Comment).NotEmpty().NotNull();
+            RuleFor(x => x.Rating).GreaterThan(0);
         }
     }
 }
