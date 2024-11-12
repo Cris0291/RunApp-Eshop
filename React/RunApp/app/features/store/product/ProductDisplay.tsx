@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Star, Truck, RefreshCcw, Heart, ChevronRight, ThumbsUp, ThumbsDown, Watch, Droplet, Shield, Clock } from "lucide-react"
+import { Star, Truck, RefreshCcw, ChevronRight, ThumbsUp, ThumbsDown, Watch, Droplet, Shield, Clock, Pencil } from "lucide-react"
 import { usePathname } from "next/navigation"
 import useGetProductQuery from "./useGetProductQuery"
 import { useAppDispatch, useAppSelector } from "@/app/hooks/reduxHooks"
@@ -209,6 +209,8 @@ export default function ProductDisplay() {
 
   const currentReviews = reviews.slice(initialIndex, lastIndex)
 
+  const isRendered = lastIndex < reviews.length
+
   const handleAddTocartState = () => {
     const productForCart = {id: newProduct.id, quantity: quantity, price: newProduct.price, priceWithDiscount: newProduct.priceWithDiscount, 
                             totalPrice: newProduct.price * quantity, image: ""}
@@ -221,20 +223,17 @@ export default function ProductDisplay() {
     setIsAddedToCart(false)
   }
 
-  const handleRating = (rating: number) => {
-    addRating({rating, productId: newProduct.id})
-  }
 
   const handleLike = (liked: boolean) => {
     AddOrRemoveLikeMutation({liked, productId: newProduct.id});
   }
 
-  const onSubmit = ({sentiment, content}: {sentiment: string, content: string}) => {
+  const onSubmit = ({sentiment, content, rating}: {sentiment: string, content: string, rating: number}) => {
     //Todo: check whether the product has been bought
     //Todo: check if i already have a review on this product
     //Todo: handle errors like the ones mention above or could not submitt review
 
-    const reviewDto = {comment: content, reviewDescription: sentiment}
+    const reviewDto = {comment: content, reviewDescription: sentiment, rating: rating}
     AddReview({reviewDto, productId: newProduct.id})
   }
 
@@ -379,7 +378,9 @@ export default function ProductDisplay() {
                         <span className="ml-2 text-sm text-gray-500 hover:text-pink-500 transition-colors duration-300">{productTest.rating} out of 5</span>
                       </div>
                     </div>
-                    <ReviewForm onSubmit={onSubmit} isSubmitting={isPending}/>
+                    <ReviewForm onSubmit={onSubmit} isSubmitting={isPending}>
+                      <Pencil className="mr-2 h-4 w-4" /> Add Review
+                    </ReviewForm>
                   </div>
 
                   {/* Rating Distribution */}
@@ -405,22 +406,21 @@ export default function ProductDisplay() {
                           <div className="ml-4">
                             <h4 className="text-sm font-semibold text-gray-900 group-hover:text-pink-600 transition-colors duration-300">{review.author}</h4>
                             <div className="flex items-center">
-                              {review.rating === 0 && review.date === "" ? <span className="ml-2 text-sm text-gray-500 group-hover:text-pink-500 transition-colors duration-300">Not Rated Yet</span> : <><StarRating rating={review.rating} />
-                              <span className="ml-2 text-sm text-gray-500 group-hover:text-pink-500 transition-colors duration-300">{review.date}</span></>}
+                              <StarRating rating={review.rating} />
+                              <span className="ml-2 text-sm text-gray-500 group-hover:text-pink-500 transition-colors duration-300">{review.date}</span>
                             </div>
                           </div>
                         </div>
                         <p className="text-gray-600 mb-4 group-hover:text-gray-800 transition-colors duration-300">{review.content}</p>
                         <div className="flex items-center space-x-4">
-                          {/*Todo: change below zero for userId*/}
-                          {review.id === 0 && review.rating === 0 && review.date === "" ? <StarRatingComponent onRatingChange={handleRating}/> : <><Button variant="outline" size="sm" className="text-gray-500 hover:bg-pink-50 hover:text-pink-600 transition-colors duration-300 transform hover:scale-105">
+                          <Button variant="outline" size="sm" className="text-gray-500 hover:bg-pink-50 hover:text-pink-600 transition-colors duration-300 transform hover:scale-105">
                             <ThumbsUp className="h-4 w-4 mr-2" />
                             Helpful ({review.helpful})
                           </Button>
                           <Button variant="outline" size="sm" className="text-gray-500 hover:bg-pink-50 hover:text-pink-600 transition-colors duration-300 transform hover:scale-105">
                             <ThumbsDown className="h-4 w-4 mr-2" />
-                            Not Helpful ({review.notHelpful})
-                          </Button></>}
+                              Not Helpful ({review.notHelpful})
+                          </Button>
                         </div>
                       </div>
                     ))}
@@ -429,10 +429,10 @@ export default function ProductDisplay() {
                   {/* Load More Reviews */}
                 
                   <div className="text-center">
-                    <Button variant="outline" className="text-pink-500 hover:text-pink-600 hover:bg-pink-50 transition-colors duration-300 transform hover:scale-105" onClick={() => setCurrentReviewsPage(prev => prev + 1)}>
+                    {isRendered ? <Button variant="outline" className="text-pink-500 hover:text-pink-600 hover:bg-pink-50 transition-colors duration-300 transform hover:scale-105" onClick={() => setCurrentReviewsPage(prev => prev + 1)}>
                       Load More Reviews
                       <ChevronRight className="h-4 w-4 ml-2" />
-                    </Button>
+                    </Button> : ""}
                   </div>
                 </div>
               </TabsContent>

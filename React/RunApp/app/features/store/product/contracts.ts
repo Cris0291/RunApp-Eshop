@@ -17,13 +17,9 @@ export type Review = {
     comment: string,
     date: string,
     reviewDescription: string,
-    rating: Rating | undefined
+    rating: number
 }
 
-export type Rating = {
-    numOfStars: number,
-    dateOfRating: string
-}
 
 export type Image = {
     id: string,
@@ -33,5 +29,5 @@ export type Image = {
 export type ReviewDto = {
     comment: string,
     reviewDescription: string,
-
+    rating: number
 }

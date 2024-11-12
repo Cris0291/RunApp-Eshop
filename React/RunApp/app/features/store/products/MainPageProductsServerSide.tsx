@@ -16,7 +16,7 @@ import { useState } from "react";
 import Link from "next/link";
 import FilterOptionsStars from "./FilterOptionsStars";
 import LikeButton from "@/app/ui/LikeButton";
-import useAddOrRemoveLikeHook from "@/app/hooks/useAddOrRemoveLikeQuery"
+import useAddOrRemoveLikeHook from "@/app/hooks/useAddOrRemoveLikeHook"
 
 interface Props {
   handleSelectedCategories: (categories: string[]) => void,
