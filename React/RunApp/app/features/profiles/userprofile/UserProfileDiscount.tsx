@@ -6,9 +6,12 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ShoppingCart, Heart } from "lucide-react"
+import useGetProductsWithDiscountQuery from "./useGetProductsWithDiscountQuery"
+import LikeButton from "@/app/ui/LikeButton"
+import useAddOrRemoveLikeHook from "@/app/hooks/useAddOrRemoveLikeHook"
 
 interface Product {
-  id: number
+  id: string
   name: string
   price: number
   discount: number
@@ -17,28 +20,17 @@ interface Product {
 }
 
 const products: Product[] = [
-  { id: 1, name: "Wireless Earbuds", price: 129.99, discount: 20, image: "https://images.unsplash.com/photo-1594534475808-b18fc33b045e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", size: "medium" },
-  { id: 2, name: "Smart Watch", price: 199.99, discount: 15, image: "https://images.unsplash.com/photo-1594534475808-b18fc33b045e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", size: "small" },
-  { id: 3, name: "4K TV", price: 799.99, discount: 30, image: "https://images.unsplash.com/photo-1594534475808-b18fc33b045e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", size: "large" },
-  { id: 4, name: "Bluetooth Speaker", price: 79.99, discount: 10, image: "https://images.unsplash.com/photo-1594534475808-b18fc33b045e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", size: "small" },
-  { id: 5, name: "Gaming Console", price: 399.99, discount: 25, image: "https://images.unsplash.com/photo-1594534475808-b18fc33b045e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", size: "medium" },
+  { id: "1", name: "Wireless Earbuds", price: 129.99, discount: 20, image: "https://images.unsplash.com/photo-1594534475808-b18fc33b045e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", size: "medium" },
+  { id: "2", name: "Smart Watch", price: 199.99, discount: 15, image: "https://images.unsplash.com/photo-1594534475808-b18fc33b045e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", size: "small" },
+  { id: "3", name: "4K TV", price: 799.99, discount: 30, image: "https://images.unsplash.com/photo-1594534475808-b18fc33b045e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", size: "large" },
+  { id: "4", name: "Bluetooth Speaker", price: 79.99, discount: 10, image: "https://images.unsplash.com/photo-1594534475808-b18fc33b045e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", size: "small" },
+  { id: "5", name: "Gaming Console", price: 399.99, discount: 25, image: "https://images.unsplash.com/photo-1594534475808-b18fc33b045e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", size: "medium" },
 ]
 
 export default function UserProfileDiscount() {
-  const [hoveredProduct, setHoveredProduct] = useState<number | null>(null)
-  const [likedProducts, setLikedProducts] = useState<number[]>([])
-
-  const calculateDiscountedPrice = (price: number, discount: number) => {
-    return (price * (100 - discount) / 100).toFixed(2)
-  }
-
-  const toggleLike = (productId: number) => {
-    setLikedProducts(prev => 
-      prev.includes(productId) 
-        ? prev.filter(id => id !== productId)
-        : [...prev, productId]
-    )
-  }
+  const {productsWithDiscount, loadingProductsWithDiscount} = useGetProductsWithDiscountQuery();
+  const {AddOrRemoveLikeMutation} = useAddOrRemoveLikeHook();
+  
 
   return (
     <>
@@ -54,8 +46,6 @@ export default function UserProfileDiscount() {
             }`}
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 300, damping: 10 }}
-            onHoverStart={() => setHoveredProduct(product.id)}
-            onHoverEnd={() => setHoveredProduct(null)}
           >
             <Card className="h-full overflow-hidden bg-white border-pink-500 border-2 shadow-lg ">
               <CardHeader className="p-0">
@@ -68,21 +58,18 @@ export default function UserProfileDiscount() {
                   <Badge className="absolute top-2 right-2 bg-pink-500 text-white">
                     {product.discount}% OFF
                   </Badge>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute top-2 left-2 text-pink-500 hover:text-pink-600 hover:bg-pink-100"
-                    onClick={() => toggleLike(product.id)}
-                  >
-                    <Heart className={`h-6 w-6 ${likedProducts.includes(product.id) ? 'fill-pink-500' : 'fill-none'}`} />
-                  </Button>
+                  
                 </div>
               </CardHeader>
               <CardContent className="p-4">
+              <div className="flex justify-between items-center space-x-2">
                 <CardTitle className="text-xl mb-2 text-gray-800">{product.name}</CardTitle>
+                <LikeButton  onLikeChange={(like: boolean) => AddOrRemoveLikeMutation({liked: like, productId: product.id})}/>
+              </div>
+                
                 <div className="flex items-center space-x-2">
                   <span className="text-2xl font-bold text-pink-600">
-                    ${calculateDiscountedPrice(product.price, product.discount)}
+                    %15
                   </span>
                   <span className="text-sm line-through text-gray-500">
                     ${product.price.toFixed(2)}

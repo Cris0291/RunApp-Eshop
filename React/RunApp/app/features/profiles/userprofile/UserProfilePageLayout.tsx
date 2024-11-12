@@ -49,7 +49,7 @@ export default function UserProfilePageLayout({children}: {children: React.React
 
 
     return (
-        <div className="flex h-screen bg-gradient-to-br from-gray-100 to-gray-200">
+        <div className="flex h-screen bg-gradient-to-br from-pink-50 to-white">
           <TooltipProvider>
             <aside className="w-16 bg-black text-white">
               <div className="flex flex-col h-full">
@@ -107,7 +107,7 @@ export default function UserProfilePageLayout({children}: {children: React.React
                     <TooltipTrigger asChild>
                       <Link
                         className="flex items-center justify-center text-gray-400 hover:text-white transition-colors duration-200"
-                        href="#"
+                        href="/userprofile/settings"
                       >
                         <Settings className="w-5 h-5" />
                       </Link>
