@@ -2,7 +2,5 @@
 
 namespace Contracts.Reviews.Requests
 {
-    public record AddReviewRequest(string comment, [EnumValidator]ReviewDescriptions reviewDescription);
-    
-    
+    public record AddReviewRequest(string Comment, int Rating, [EnumValidator]ReviewDescriptions ReviewDescription);
 }

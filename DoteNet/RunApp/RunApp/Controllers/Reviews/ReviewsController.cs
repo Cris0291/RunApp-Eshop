@@ -28,12 +28,12 @@ namespace RunApp.Api.Controllers.Reviews
         {
            Guid userId = HttpContext.GetUserId();
             
-           ReviewDescriptionEnums reviewEnum = ReviewDescriptionEnums.FromName(reviewRequest.reviewDescription.ToString());
+           ReviewDescriptionEnums reviewEnum = ReviewDescriptionEnums.FromName(reviewRequest.ReviewDescription.ToString());
            CreateReviewCommand reviewCommand = reviewRequest.ReviewRequestToReviewCommand(id,reviewEnum, userId);
 
             ErrorOr<Review> reviewsOrError = await _mediator.Send(reviewCommand, cancellationToken);
 
-            return reviewsOrError.Match( Ok, Problem);
+            return reviewsOrError.Match(value => Ok(value.ReviewToReviewResponse()), Problem);
         }
 
         [Authorize]
@@ -51,11 +51,11 @@ namespace RunApp.Api.Controllers.Reviews
         {
             Guid userId = HttpContext.GetUserId();
 
-            var reviewEnum = ReviewDescriptionEnums.FromName(reviewRequest.reviewDescription.ToString());
+            var reviewEnum = ReviewDescriptionEnums.FromName(reviewRequest.ReviewDescription.ToString());
 
-            var result = await _mediator.Send(new UpdateReviewCommand(id, userId, reviewRequest.comment, reviewEnum));
+            var result = await _mediator.Send(new UpdateReviewCommand(id, userId, reviewRequest.Comment, reviewRequest.Rating, reviewEnum));
 
-            return result.Match(value => Ok(), Problem);
+            return result.Match(value => Ok(value.ReviewToReviewResponse()), Problem);
         }
     }
 }
