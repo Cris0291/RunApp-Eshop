@@ -6,37 +6,37 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { User, Mail, MapPin, CreditCard, Check, AlertCircle } from "lucide-react"
+import { User, Mail, MapPin, CreditCard, Check, Eye, EyeOff} from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { UserSettingsForm } from "../sections/contracts"
 import { useForm, SubmitHandler } from "react-hook-form";
 
 export default function UserSettingsPage() {
   const [isSaved, setIsSaved] = useState(false)
-  const [activeTab, setActiveTab] = useState("account")
-  const [formData, setFormData] = useState({
-    email: "",
-    confirmemail: "",
-    username: "",
-    name: "",
-    password: "",
-    consfirmpassword: "",
-    cardnumber: "",
-    cardname: "",
-    expirydate: "",
-    cvv: "",
-    address: "",
-    city: "",
-    state: "",
-    zipcode: "",
-    country: "",
-  });
-  const {register, getValues, handleSubmit, formState: {errors}} = useForm<UserSettingsForm>();
+  const [activeTab, setActiveTab] = useState("account");
+  const [showPassword, setShowPassword] = useState(false);
+  
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = e.target
-    setFormData(prev => ({...prev, [name]: value}));
-  }
+  const {register, getValues, handleSubmit, formState: {errors}} = useForm<UserSettingsForm>({
+    defaultValues: {
+      email: "test@example.com",
+      confirmemail: "test@example.com",
+      username: "test",
+      name: "test",
+      password: "",
+      confirmpassword: "",
+      cardnumber: "",
+      cardname: "",
+      expirydate: "",
+      cvv: "",
+      address: "test St",
+      city: "",
+      state: "",
+      zipcode: "",
+      country: "",
+    }
+  });
+
 
   const handleSubmitForm = (event: React.FormEvent) => {
     event.preventDefault()
@@ -94,20 +94,65 @@ export default function UserSettingsPage() {
                       <CardContent className="space-y-4">
                         <div className="space-y-2">
                           <Label htmlFor="username">Username</Label>
-                          <Input id="username" 
-                                 placeholder="johndoe"
-                                 value={formData.username}
+                          <Input id="username"
+                                 type="text" 
                                  className="border-pink-200 focus:border-pink-500"
                                  {...register("username", {
-                                  required: "user name is required"
-                                 })}
-                                 name="username"
-                                 onChange={handleInputChange}  />
+                                  required: "User name is required"
+                                 })}/>
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="name">Full Name</Label>
-                          <Input id="name" defaultValue="John Doe" className="border-pink-200 focus:border-pink-500" />
+                          <Input id="name"
+                                 type="text" 
+                                 className="border-pink-200 focus:border-pink-500" 
+                                 {...register("name", {
+                                  required: "Name is required"
+                                 })}/>
                         </div>
+                    <div className="space-y-2">
+                          <Label htmlFor="password" className="text-sm font-medium">
+                            Password
+                         </Label>
+                      <div className="relative">
+                          <Input
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            {...register("password", {required: "Password is required", min: {
+                              value: 8,
+                             message: "Password must be at least 8 characters"
+                              }})}
+                            placeholder="********"
+                            className="pl-10 pr-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
+                           />
+                        <button
+                           type="button"
+                           onClick={() => setShowPassword(!showPassword)}
+                           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                           {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                           </button>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                       <Label
+                         htmlFor="confirmpassword"
+                         className="text-sm font-medium"
+                       >
+                          Confirm Password
+                       </Label>
+                       <div className="relative">
+                       <Input
+                         id="confirmpassword"
+                         type={showPassword ? "text" : "password"}
+                         {...register("confirmpassword", {required: "Password is required", 
+                             validate: (value) => value === getValues("password") || "Passwords do not match"
+                         })}
+                         placeholder="********"
+                         className="pl-10 pr-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
+                       />
+                       </div>
+                    </div>
                       </CardContent>
                     </TabsContent>
                     <TabsContent value="email">
@@ -118,11 +163,26 @@ export default function UserSettingsPage() {
                       <CardContent className="space-y-4">
                         <div className="space-y-2">
                           <Label htmlFor="email">Email</Label>
-                          <Input id="email" type="email" defaultValue="john@example.com" className="border-pink-200 focus:border-pink-500" />
+                          <Input id="email" 
+                                 type="email" 
+                                 className="border-pink-200 focus:border-pink-500" 
+                                 {...register("email", {
+                                  required: "Email is required", 
+                                  pattern: {
+                                    value: /\S+@\S+\.\S+/,
+                                    message: "Email is invalid"
+                                  }
+                                 })}/>
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="confirmEmail">Confirm Email</Label>
-                          <Input id="confirmEmail" type="email" className="border-pink-200 focus:border-pink-500" />
+                          <Label htmlFor="confirmemail">Confirm Email</Label>
+                          <Input id="confirmemail" 
+                                 type="email" 
+                                 className="border-pink-200 focus:border-pink-500"
+                                 {...register("confirmemail", {
+                                  required: "Confirmation email is required",
+                                  validate: (value) => value === getValues("email") || "Email and confirmation email do not match"
+                                 })} />
                         </div>
                       </CardContent>
                     </TabsContent>
@@ -133,22 +193,42 @@ export default function UserSettingsPage() {
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="space-y-2">
-                          <Label htmlFor="address">Address</Label>
-                          <Input id="address" defaultValue="123 Main St" className="border-pink-200 focus:border-pink-500" />
+                          <Label htmlFor="address">Street</Label>
+                          <Input id="address" 
+                                 className="border-pink-200 focus:border-pink-500" 
+                                 {...register("address", {
+                                  required: "Street is required"
+                                 })}/>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <Label htmlFor="city">City</Label>
-                            <Input id="city" defaultValue="Anytown" className="border-pink-200 focus:border-pink-500" />
+                            <Input id="city" 
+                                   className="border-pink-200 focus:border-pink-500" 
+                                   {...register("city", {
+                                    required: "City is required"
+                                   })}/>
                           </div>
                           <div className="space-y-2">
                             <Label htmlFor="state">State</Label>
-                            <Input id="state" defaultValue="CA" className="border-pink-200 focus:border-pink-500" />
+                            <Input id="state" 
+                                   className="border-pink-200 focus:border-pink-500" 
+                                   {...register("state", {
+                                    required: "State is required"
+                                   })}/>
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="zip">ZIP Code</Label>
-                          <Input id="zip" defaultValue="12345" className="border-pink-200 focus:border-pink-500" />
+                          <Label htmlFor="zipcode">ZIP Code</Label>
+                          <Input id="zipcode" 
+                                 className="border-pink-200 focus:border-pink-500"
+                                 {...register("zipcode", {
+                                    required: "Zipcode is required",
+                                    pattern: {
+                                      value: /^\d{5}(?:[-\s]\d{4})?$/i,
+                                      message: "Zipcode is invalid"
+                                    }
+                                 })} />
                         </div>
                       </CardContent>
                     </TabsContent>
@@ -160,16 +240,29 @@ export default function UserSettingsPage() {
                       <CardContent className="space-y-4">
                         <div className="space-y-2">
                           <Label htmlFor="cardNumber">Card Number</Label>
-                          <Input id="cardNumber" defaultValue="**** **** **** 1234" className="border-pink-200 focus:border-pink-500" />
+                          <Input id="cardNumber" 
+                                 className="border-pink-200 focus:border-pink-500"
+                                 {...register("cardnumber", {
+                                  required: "Card number is required"
+                                 })} />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <Label htmlFor="expiryDate">Expiry Date</Label>
-                            <Input id="expiryDate" defaultValue="12/24" className="border-pink-200 focus:border-pink-500" />
+                            <Input id="expiryDate" 
+                                   className="border-pink-200 focus:border-pink-500" 
+                                   {...register("expirydate", {
+                                    required: "Expiry date is required"
+                                   })}/>
                           </div>
                           <div className="space-y-2">
                             <Label htmlFor="cvv">CVV</Label>
-                            <Input id="cvv" defaultValue="***" type="password" className="border-pink-200 focus:border-pink-500" />
+                            <Input id="cvv" 
+                                   type="password" 
+                                   className="border-pink-200 focus:border-pink-500"
+                                   {...register("cvv",{
+                                    required: "Cvv is required"
+                                   })} />
                           </div>
                         </div>
                       </CardContent>
