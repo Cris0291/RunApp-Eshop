@@ -24,11 +24,11 @@ export default function LikeButton({
   const [liked, setLiked] = useState(initialLiked)
 
   const handleClick = () => {
-    const newLikedState = !liked
-    setLiked(newLikedState)
+    setLiked(prev => !prev)
     if (onLikeChange) {
-      onLikeChange(newLikedState)
+      onLikeChange(liked)
     }
+    console.log(liked)
   }
 
   const sizeClasses = {
