@@ -17,6 +17,10 @@ namespace RunApp.Api.Mappers.Products
             IEnumerable<string> bulletpoints = product.BulletPoints.Select(bulletpoint => bulletpoint.BulletPoint);
             return new ProductResponse(product.ProductId, product.Name, product.Description, product.ActualPrice, bulletpoints, product.PriceOffer != null ? product.PriceOffer.PriceWithDiscount : null, product.PriceOffer != null ? product.PriceOffer.PromotionalText : null, product.PriceOffer != null ? product.PriceOffer.Discount : null);
         }
+        public static IEnumerable<ProductResponse> ProductsToProductsResponse(this IEnumerable<Product> products)
+        {
+            return products.Select(x => x.ProductToProductResponse());
+        }
         public static IEnumerable<ProductForCard> AllProductsToProductsResponse(this IEnumerable<ProductsJoin> productsJoin)
         {
             IEnumerable<ProductForCard> responses = productsJoin.Select(productJoin =>

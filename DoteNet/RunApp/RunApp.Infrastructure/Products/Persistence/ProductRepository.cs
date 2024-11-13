@@ -65,6 +65,10 @@ namespace RunApp.Infrastructure.Products.Persistence
             _appDbContext.Remove(category);
             await Task.CompletedTask;
         }
+        public async Task<IEnumerable<Product>> GetLatestDiscounts()
+        {
+            return await _appDbContext.Products.Where(x => x.PriceOffer != null && x.PriceOffer.PriceWithDiscount != null && x.PriceOffer.DiscountDate <= DateTime.Now && x.PriceOffer.DiscountDate > DateTime.Now.AddDays(-7)).ToListAsync();
+        }
        
     }
 }

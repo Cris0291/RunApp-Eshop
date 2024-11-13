@@ -18,6 +18,7 @@ using Contracts.Categories.Request;
 using RunnApp.Application.Products.Commands.AddCategory;
 using RunApp.Api.Mappers.Categories;
 using RunnApp.Application.Products.Commands.DeleteCategory;
+using RunnApp.Application.Products.Queries.GetProductsWithDiscount;
 
 
 
@@ -61,6 +62,11 @@ namespace RunApp.Api.Controllers.Products
 
             var products = await _mediator.Send(getProductsQuery);
             return products.Match(value => Ok(value.AllProductsToProductsResponse()), Problem);
+        }
+        public async Task<IActionResult> GetProductsWithDiscount()
+        {
+            var result = await _mediator.Send(new GetProductsWithDiscountQuery());
+            return Ok(result.ProductsToProductsResponse());
         }
 
         [Authorize("StoreProfile")]

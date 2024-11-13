@@ -18,6 +18,7 @@ namespace RunApp.Infrastructure.Products.Persistence
 
             builder.OwnsOne(p => p.PriceOffer, px => px.Property(x => x.PriceWithDiscount).HasColumnType("decimal(10,2)").HasColumnName("PriceWithDiscount"));
             builder.OwnsOne(p => p.PriceOffer, px => px.Property(x => x.PromotionalText).HasColumnName("PromotionalText"));
+            builder.OwnsOne(p => p.PriceOffer, px => px.Property(x => x.DiscountDate).HasComputedColumnSql("getutcdate()", stored: true));
 
             builder.OwnsOne(p => p.Characteristic, px => px.Property(x => x.Weight).HasColumnType("decimal(6,2)"));
 
@@ -32,7 +33,7 @@ namespace RunApp.Infrastructure.Products.Persistence
                 .WithOne()
                 .HasForeignKey<Stock>(x => x.StockProductId);
 
-            builder.HasMany(x => x.Tags)
+            builder.HasMany(x => x.Categories)
                 .WithMany();
                 
               
