@@ -4,7 +4,7 @@ export type UserSettingsForm = {
     username: string,
     name: string,
     password: string,
-    consfirmpassword: string,
+    confirmpassword: string,
     cardnumber: string,
     cardname: string,
     expirydate: string,
