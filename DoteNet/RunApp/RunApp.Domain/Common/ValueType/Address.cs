@@ -8,6 +8,7 @@
         public string City { get; internal set; }
         public int HouseNumber { get; internal set; }
         public string Country { get; internal set; }
+        public string State { get; internal set; }
         public string? AlternativeStreet { get; internal set; }
         public int? AlternativeHouseNumber { get; internal set; }
 

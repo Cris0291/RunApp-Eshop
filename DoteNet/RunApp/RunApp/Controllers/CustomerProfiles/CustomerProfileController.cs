@@ -1,13 +1,17 @@
 ﻿using Contracts.Common;
+using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RunApp.Api.Mappers.CustomerProfile;
 using RunApp.Api.Mappers.Orders;
 using RunApp.Api.Mappers.Products;
 using RunApp.Api.Routes;
 using RunApp.Api.Services;
 using RunnApp.Application.CustomerProfiles.Commands.AddAddress;
 using RunnApp.Application.CustomerProfiles.Commands.AddPaymentMethod;
+using RunnApp.Application.CustomerProfiles.Commands.UpdateAddress;
+using RunnApp.Application.CustomerProfiles.Commands.UpdatePaymentMethod;
 using RunnApp.Application.CustomerProfiles.Queries.GetUserBoughtProducts;
 using RunnApp.Application.CustomerProfiles.Queries.GetUserLikes;
 using RunnApp.Application.CustomerProfiles.Queries.GetUserRatings;
@@ -51,7 +55,7 @@ namespace RunApp.Api.Controllers.CustomerProfiles
         }
 
         [Authorize]
-        [HttpGet]
+        [HttpGet(ApiEndpoints.CustomerProfiles.GetUserBoughtProducts)]
         public async Task<IActionResult> GetBoughtProducts()
         {
             Guid userId = HttpContext.GetUserId();
@@ -66,17 +70,42 @@ namespace RunApp.Api.Controllers.CustomerProfiles
         {
             Guid userId = HttpContext.GetUserId();
 
-            var result = await _mediator.Send(new AddAddressCommand(userId, addressRequest.ZipCode, addressRequest.Street, addressRequest.City, addressRequest.BuildingNumber, addressRequest.Country, addressRequest.AlternativeStreet, addressRequest.AlternativeBuildingNumber));
+            var result = await _mediator.Send(new AddAddressCommand(userId, addressRequest.ZipCode, addressRequest.Street, addressRequest.City, addressRequest.HouseNumber, addressRequest.Country, addressRequest.State));
 
-            return result.Match(value => Ok(value.FromAddressToAddressDto()), Problem);
+            return result.Match(value => Ok(value.FromAddressToAddressResponse()), Problem);
         }
+
+        [Authorize]
+        [HttpPost(ApiEndpoints.CustomerProfiles.AddPaymenthMethod)]
         public async Task<IActionResult> AddPaymentMethod([FromBody] CardRequest cardRequest)
         {
             Guid userId = HttpContext.GetUserId();
 
             var result = await _mediator.Send(new AddPaymentMethodCommand(userId, cardRequest.HoldersName, cardRequest.CardNumber, cardRequest.CVV, cardRequest.ExpiryDate));
 
-            return result.Match(value => Ok(value.FromCardToCardDto()), Problem);
+            return result.MatchFirst(value => Ok(value.FromCardToCardDto()), Problem);
         }
+
+        [Authorize]
+        [HttpPut(ApiEndpoints.CustomerProfiles.UpdateAddress)]
+        public async Task<IActionResult> UpdateAddres([FromBody] AddressRequest addressRequest)
+        {
+            Guid userId = HttpContext.GetUserId();
+
+            var result = await _mediator.Send(new UpdateAddressCommand(userId, addressRequest.ZipCode, addressRequest.Street, addressRequest.City, addressRequest.HouseNumber, addressRequest.Country, addressRequest.State));
+
+            return result.MatchFirst(value => Ok(value.FromAddressToAddressResponse()), Problem);
+        }
+
+        [Authorize]
+        [HttpPut(ApiEndpoints.CustomerProfiles.UpdatePaymentMethod)]
+        public async Task<IActionResult> UpdatePaymentMethod([FromBody] CardRequest cardRequest)
+        {
+            Guid userId = HttpContext.GetUserId();
+
+            var result = await _mediator.Send(new UpdatePaymentMethodCommand(userId, cardRequest.HoldersName, cardRequest.CardNumber, cardRequest.CVV, cardRequest.ExpiryDate));
+
+            return result.MatchFirst(value => Ok(value.FromCardToCardDto()), Problem);
+        } 
     }
 }

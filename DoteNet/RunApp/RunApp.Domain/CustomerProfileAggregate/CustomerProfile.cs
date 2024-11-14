@@ -40,32 +40,51 @@ namespace RunApp.Domain.CustomerProfileAggregate
             };
 
         }
-        public Address AddAddress(string ZipCode, string Street, string City,
-                                     int BuildingNumber, string Country, 
-                                     string? AlternativeStreet, int? AlternativeBuildingNumber)
+        public Address AddAddress(string zipCode, string street, string city,
+                                     int buildingNumber, string country, string state)
         {
             ShippingAdress = new Address
             {
-                ZipCode = ZipCode,
-                Street = Street,
-                City = City,
-                HouseNumber = BuildingNumber,
-                Country = Country,
-                AlternativeStreet = AlternativeStreet,
-                AlternativeHouseNumber = AlternativeBuildingNumber,
+                ZipCode = zipCode,
+                Street = street,
+                City = city,
+                HouseNumber = buildingNumber,
+                Country = country,
+                State = state
             };
 
             return ShippingAdress;
         }
-        public Card AddPaymentMethod(string HoldersName, string CardNumber, string CVV, DateTime ExpiryDate)
+        public Address UpdateAddress(string zipCode, string street, string city,
+                                     int houseNumber, string country, string state)
+        {
+            ShippingAdress!.ZipCode = zipCode;
+            ShippingAdress.Street = street;
+            ShippingAdress.City = city;
+            ShippingAdress.HouseNumber = houseNumber;
+            ShippingAdress.Country = country;
+            ShippingAdress.State = state;
+
+            return ShippingAdress;
+        }
+        public Card AddPaymentMethod(string holdersName, string cardNumber, string cvv, DateTime expiryDate)
         {
             PaymentMethod = new Card
             {
-                CVV = CVV,
-                HoldersName = HoldersName,
-                CardNumber = CardNumber,
-                ExpityDate = ExpiryDate
+                CVV = cvv,
+                HoldersName = holdersName,
+                CardNumber = cardNumber,
+                ExpiryDate = expiryDate
             };
+
+            return PaymentMethod;
+        }
+        public Card UpdatePaymentMethod(string holdersName, string cardNumber, string cvv, DateTime expiryDate)
+        {
+            PaymentMethod!.CVV = cvv;
+            PaymentMethod.HoldersName = holdersName;
+            PaymentMethod.CardNumber = cardNumber;
+            PaymentMethod.ExpiryDate = expiryDate;
 
             return PaymentMethod;
         }

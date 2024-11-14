@@ -20,7 +20,7 @@ namespace RunApp.Api.Mappers.Orders
         }
         public static CardDto FromCardToCardDto(this Card card)
         {
-            return new CardDto(card.HoldersName, card.CardNumber, card.CVV, card.ExpityDate);
+            return new CardDto(card.HoldersName, card.CardNumber, card.CVV, card.ExpiryDate);
         }
         public static LineItemDtoResponse FromLineItemToLineItemDtoResponse(this LineItem lineItem)
         {
