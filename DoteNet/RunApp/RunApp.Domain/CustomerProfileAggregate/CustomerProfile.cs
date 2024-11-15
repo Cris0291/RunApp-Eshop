@@ -18,7 +18,6 @@ namespace RunApp.Domain.CustomerProfileAggregate
         public string Name { get; private set; }
         public string Email { get; private set; }
         public string NickName { get; private set; }
-        public int? Phone { get; private set; }
         public Address? ShippingAdress { get; private set; }
         public Card? PaymentMethod { get; private set; }
         public Guid Id { get; private set; }
@@ -87,6 +86,13 @@ namespace RunApp.Domain.CustomerProfileAggregate
             PaymentMethod.ExpiryDate = expiryDate;
 
             return PaymentMethod;
+        }
+
+        public void UpdateAccountInfo(string name, string email, string nickName)
+        {
+            Name = name;
+            Email = email;
+            NickName = nickName;
         }
         public bool IsProductBought(Guid productId)
         {
