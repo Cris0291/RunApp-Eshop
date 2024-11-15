@@ -58,6 +58,8 @@
             public const string AddPaymenthMethod = $"{UserBase}/payment";
             public const string UpdateAddress = $"{UserBase}/address";
             public const string UpdatePaymentMethod = $"{UserBase}/payment";
+            public const string UpdateAccountInfo = $"{UserBase}/account-info";
+            public const string GetAccountInfo = $"{UserBase}/account";
         }
         public static class Orders
         {
