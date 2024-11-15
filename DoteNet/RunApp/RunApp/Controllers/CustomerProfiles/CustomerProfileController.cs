@@ -1,17 +1,22 @@
 ﻿using Contracts.Common;
+using Contracts.CustomerProfile.Request;
 using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using RunApp.Api.Mappers.CustomerProfile;
+using RunApp.Api.Mappers.CustomerProfiles;
 using RunApp.Api.Mappers.Orders;
 using RunApp.Api.Mappers.Products;
 using RunApp.Api.Routes;
 using RunApp.Api.Services;
+using RunApp.Domain.UserAggregate;
 using RunnApp.Application.CustomerProfiles.Commands.AddAddress;
 using RunnApp.Application.CustomerProfiles.Commands.AddPaymentMethod;
+using RunnApp.Application.CustomerProfiles.Commands.UpdateAccountInfo;
 using RunnApp.Application.CustomerProfiles.Commands.UpdateAddress;
 using RunnApp.Application.CustomerProfiles.Commands.UpdatePaymentMethod;
+using RunnApp.Application.CustomerProfiles.Queries.GetUserAccountInfo;
 using RunnApp.Application.CustomerProfiles.Queries.GetUserBoughtProducts;
 using RunnApp.Application.CustomerProfiles.Queries.GetUserLikes;
 using RunnApp.Application.CustomerProfiles.Queries.GetUserRatings;
@@ -19,9 +24,10 @@ using RunnApp.Application.CustomerProfiles.Queries.GetUserReviews;
 
 namespace RunApp.Api.Controllers.CustomerProfiles
 {
-    public class CustomerProfileController(ISender mediator) : ApiController
+    public class CustomerProfileController(ISender mediator, UserManager<AppUser> userManager) : ApiController
     {
         private readonly ISender _mediator = mediator;
+        private readonly UserManager<AppUser> _userManager = userManager;
 
         [Authorize]
         [HttpGet(ApiEndpoints.CustomerProfiles.GetUserReviews)]
@@ -106,6 +112,49 @@ namespace RunApp.Api.Controllers.CustomerProfiles
             var result = await _mediator.Send(new UpdatePaymentMethodCommand(userId, cardRequest.HoldersName, cardRequest.CardNumber, cardRequest.CVV, cardRequest.ExpiryDate));
 
             return result.MatchFirst(value => Ok(value.FromCardToCardDto()), Problem);
-        } 
+        }
+
+        [Authorize]
+        [HttpPut(ApiEndpoints.CustomerProfiles.UpdateAccountInfo)]
+        public async Task<IActionResult> UpdateAccount([FromBody] AccountInfoRequest accountInfo)
+        {
+            Guid userId = HttpContext.GetUserId();
+
+            var result = await _mediator.Send(new UpdateAccountInfoCommand(userId, accountInfo.Name, accountInfo.Email, accountInfo.NickName));
+
+            return result.MatchFirst(value => Ok(value.FromCustomerToAccountResponse()), Problem);
+        }
+
+        [Authorize]
+        [HttpGet(ApiEndpoints.CustomerProfiles.GetAccountInfo)]
+        public async Task<IActionResult> GetAccountInformation()
+        {
+            Guid userId = HttpContext.GetUserId();
+
+            var result = await _mediator.Send(new GetUserAccountInfoQuery(userId));
+
+            return result.MatchFirst(value => Ok(value.FromCustomerToUserInfo()), Problem);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword([FromBody] PasswordDtoRequest passwordDtoRequest)
+        {
+            var user = await _userManager.FindByEmailAsync(passwordDtoRequest.Email);
+            if(user == null) return BadRequest("User was not found");
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, passwordDtoRequest.Password);
+
+            if (result.Succeeded) return Ok();
+
+            var errorDescriptions = result.Errors.Select(x => x.Description);
+
+            return BadRequest(new ProblemDetails
+            {
+                Status = 500,
+                Title = "An unexpected error happened",
+                Detail = string.Join(", ", errorDescriptions)
+            });
+        }
     }
 }
