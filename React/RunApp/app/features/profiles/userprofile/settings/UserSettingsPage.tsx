@@ -3,26 +3,40 @@
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { User, Mail, MapPin, Check, Eye, EyeOff, Lock, MapPinHouse, CreditCard } from "lucide-react"
+import { User, Mail, MapPin, Check, Eye, EyeOff, Lock, MapPinHouse, CreditCard, AlertCircle, KeyRound  } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import { AccountSettingsForm, AddressSettingsForm, PaymentSettingsForm } from "../sections/contracts"
+import { AccountSettingsForm, AddressSettingsForm, PaymentSettingsForm, PasswordSettingsForm } from "./contracts"
 import { useForm, SubmitHandler } from "react-hook-form";
+import useGetUserAccountInfo from "./useGetUserAccountInfo";
+import useUpdateAccountInfo from "./useUpdateAccountInfo";
+import useUpdatePasswordInfo from "./useUpdatePasswordInfo";
 
 export default function UserSettingsPage() {
+  const {userInfo, isLoading} = useGetUserAccountInfo();
+  const {updateUserAccountInfo, updatingUserAccount} = useUpdateAccountInfo();
+  const {updatePassword, updatingPassword} = useUpdatePasswordInfo()
   const [isSaved, setIsSaved] = useState(false)
   const [activeTab, setActiveTab] = useState("account");
   const [showPassword, setShowPassword] = useState(false);
-  
+  const [submittedAccountErrors, setSubmittedAccountErrors] = useState<(string | undefined)[]>([])
+  const [submittedAddressErrors, setSubmittedAddressErrors] = useState<(string | undefined)[]>([])
+  const [submittedPaymentErrors, setSubmittedPaymentErrors] = useState<(string | undefined)[]>([])
+  const [submittedPasswordErrors, setSubmittedPasswordErrors] = useState<(string | undefined)[]>([])
 
-  const {register: accountRegister, getValues: getAccountValues, handleSubmit: handleAccountSubmit, formState: {errors: accountErrors}} = useForm<AccountSettingsForm>({
+  const {register: accountRegister, getValues: getAccountValues, handleSubmit: handleAccountSubmit, formState: {errors: accountErrors}, reset: accountReset} = useForm<AccountSettingsForm>({
     defaultValues: {
       email: "test@example.com",
       confirmemail: "test@example.com",
       username: "test",
       name: "test",
+    }
+  });
+  const {register: passwordRegister, getValues: getPasswordValues, handleSubmit: handlePasswordSubmit, formState: {errors: passwordErrors}, reset: passwordReset} = useForm<PasswordSettingsForm>({
+    defaultValues: {
       password: "",
       confirmpassword: "",
     }
@@ -40,21 +54,80 @@ export default function UserSettingsPage() {
     defaultValues: {
       cardnumber: "55555577777",
       cardname: "",
-      expirydate: "",
+      expirydate: "04/12",
       cvv: "",
     }
   });
 
 
-  const handleSubmitForm = (event: React.FormEvent) => {
-    event.preventDefault()
-    // Here you would typically send the form data to your backend
-    setIsSaved(true)
-    setTimeout(() => setIsSaved(false), 3000) // Reset saved state after 3 seconds
+  const onAccountSubmit: SubmitHandler<AccountSettingsForm> = (data) => {
+    updateUserAccountInfo(data, {
+      onSuccess: () => accountReset()
+    })
+  }
+  const onPasswordSubmit: SubmitHandler<PasswordSettingsForm> = (data) => {
+    const mail = getAccountValues("email")
+    const newPassword = {password: data.password, email: mail}
+    updatePassword(newPassword, {
+      onSuccess: () => passwordReset()
+    })
+  }
+
+  const onAddressSubmit: SubmitHandler<AddressSettingsForm> = (data) => {
+    console.log(data);
+  }
+
+  const onPaymentSubmit: SubmitHandler<PaymentSettingsForm> = (data) => {
+    console.log(data);
+  }
+
+  const onAccountError = () => {
+    const newErrors: (string | undefined)[] = [];
+    const values = Object.values(accountErrors);
+
+    values.forEach(element => {
+      newErrors.push(element.message);
+    });
+
+    setSubmittedAccountErrors(newErrors);
+  }
+  
+  const onPasswordError = () => {
+    const newErrors: (string | undefined)[] = [];
+    const values = Object.values(passwordErrors);
+
+    values.forEach(element => {
+      newErrors.push(element.message);
+    });
+
+    setSubmittedPasswordErrors(newErrors);
+  }
+
+  const onAddressError = () => {
+    const newErrors: (string | undefined)[] = [];
+    const values = Object.values(addressErrors);
+
+    values.forEach(element => {
+      newErrors.push(element.message);
+    });
+
+    setSubmittedAddressErrors(newErrors);
+  }
+
+  const onPaymentError = () => {
+    const newErrors: (string | undefined)[] = [];
+    const values = Object.values(paymentErrors);
+
+    values.forEach(element => {
+      newErrors.push(element.message);
+    });
+
+    setSubmittedPaymentErrors(newErrors);
   }
 
   const tabIcons = {
     account: <User className="w-4 h-4" />,
+    password: <KeyRound className="w-4 h-4"/>,
     address: <MapPin className="w-4 h-4" />,
     payment: <CreditCard className="w-4 h-4" />,
   }
@@ -72,7 +145,7 @@ export default function UserSettingsPage() {
         <Card className="shadow-lg">
           <CardContent className="p-6">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-8">
+              <TabsList className="grid w-full grid-cols-4 mb-8">
                 {Object.entries(tabIcons).map(([key, icon]) => (
                   <TabsTrigger 
                     key={key} 
@@ -92,7 +165,7 @@ export default function UserSettingsPage() {
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <form>
+                    <form onSubmit={handleAccountSubmit(onAccountSubmit, onAccountError)}>
                     <TabsContent value="account">
                       <CardHeader>
                         <CardTitle>Account Information</CardTitle>
@@ -130,55 +203,6 @@ export default function UserSettingsPage() {
                           </div>
                         </div>
                     <div className="space-y-2">
-                          <Label htmlFor="password" className="text-sm font-medium">
-                            Password
-                         </Label>
-                      <div className="relative">
-                          <Lock
-                           className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                           size={18}
-                           />
-                          <Input
-                            id="password"
-                            type={showPassword ? "text" : "password"}
-                            {...accountRegister("password", {required: "Password is required", min: {
-                              value: 8,
-                             message: "Password must be at least 8 characters"
-                              }})}
-                            className="pl-10 pr-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
-                           />
-                        <button
-                           type="button"
-                           onClick={() => setShowPassword(!showPassword)}
-                           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                        >
-                           {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                           </button>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                       <Label
-                         htmlFor="confirmpassword"
-                         className="text-sm font-medium"
-                       >
-                          Confirm Password
-                       </Label>
-                       <div className="relative">
-                       <Lock
-                           className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                           size={18}
-                           />
-                       <Input
-                         id="confirmpassword"
-                         type={showPassword ? "text" : "password"}
-                         {...accountRegister("confirmpassword", {required: "Password is required", 
-                             validate: (value) => value === getAccountValues("password") || "Passwords do not match"
-                         })}
-                         className="pl-10 pr-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
-                       />
-                       </div>
-                    </div>
-                    <div className="space-y-2">
                           <Label htmlFor="email">Email</Label>
                           <div className="relative">
                             <Mail
@@ -215,14 +239,98 @@ export default function UserSettingsPage() {
                           </div>
                         </div>
                       </CardContent>
-                      <CardFooter className="flex justify-between items-center mt-6">
+                      <CardFooter className="grid grid-cols-1 mt-6">
+                      {submittedAccountErrors.length > 0 && (
+                        <Alert variant="destructive">
+                          <AlertCircle className="h-4 w-4" />
+                             <AlertDescription>
+                               {submittedAccountErrors.map((error, index) => (
+                                <p key={index}>{error}</p>
+                              ))}
+                            </AlertDescription>
+                       </Alert>
+                       )}          
                          <Button type="submit" className="bg-pink-500 hover:bg-pink-600 transition-colors">
                             Save Changes
                          </Button>
                       </CardFooter>
                     </TabsContent>
                     </form>
-                    <form>
+                    <form onSubmit={handlePasswordSubmit(onPasswordSubmit, onPasswordError)}>
+                    <TabsContent value="password">
+                      <CardHeader>
+                        <CardTitle>Password Information</CardTitle>
+                        <CardDescription>Make changes to your password here.</CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                          <Label htmlFor="password" className="text-sm font-medium">
+                            Password
+                         </Label>
+                      <div className="relative">
+                          <Lock
+                           className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                           size={18}
+                           />
+                          <Input
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            {...passwordRegister("password", {required: "Password is required", min: {
+                              value: 8,
+                             message: "Password must be at least 8 characters"
+                              }})}
+                            className="pl-10 pr-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
+                           />
+                        <button
+                           type="button"
+                           onClick={() => setShowPassword(!showPassword)}
+                           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                           {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                           </button>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                       <Label
+                         htmlFor="confirmpassword"
+                         className="text-sm font-medium"
+                       >
+                          Confirm Password
+                       </Label>
+                       <div className="relative">
+                       <Lock
+                           className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                           size={18}
+                           />
+                       <Input
+                         id="confirmpassword"
+                         type={showPassword ? "text" : "password"}
+                         {...passwordRegister("confirmpassword", {required: "Confirmation password is required", 
+                             validate: (value) => value === getPasswordValues("password") || "Passwords do not match"
+                         })}
+                         className="pl-10 pr-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
+                       />
+                       </div>
+                    </div>
+                      </CardContent>
+                      <CardFooter className="grid grid-cols-1 mt-6">
+                      {submittedPasswordErrors.length > 0 && (
+                        <Alert variant="destructive">
+                          <AlertCircle className="h-4 w-4" />
+                             <AlertDescription>
+                               {submittedPasswordErrors.map((error, index) => (
+                                <p key={index}>{error}</p>
+                              ))}
+                            </AlertDescription>
+                       </Alert>
+                       )}          
+                         <Button type="submit" className="bg-pink-500 hover:bg-pink-600 transition-colors">
+                            Save Changes
+                         </Button>
+                      </CardFooter>
+                    </TabsContent>
+                    </form>
+                    <form onSubmit={handleAddressSubmit(onAddressSubmit, onAddressError)}>
                     <TabsContent value="address">
                       <CardHeader>
                         <CardTitle>Shipping Address</CardTitle>
@@ -297,14 +405,24 @@ export default function UserSettingsPage() {
                           </div>
                         </div>
                       </CardContent>
-                      <CardFooter className="flex justify-between items-center mt-6">
+                      <CardFooter className="grid grid-cols-1 mt-6">
+                      {submittedAddressErrors.length > 0 && (
+                        <Alert variant="destructive">
+                          <AlertCircle className="h-4 w-4" />
+                             <AlertDescription>
+                               {submittedAddressErrors.map((error, index) => (
+                                <p key={index}>{error}</p>
+                              ))}
+                            </AlertDescription>
+                       </Alert>
+                       )} 
                          <Button type="submit" className="bg-pink-500 hover:bg-pink-600 transition-colors">
                             Save Changes
                          </Button>
                       </CardFooter>
                     </TabsContent>
                     </form>
-                    <form>
+                    <form onSubmit={handlePaymentSubmit(onPaymentSubmit, onPaymentError)}>
                     <TabsContent value="payment">
                       <CardHeader>
                         <CardTitle>Payment Method</CardTitle>
@@ -360,7 +478,17 @@ export default function UserSettingsPage() {
                           </div>
                         </div>
                       </CardContent>
-                      <CardFooter className="flex justify-between items-center mt-6">
+                      <CardFooter className="grid grid-cols-1 mt-6">
+                      {submittedPaymentErrors.length > 0 && (
+                        <Alert variant="destructive">
+                          <AlertCircle className="h-4 w-4" />
+                             <AlertDescription>
+                               {submittedPaymentErrors.map((error, index) => (
+                                <p key={index}>{error}</p>
+                              ))}
+                            </AlertDescription>
+                       </Alert>
+                       )} 
                          <Button type="submit" className="bg-pink-500 hover:bg-pink-600 transition-colors">
                             Save Changes
                          </Button>
