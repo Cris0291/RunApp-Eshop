@@ -14,18 +14,54 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import useGetUserAccountInfo from "./useGetUserAccountInfo";
 import useUpdateAccountInfo from "./useUpdateAccountInfo";
 import useUpdatePasswordInfo from "./useUpdatePasswordInfo";
+import useUpdateOrCreateAddressInfo from "./useUpdateOrCreateAddressInfo";
+import { useQueryClient } from "@tanstack/react-query";
+import { useAppSelector } from "@/app/hooks/reduxHooks";
+import { getUserToken } from "@/app/features/registration/userSlice";
+import useUpdateOrCreatePaymentInfo from "./useUpdateOrCreatePaymentInfo";
 
 export default function UserSettingsPage() {
-  const {userInfo, isLoading} = useGetUserAccountInfo();
-  const {updateUserAccountInfo, updatingUserAccount} = useUpdateAccountInfo();
-  const {updatePassword, updatingPassword} = useUpdatePasswordInfo()
+  const token = useAppSelector(getUserToken)
+  const {userInfo, isLoading} = useGetUserAccountInfo(token);
+  const {updateUserAccountInfo, updatingUserAccount} = useUpdateAccountInfo(token);
+  const {updateOrCreateAddress, updatingOrCreatingAddress} = useUpdateOrCreateAddressInfo(token);
+  const {updateOrCreatePayment, updatingOrCreatingPayment} = useUpdateOrCreatePaymentInfo(token)
+  const {updatePassword, updatingPassword} = useUpdatePasswordInfo(token);
   const [isSaved, setIsSaved] = useState(false)
+  const [wasCreated, setWasCreated] = useState(false)
   const [activeTab, setActiveTab] = useState("account");
   const [showPassword, setShowPassword] = useState(false);
+  const queryClient = useQueryClient()
   const [submittedAccountErrors, setSubmittedAccountErrors] = useState<(string | undefined)[]>([])
   const [submittedAddressErrors, setSubmittedAddressErrors] = useState<(string | undefined)[]>([])
   const [submittedPaymentErrors, setSubmittedPaymentErrors] = useState<(string | undefined)[]>([])
   const [submittedPasswordErrors, setSubmittedPasswordErrors] = useState<(string | undefined)[]>([])
+
+  const isUpdateOrCreate = (field: string) => {
+    switch(field){
+      case "payment":
+        return (
+          userInfo?.cardnumber &&
+          userInfo?.cardname &&
+          userInfo?.cvv &&
+          userInfo?.expirydate
+        )
+      case "address":
+        return (
+          userInfo?.address &&
+          userInfo?.city &&
+          userInfo?.country &&
+          userInfo?.state &&
+          userInfo?.zipcode
+        )
+    }
+
+  }
+
+  const handleUpdateOrCreation = (field: string) => {
+    const result = isUpdateOrCreate(field);
+    setWasCreated(result != undefined && result.length > 0);
+  }
 
   const {register: accountRegister, getValues: getAccountValues, handleSubmit: handleAccountSubmit, formState: {errors: accountErrors}, reset: accountReset} = useForm<AccountSettingsForm>({
     defaultValues: {
@@ -41,7 +77,7 @@ export default function UserSettingsPage() {
       confirmpassword: "",
     }
   });
-  const {register: addressRegister, handleSubmit: handleAddressSubmit, formState: {errors: addressErrors}} = useForm<AddressSettingsForm>({
+  const {register: addressRegister, handleSubmit: handleAddressSubmit, formState: {errors: addressErrors}, reset: addressReset} = useForm<AddressSettingsForm>({
     defaultValues: {
       address: "test St",
       city: "",
@@ -50,7 +86,7 @@ export default function UserSettingsPage() {
       country: "",
     }
   });
-  const {register: paymentRegister, handleSubmit: handlePaymentSubmit, formState: {errors: paymentErrors}} = useForm<PaymentSettingsForm>({
+  const {register: paymentRegister, handleSubmit: handlePaymentSubmit, formState: {errors: paymentErrors}, reset: paymentReset} = useForm<PaymentSettingsForm>({
     defaultValues: {
       cardnumber: "55555577777",
       cardname: "",
@@ -62,7 +98,9 @@ export default function UserSettingsPage() {
 
   const onAccountSubmit: SubmitHandler<AccountSettingsForm> = (data) => {
     updateUserAccountInfo(data, {
-      onSuccess: () => accountReset()
+      onSuccess: (data) => {
+
+      }
     })
   }
   const onPasswordSubmit: SubmitHandler<PasswordSettingsForm> = (data) => {
@@ -74,11 +112,25 @@ export default function UserSettingsPage() {
   }
 
   const onAddressSubmit: SubmitHandler<AddressSettingsForm> = (data) => {
-    console.log(data);
+    updateOrCreateAddress({addressInfo: data, wasCreated}, {
+      onSuccess: () => {
+        addressReset();
+        queryClient.invalidateQueries({
+          queryKey: ["userInfo"]
+        })
+      }
+    })
   }
 
   const onPaymentSubmit: SubmitHandler<PaymentSettingsForm> = (data) => {
-    console.log(data);
+    updateOrCreatePayment({paymentInfo: data, wasCreated}, {
+      onSuccess: () => {
+        paymentReset();
+        queryClient.invalidateQueries({
+          queryKey: ["userInfo"]
+        })
+      }
+    })
   }
 
   const onAccountError = () => {
@@ -151,6 +203,7 @@ export default function UserSettingsPage() {
                     key={key} 
                     value={key}
                     className="flex items-center justify-center space-x-2 data-[state=active]:bg-pink-100 data-[state=active]:text-pink-600"
+                    onClick={key === "address" || key === "payment" ? () => handleUpdateOrCreation(key): () => {}}
                   >
                     {icon}
                     <span className="hidden sm:inline">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
