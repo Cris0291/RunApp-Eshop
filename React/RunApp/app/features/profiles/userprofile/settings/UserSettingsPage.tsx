@@ -16,8 +16,8 @@ import useUpdateAccountInfo from "./useUpdateAccountInfo";
 import useUpdatePasswordInfo from "./useUpdatePasswordInfo";
 import useUpdateOrCreateAddressInfo from "./useUpdateOrCreateAddressInfo";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAppSelector } from "@/app/hooks/reduxHooks";
-import { getUserToken } from "@/app/features/registration/userSlice";
+import { useAppDispatch, useAppSelector } from "@/app/hooks/reduxHooks";
+import { getUserToken, updateUser } from "@/app/features/registration/userSlice";
 import useUpdateOrCreatePaymentInfo from "./useUpdateOrCreatePaymentInfo";
 
 export default function UserSettingsPage() {
@@ -36,6 +36,7 @@ export default function UserSettingsPage() {
   const [submittedAddressErrors, setSubmittedAddressErrors] = useState<(string | undefined)[]>([])
   const [submittedPaymentErrors, setSubmittedPaymentErrors] = useState<(string | undefined)[]>([])
   const [submittedPasswordErrors, setSubmittedPasswordErrors] = useState<(string | undefined)[]>([])
+  const dispatch = useAppDispatch();
 
   const isUpdateOrCreate = (field: string) => {
     switch(field){
@@ -99,7 +100,7 @@ export default function UserSettingsPage() {
   const onAccountSubmit: SubmitHandler<AccountSettingsForm> = (data) => {
     updateUserAccountInfo(data, {
       onSuccess: (data) => {
-
+        dispatch(updateUser({name: data.name, email: data.email, userName: data.username}))
       }
     })
   }
