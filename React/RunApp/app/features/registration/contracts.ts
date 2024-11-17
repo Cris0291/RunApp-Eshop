@@ -14,6 +14,12 @@ export type FormValues = {
     id: string,
   }
 
+  export type UpdateUserDto = {
+    name: string,
+    email: string,
+    userName: string
+  }
+
   export interface User {
     name: string,
     email: string,

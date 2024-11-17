@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { UserDto } from './contracts'
+import { UpdateUserDto, UserDto } from './contracts'
 import { RootState } from '@/app/utils/store'
 
 const initialState: UserDto = {
@@ -21,11 +21,16 @@ export const userSlice = createSlice({
             state.userName = action.payload.userName,
             state.id = action.payload.id,
             state.token = action.payload.token
+        },
+        updateUser: (state, action: PayloadAction<UpdateUserDto>) => {
+            state.name = action.payload.name,
+            state.email = action.payload.email,
+            state.userName = action.payload.userName
         }
     }
 })
 
-export const {setUser} = userSlice.actions
+export const {setUser, updateUser} = userSlice.actions
 
 export default userSlice.reducer
 
