@@ -1,6 +1,5 @@
 import axios from "axios"
-import { AccountSettingsForm, UserInfoQuery, AccountInfoResponse, PasswordUpdatedSettings} from "../features/profiles/userprofile/settings/contracts";
-import { headers } from "next/headers";
+import { AccountSettingsForm, UserInfoQuery, AccountInfoResponse, PasswordUpdatedSettings, AddressSettingsForm, AddressResponse, PaymentSettingsForm} from "../features/profiles/userprofile/settings/contracts";
 
 axios.defaults.baseURL = "http://localhost:5253";
 
@@ -25,10 +24,45 @@ export async function UpdateAccountInfo({accountInfo, token} : {accountInfo: Acc
 
 export async function UpdatePasswordInfo({passwordInfo, token}: {passwordInfo: PasswordUpdatedSettings, token: string}){
 
-    axios.put<void>("api/user/password", passwordInfo, {
+    return axios.put<void>("api/user/password", passwordInfo, {
         headers: {
             "Authorization": `Bearer ${token}`
         }
     })
+
+}
+
+export async function CreateAddressInfo({addressInfo, token}: {addressInfo: AddressSettingsForm, token: string}){
+    return axios.post<AddressResponse>("api/user/address", addressInfo, {
+        headers:{
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(response => response.data)
+
+}
+
+export async function UpdateAddressInfo({addressInfo, token}: {addressInfo: AddressSettingsForm, token: string}){
+    return axios.put<AddressResponse>("api/user/address", addressInfo, {
+        headers:{
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(response => response.data)
+}
+
+export async function CreatePaymentMethod({paymentInfo, token}: {paymentInfo: PaymentSettingsForm, token: string}){
+    return axios.post<void>("api/user/payment", paymentInfo, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(response => response.data);
+
+}
+
+export async function UpdatePaymentMethod({paymentInfo, token}: {paymentInfo: PaymentSettingsForm, token: string}){
+    return axios.put<void>("api/user/payment", paymentInfo, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(response => response.data);
 
 }
