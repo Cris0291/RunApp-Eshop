@@ -1,4 +1,4 @@
-import RegistrationFormSales from "@/app/features/profiles/salescenter/RegistrationFormSales";
+import RegistrationFormSales from "@/app/features/profiles/creationcenter/RegistrationFormSales";
 
 function RegisterSalesProfile() {
   return <RegistrationFormSales />;
