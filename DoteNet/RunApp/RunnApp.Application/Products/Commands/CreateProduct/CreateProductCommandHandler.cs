@@ -20,14 +20,14 @@ namespace RunnApp.Application.Products.Commands.CreateProduct
         {
             List<Error> errors = new();
             ErrorOr<Product> productOrError = Product.CreateProduct(request.Name, request.Description, request.Price, request.Bulletpoints, 
-                                                                    request.PriceWithDiscount, request.PromotionalText, request.Brand, request.Type, request.Color, request.Weight,request.StoreProfileId);
+                                                                    request.PriceWithDiscount, request.PromotionalText, request.Brand, request.Type, request.Color, request.Weight, request.UserId);
 
             if (productOrError.IsError) return productOrError.Errors;
 
-            foreach(var tag in request.Tags)
+            foreach(var category in request.Categories)
             {
-                var errorOrTag = productOrError.Value.AddTag(tag);
-                if (errorOrTag.IsError) errors.Add(errorOrTag.Errors.First());
+                var errorOrCategory = productOrError.Value.AddCategory(category);
+                if (errorOrCategory.IsError) errors.Add(errorOrCategory.Errors.First());
             }
             if (errors.Count > 0) return errors;
 

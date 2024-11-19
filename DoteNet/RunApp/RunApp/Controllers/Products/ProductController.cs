@@ -69,19 +69,19 @@ namespace RunApp.Api.Controllers.Products
             return Ok(result.ProductsToProductsResponse());
         }
 
-        [Authorize("StoreProfile")]
+        [Authorize]
         [HttpPost(ApiEndpoints.Products.Create)]
         public async Task<IActionResult> CreateProduct(CreateProductRequest createProduct)
         {
-            Guid storeProfileId = HttpContext.GetStoreOwnerId();
-            CreateProductCommand productCommand = createProduct.ProductRequestToProductCommand(storeProfileId);
+            Guid UserId = HttpContext.GetUserId();
+            CreateProductCommand productCommand = createProduct.ProductRequestToProductCommand(UserId);
             ErrorOr<Product> productorError =  await _mediator.Send(productCommand);
 
             return productorError.Match(product => CreatedAtAction(nameof(Get), new { id = product.ProductId }, product.ProductToProductResponse()),
               Problem); 
         }
 
-        [Authorize("StoreProfile")]
+        [Authorize]
         [HttpPut(ApiEndpoints.Products.UpdateProduct)]
         public async Task<IActionResult> UpdateProduct([FromRoute] Guid id, UpdateProductRequest updateProduct)
         {
@@ -92,17 +92,17 @@ namespace RunApp.Api.Controllers.Products
            return updatedProductResult.Match(result => Ok(result.ProductToProductResponse()), Problem);
         }
 
-        [Authorize("StoreProfile")]
+        [Authorize]
         [HttpDelete(ApiEndpoints.Products.DeleteProduct)]
         public async Task<IActionResult> DeleteProduct([FromRoute] Guid id)
         {
             var deleteProductCommand = new DeleteProductCommand(id);
             var deleteResult = await _mediator.Send(deleteProductCommand);
 
-            return deleteResult.Match(result => Ok(), Problem);
+            return deleteResult.MatchFirst(result => Ok(), Problem);
         }
 
-        [Authorize("StoreProfile")]
+        [Authorize]
         [HttpPost(ApiEndpoints.Products.AddPriceWithDiscount)]
         public async Task<IActionResult> AddDiscount([FromRoute] Guid id, ProductDiscountRequest discount)
         {
@@ -113,7 +113,7 @@ namespace RunApp.Api.Controllers.Products
            return productWithDiscount.Match(result => Ok(result.ProductToProductResponse()), Problem);
         }
 
-        [Authorize("StoreProfile")]
+        [Authorize]
         [HttpDelete(ApiEndpoints.Products.DeletePriceWithDiscount)]
         public async Task<IActionResult> RemoveDiscount([FromRoute] Guid id)
         {
@@ -122,15 +122,15 @@ namespace RunApp.Api.Controllers.Products
             return deletedDiscount.MatchFirst(result =>Ok(), Problem);
         }
 
-        [Authorize("StoreProfile")]
+        [Authorize]
         [HttpPost(ApiEndpoints.Products.AddCategory)]
-        public async Task<IActionResult> AddTag([FromRoute] Guid id, [FromBody] CategoryRequest categoryRequest)
+        public async Task<IActionResult> AddCategory([FromRoute] Guid id, CategoryRequest categoryRequest)
         {
             var result = await _mediator.Send(new AddCategoryCommand(id, categoryRequest.Category));
             return result.MatchFirst(value => Ok(value.TagToTagResponse()), Problem);
         }
 
-        [Authorize("StoreProfile")]
+        [Authorize]
         [HttpDelete(ApiEndpoints.Products.DeleteCategory)]
         public async Task<IActionResult> DeleteTag([FromRoute] DeleteCategoryRequest deleteTag)
         {

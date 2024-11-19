@@ -1,4 +1,5 @@
-﻿using Contracts.Products.Requests;
+﻿using Bogus.DataSets;
+using Contracts.Products.Requests;
 using Contracts.Products.Responses;
 using Contracts.Rates.Response;
 using Contracts.Reviews.Responses;
@@ -7,6 +8,7 @@ using RunnApp.Application.Products.Commands.CreateProduct;
 using RunnApp.Application.Products.Commands.UpdateProduct;
 using RunnApp.Application.Products.Queries.GetProduct;
 using RunnApp.Application.Products.Queries.GetProducts;
+using System.Drawing;
 
 namespace RunApp.Api.Mappers.Products
 {
@@ -15,7 +17,7 @@ namespace RunApp.Api.Mappers.Products
         public static ProductResponse ProductToProductResponse(this Product product)
         {
             IEnumerable<string> bulletpoints = product.BulletPoints.Select(bulletpoint => bulletpoint.BulletPoint);
-            return new ProductResponse(product.ProductId, product.Name, product.Description, product.ActualPrice, bulletpoints, product.PriceOffer != null ? product.PriceOffer.PriceWithDiscount : null, product.PriceOffer != null ? product.PriceOffer.PromotionalText : null, product.PriceOffer != null ? product.PriceOffer.Discount : null);
+            return new ProductResponse(product.ProductId, product.Name, product.Description, product.ActualPrice, bulletpoints, product.PriceOffer != null ? product.PriceOffer.PriceWithDiscount : null, product.PriceOffer != null ? product.PriceOffer.PromotionalText : null, product.PriceOffer != null ? product.PriceOffer.Discount : null, product.Characteristic.Brand, product.Characteristic.Type, product.Characteristic.Color, product.Characteristic.Weight, product.Categories.Select(x => x.CategoryName).ToArray());
         }
         public static IEnumerable<ProductResponse> ProductsToProductsResponse(this IEnumerable<Product> products)
         {
@@ -38,12 +40,12 @@ namespace RunApp.Api.Mappers.Products
             return responses;
         }
 
-        public static CreateProductCommand ProductRequestToProductCommand(this CreateProductRequest createProduct, Guid storeProfileId)
+        public static CreateProductCommand ProductRequestToProductCommand(this CreateProductRequest createProduct, Guid UserId)
         {
             return new CreateProductCommand(createProduct.Name, createProduct.Description,
                 createProduct.Price, createProduct.Bulletpoints,
                 createProduct.PriceWithDiscount, createProduct.PromotionalText, createProduct.Characteristics.Brand, 
-                createProduct.Characteristics.Type, createProduct.Characteristics.Color, createProduct.Characteristics.Weight, storeProfileId, createProduct.Tags);
+                createProduct.Characteristics.Type, createProduct.Characteristics.Color, createProduct.Characteristics.Weight, UserId, createProduct.Categories);
         }
         public static UpdateProductCommand ProductRequestToProductCommand(this UpdateProductRequest updateProduct, Guid productId)
         {

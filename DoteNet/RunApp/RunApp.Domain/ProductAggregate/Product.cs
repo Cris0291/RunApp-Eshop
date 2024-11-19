@@ -93,20 +93,6 @@ namespace RunApp.Domain.Products
             return Result.Success;
         }
 
-        public ErrorOr<Success> AddBulletPoints(IEnumerable<string> points)
-        {
-            AddValidation(nameof(ProductError.BulletPointsCollectionShoulNotBeEmpty), () => !points.Any());
-            Validate();
-            if (HasError()) return Errors;
-
-            foreach (string point in points)
-            {
-                BulletPoints.Add(new About() {BulletPoint = point});
-            }
-
-            return Result.Success;
-        }
-
         public ErrorOr<Success> AddPriceWithDiscount(decimal priceWithDiscount, string promotionalText)
         {
             decimal maximumDiscount = 0.7m;
