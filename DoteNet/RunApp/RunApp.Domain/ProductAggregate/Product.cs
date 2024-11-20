@@ -147,12 +147,11 @@ namespace RunApp.Domain.Products
             Categories.Add(categoryToAdd);
             return categoryToAdd;
         }
-        public ErrorOr<Category> DeleteCategory(Guid tagId)
+        public Category? DeleteCategory(Guid categoryId)
         {
-            if (Categories.Count == 0) return Error.NotFound(code: "CategoryWasNotFound", description: "Category was not found");
             if (Categories.Count > 1) throw new InvalidOperationException("Cannot repeat categories");
 
-            return Categories.First();
+            return Categories.SingleOrDefault(x => x.CategoryId == categoryId);
         }
     }
 }

@@ -127,15 +127,15 @@ namespace RunApp.Api.Controllers.Products
         public async Task<IActionResult> AddCategory([FromRoute] Guid id, CategoryRequest categoryRequest)
         {
             var result = await _mediator.Send(new AddCategoryCommand(id, categoryRequest.Category));
-            return result.MatchFirst(value => Ok(value.TagToTagResponse()), Problem);
+            return result.MatchFirst(value => Ok(value.CategoryToCategoryResponse()), Problem);
         }
 
         [Authorize]
         [HttpDelete(ApiEndpoints.Products.DeleteCategory)]
         public async Task<IActionResult> DeleteTag([FromRoute] DeleteCategoryRequest deleteTag)
         {
-            var result = await _mediator.Send(new DeleteCategoryCommand(deleteTag.ProductId, deleteTag.TagId));
-            return result.MatchFirst(value => Ok(), Problem);
+            var result = await _mediator.Send(new DeleteCategoryCommand(deleteTag.ProductId, deleteTag.CategoryId));
+            return result.Match(value => Ok(), Problem);
         }
     }
 }

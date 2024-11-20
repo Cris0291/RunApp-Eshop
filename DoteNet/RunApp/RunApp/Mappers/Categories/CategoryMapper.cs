@@ -5,7 +5,7 @@ namespace RunApp.Api.Mappers.Categories
 {
     public static class CategoryMapper
     {
-        public static CategoryResponse TagToTagResponse(this Category category)
+        public static CategoryResponse CategoryToCategoryResponse(this Category category)
         {
             return new CategoryResponse(category.CategoryId, category.CategoryName); 
         }

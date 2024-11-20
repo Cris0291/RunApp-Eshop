@@ -13,10 +13,10 @@ namespace RunnApp.Application.Products.Commands.DeleteCategory
             var product = await _productsRepository.GetProductWithCategories(request.ProductId, request.CategoryId);
             if (product == null) return Error.NotFound(code: "ProductWasNotFoundWithGivenId", description: "Product was not found");
 
-            var categoryOrError = product.DeleteCategory(request.CategoryId);
-            if(categoryOrError.IsError) return categoryOrError.Errors;
+            var category = product.DeleteCategory(request.CategoryId);
+            if(category == null) return Error.NotFound(code: "CategoryWasNotFound", description: "Category was not found");
 
-            await _productsRepository.DeleteCategory(categoryOrError.Value);
+            await _productsRepository.DeleteCategory(category);
 
             await _unitOfWorkPattern.CommitChangesAsync();
             return Result.Success;
