@@ -3,13 +3,14 @@
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Upload, Plus, X } from 'lucide-react'
+import { Upload, Plus, X, AlertCircle } from 'lucide-react'
 import { motion } from "framer-motion"
 import { ProductCreationDto } from "./contracts"
 
@@ -24,7 +25,7 @@ export default function CreationForm() {
   const [bulletPoints, setBulletPoints] = useState<string[]>([''])
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [submittedErrors, setSubmittedErrors] = useState<string[]>([])
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ProductCreationDto>({
     name: "",
     description: "",
     price: 0,
@@ -34,36 +35,87 @@ export default function CreationForm() {
     categories: [],
     brand: "",
     color: "",
-    weight: "",
+    weight: 0,
     type: ""
 })
 
 const handleProductSubmit = (e: React.FormEvent) => {
   e.preventDefault();
+  const errors = validateFormData();
+
+  for(let i = 0; i < errors.length; i++){
+   console.log(errors[i]);
+   console.log("was here")
+  }
+   
+
+  if(errors.length === 0){
+    console.log("Ok")
+  }
+  else{
+    console.log("Bad")
+  }
 }
 
 const validateFormData = () => {
+  const newErrors: string[] =[];
   const keys = Object.keys(formData)
 
   keys.forEach(key => {
     switch(key){
       case "name":
-        if(formData.name.trim().length === 0) setSubmittedErrors(prev => ([...prev, "Product name cannot be empty"]));
+        if(formData.name.trim().length === 0) newErrors.push("Product name cannot be empty");
         break;
       case "description":
-        if(formData.description.trim().length === 0) setSubmittedErrors(prev => ([...prev, "Product description cannot be empty"]));
+        if(formData.description.trim().length === 0) newErrors.push("Product description cannot be empty");
+        break;
+      case "bulletPoints":
+        if(formData.bulletPoints.length === 0 || !isCollectionValid(formData.bulletPoints)) newErrors.push("Bulletpoints cannot be empty");
         break;
       case "price":
-        if(formData.bulletPoints.length === 0 || )
+        if(formData.price <= 0) newErrors.push("Product price must be greater than zero")
+        break;
+      case "priceWithDiscount":
+        if(formData.priceWithDiscount !== undefined){
+          if(formData.priceWithDiscount <= 0) newErrors.push("Price with discount must be greater than zero")
+        }
+        break;
+      case "promotionalText":
+        if(formData.promotionalText !== undefined){
+          if(formData.promotionalText.trim().length === 0) newErrors.push("Promotional text cannot be empty")
+        }
+        break;
+      case "categories":
+        if(formData.categories.length === 0 || !isCollectionValid(formData.categories)) newErrors.push("Categories cannot be empty");
+        break;
+      case "brand":
+        if(formData.brand.trim().length === 0) newErrors.push("Product brand cannot be empty");
+        break;
+      case "color":
+        if(formData.color.trim().length === 0) newErrors.push("Product color cannot be empty");
+        break;
+      case "weight":
+        if(formData.weight <= 0) newErrors.push("Product weight must be greater than zero");
+        break;
+      case "type":
+        if(formData.type.trim().length === 0) newErrors.push("Product type cannot be empty");
+        break;
     }
   });
+
+  setSubmittedErrors(newErrors);
+  return newErrors
 }
 
-const areBulletPointsValid = (points: string[]) => {
-  
+const isCollectionValid = (points: string[]) => {
+  let isValid = true;
   for(let i = 0; i < points.length; i++){
-
+    if(points[i].trim().length === 0) {
+      isValid = false;
+      break;
+    }
   }
+  return isValid;
 }
 
 const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,13 +129,16 @@ const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 }
 
 const handleCategoryChange = (name: string, category: string) => {
-  setSelectedCategories(prev => 
-    prev.includes(category)
-      ? prev.filter(c => c !== category)
-      : [...prev, category]
-  )
+  let newCategories: string[] = []
 
-  setFormData(prev => ({...prev, [name]: selectedCategories}))
+  setFormData(prev => {
+
+    newCategories = prev.categories.includes(category)
+      ? prev.categories.filter(c => c !== category)
+      : [...prev.categories, category]
+
+      return ({...prev, [name]: newCategories})
+  })
 }
 
 const updateBulletPoint = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
@@ -93,7 +148,7 @@ const updateBulletPoint = (e: React.ChangeEvent<HTMLInputElement>, index: number
   newBulletPoints[index] = value
   setBulletPoints(newBulletPoints)
 
-  setFormData(prev => ({...prev, [name]: bulletPoints}))
+  setFormData(prev => ({...prev, [name]: newBulletPoints}))
 }
 
 const addBulletPoint = () => {
@@ -115,13 +170,6 @@ const removeBulletPoint = (index: number) => {
       }
       reader.readAsDataURL(file)
     }
-  }
-
- 
-
-  const handleProductError  = () => {
-    console.log(errors)
-    console.log("erroros just")
   }
 
   const handleImageSubmit = (event: React.FormEvent) => {
@@ -341,6 +389,16 @@ const removeBulletPoint = (index: number) => {
                   <Plus className="mr-2 h-4 w-4" /> Add Bullet Point
                 </Button>
               </div>
+              {submittedErrors.length > 0 && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    {submittedErrors.map((error, index) => (
+                      <p key={index}>{error}</p>
+                    ))}
+                  </AlertDescription>
+                </Alert>
+              )}
               <Button 
                 type="submit" 
                 className="w-full bg-yellow-500 hover:bg-yellow-600 text-black text-lg font-semibold py-6 transition-all duration-300 transform hover:scale-105"

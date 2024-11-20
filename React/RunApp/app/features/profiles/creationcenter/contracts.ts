@@ -6,7 +6,10 @@ export type ProductCreationDto = {
     priceWithDiscount?: number,
     promotionalText?: string,
     categories: string[],
-    characteristics: CharacteristicsDto
+    brand: string,
+    color: string,
+    weight: number,
+    type: string
 }
 
 export type CharacteristicsDto = {
