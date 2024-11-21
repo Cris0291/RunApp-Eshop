@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { Upload, Plus, X, AlertCircle } from 'lucide-react'
 import { motion } from "framer-motion"
 import { ProductCreationDto } from "./contracts"
+import useCreateProductCommand from "./useCreateProductCommand";
 
 const CATEGORIES = [
   "Electronics", "Clothing", "Books", "Home & Garden", "Toys & Games",
@@ -20,16 +21,15 @@ const CATEGORIES = [
 ]
 
 export default function CreationForm() {
+  const {ProductsCraetionFunction, isCreating} = useCreateProductCommand()
   const [hasPromotion, setHasPromotion] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [bulletPoints, setBulletPoints] = useState<string[]>([''])
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [submittedErrors, setSubmittedErrors] = useState<string[]>([])
   const [formData, setFormData] = useState<ProductCreationDto>({
     name: "",
     description: "",
     price: 0,
-    bulletPoints: [],
+    bulletPoints: [''],
     priceWithDiscount: undefined,
     promotionalText: undefined,
     categories: [],
@@ -43,17 +43,8 @@ const handleProductSubmit = (e: React.FormEvent) => {
   e.preventDefault();
   const errors = validateFormData();
 
-  for(let i = 0; i < errors.length; i++){
-   console.log(errors[i]);
-   console.log("was here")
-  }
-   
-
   if(errors.length === 0){
-    console.log("Ok")
-  }
-  else{
-    console.log("Bad")
+    ProductsCraetionFunction(formData);
   }
 }
 
@@ -76,13 +67,13 @@ const validateFormData = () => {
         if(formData.price <= 0) newErrors.push("Product price must be greater than zero")
         break;
       case "priceWithDiscount":
-        if(formData.priceWithDiscount !== undefined){
-          if(formData.priceWithDiscount <= 0) newErrors.push("Price with discount must be greater than zero")
+        if(hasPromotion){
+          if(formData.priceWithDiscount === undefined || formData.priceWithDiscount <= 0) newErrors.push("Price with discount must be greater than zero")
         }
         break;
       case "promotionalText":
-        if(formData.promotionalText !== undefined){
-          if(formData.promotionalText.trim().length === 0) newErrors.push("Promotional text cannot be empty")
+        if(hasPromotion){
+          if(formData.promotionalText === undefined || formData.promotionalText.trim().length === 0) newErrors.push("Promotional text cannot be empty")
         }
         break;
       case "categories":
@@ -106,6 +97,10 @@ const validateFormData = () => {
   setSubmittedErrors(newErrors);
   return newErrors
 }
+
+useEffect(() => {
+  if(!hasPromotion)  setFormData(prev => ({...prev, priceWithDiscount: undefined, promotionalText: undefined}))
+}, [hasPromotion])
 
 const isCollectionValid = (points: string[]) => {
   let isValid = true;
@@ -143,21 +138,28 @@ const handleCategoryChange = (name: string, category: string) => {
 
 const updateBulletPoint = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
   const {name, value} = e.target
+  let newBulletPoints: string[] = []
 
-  const newBulletPoints = [...bulletPoints]
-  newBulletPoints[index] = value
-  setBulletPoints(newBulletPoints)
+  setFormData(prev => {
+    newBulletPoints = [...prev.bulletPoints];
+    newBulletPoints[index] = value;
 
-  setFormData(prev => ({...prev, [name]: newBulletPoints}))
+    return ({...prev, [name]: newBulletPoints})
+  })
 }
 
 const addBulletPoint = () => {
-  setBulletPoints([...bulletPoints, ''])
+  setFormData(prev => ({...prev, bulletPoints: [...prev.bulletPoints, '']}))
 }
 
 const removeBulletPoint = (index: number) => {
-  const newBulletPoints = bulletPoints.filter((_, i) => i !== index)
-  setBulletPoints(newBulletPoints)
+  let newBulletPoints: string[] = []
+  setFormData(prev => {
+    newBulletPoints = prev.bulletPoints.filter((_, i) => i !== index);
+
+    return ({...prev, bulletPoints: newBulletPoints})
+
+  });
 }
 
 
@@ -295,7 +297,7 @@ const removeBulletPoint = (index: number) => {
                   </SelectContent>
                 </Select>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {selectedCategories.map((category) => (
+                  {formData.categories.map((category) => (
                     <Badge key={category} variant="secondary" className="bg-yellow-100 text-yellow-800">
                       {category}
                       <button
@@ -360,7 +362,7 @@ const removeBulletPoint = (index: number) => {
               </div>
               <div className="space-y-2">
                 <Label className="text-black font-semibold">Bullet Points</Label>
-                {bulletPoints.map((point, index) => (
+                {formData.bulletPoints.map((point, index) => (
                   <div key={index} className="flex items-center space-x-2">
                     <Input 
                       id="bulletPoints"

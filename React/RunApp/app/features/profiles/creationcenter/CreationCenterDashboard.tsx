@@ -15,9 +15,7 @@ import {
   Package,
   Settings,
   ShoppingCart,
-  TrendingUp,
   User,
-  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -30,35 +28,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import CreationForm from "./CreationForm";
+import ProductImageUpload from "./ProductImageUpload";
 
 function SalesCenterDashboard() {
-  const [activeLink, setActiveLink] = useState("Dasboard");
+  const [activeLink, setActiveLink] = useState<{name: string, component: React.FC}>({name: "Dasboard", component: CreationForm});
 
   const navItems = [
-    { name: "Dashboard", icon: Home },
-    { name: "Sales", icon: DollarSign },
-    { name: "Products", icon: Package },
-    { name: "Analytics", icon: BarChart },
-    { name: "Orders", icon: ShoppingCart },
+    { name: "Dashboard", icon: Home, component:  ProductImageUpload},
+    { name: "Sales", icon: DollarSign, component: ProductImageUpload},
+    { name: "Products", icon: Package, component: CreationForm},
+    { name: "Analytics", icon: BarChart, component: ProductImageUpload},
+    { name: "Orders", icon: ShoppingCart, component: ProductImageUpload},
   ];
 
   return (
@@ -78,11 +60,11 @@ function SalesCenterDashboard() {
                         <Link
                           href="#"
                           className={`flex items-center justify-center p-2 rounded hover:bg-gray-800 ${
-                            activeLink === item.name
+                            activeLink.name === item.name
                               ? "bg-yellow-500 text-black"
                               : ""
                           }`}
-                          onClick={() => setActiveLink(item.name)}
+                          onClick={() => setActiveLink({name: item.name, component: item.component})}
                         >
                           <item.icon className="w-5 h-5" />
                         </Link>
@@ -149,7 +131,7 @@ function SalesCenterDashboard() {
               </DropdownMenu>
             </div>
           </div>
-          <CreationForm/>
+          <activeLink.component/>
         </div>
       </main>
     </div>
