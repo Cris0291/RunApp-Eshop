@@ -7,20 +7,32 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Upload, X, Check } from 'lucide-react'
+import fileToDataString from "@/app/utils/fileToDataString"
 
 export default function ProductImageUpload() {
-  const [image, setImage] = useState<string | null>(null)
+  const [previewImgUrl, setPreviewimgUrl] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<File>();
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => setImage(e.target?.result as string)
-      reader.readAsDataURL(file)
+
+     if (file) {
+      setSelectedImage(file);
+    }
+    else{
+      return;
+    }
+
+    try{
+      const imgUrl = await fileToDataString(file);
+      setPreviewimgUrl(imgUrl);
+    }
+    catch (error){
+      console.log(error);
     }
   }
 
@@ -34,19 +46,29 @@ export default function ProductImageUpload() {
     setIsDragging(false)
   }
 
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault()
     setIsDragging(false)
     const file = event.dataTransfer.files?.[0]
+  
     if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => setImage(e.target?.result as string)
-      reader.readAsDataURL(file)
+      setSelectedImage(file);
+    }
+    else{
+      return;
+    }
+
+    try{
+      const imgUrl = await fileToDataString(file);
+      setPreviewimgUrl(imgUrl);
+    }
+    catch (error){
+      console.log(error);
     }
   }
 
   const handleRemoveImage = () => {
-    setImage(null)
+    setPreviewimgUrl(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
     }
@@ -61,7 +83,7 @@ export default function ProductImageUpload() {
     setUploadSuccess(true)
     setTimeout(() => {
       setUploadSuccess(false)
-      setImage(null)
+      setPreviewimgUrl(null)
       if (fileInputRef.current) {
         fileInputRef.current.value = ""
       }
@@ -87,7 +109,7 @@ export default function ProductImageUpload() {
               whileTap={{ scale: 0.98 }}
             >
               <AnimatePresence mode="wait">
-                {image ? (
+                {previewImgUrl ? (
                   <motion.div
                     key="image"
                     initial={{ opacity: 0 }}
@@ -95,7 +117,7 @@ export default function ProductImageUpload() {
                     exit={{ opacity: 0 }}
                     className="relative"
                   >
-                    <img src={image} alt="Product preview" className="max-w-full h-auto mx-auto rounded-md" />
+                    <img src={previewImgUrl} alt="Product preview" className="max-w-full h-auto mx-auto rounded-md" />
                     <Button
                       type="button"
                       variant="secondary"
@@ -118,7 +140,7 @@ export default function ProductImageUpload() {
                     <p className="mt-4 text-lg font-semibold text-black">Drag and drop your image here</p>
                     <p className="mt-2 text-sm text-gray-600">or</p>
                     <Label htmlFor="image-upload" className="mt-4 inline-block">
-                      <Button type="button" variant="outline" className="bg-white text-yellow-500 border-yellow-500 hover:bg-yellow-50">
+                      <Button type="button" variant="outline" className="bg-white text-yellow-500 border-yellow-500 hover:bg-yellow-50" onClick={() => document.getElementById("image-upload")?.click()}>
                         Select Image
                       </Button>
                     </Label>
@@ -139,7 +161,7 @@ export default function ProductImageUpload() {
             <Button 
               type="submit" 
               className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 rounded-md transition-all duration-300 ease-in-out transform hover:scale-105"
-              disabled={!image || isUploading}
+              disabled={!previewImgUrl || isUploading}
             >
               {isUploading ? (
                 <motion.div

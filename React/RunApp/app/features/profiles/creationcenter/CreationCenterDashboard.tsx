@@ -31,14 +31,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import CreationForm from "./CreationForm";
 import ProductImageUpload from "./ProductImageUpload";
+import ProductManagementTable from "./ProductManagementTable";
 
 function SalesCenterDashboard() {
   const [activeLink, setActiveLink] = useState<{name: string, component: React.FC}>({name: "Dasboard", component: CreationForm});
 
   const navItems = [
-    { name: "Dashboard", icon: Home, component:  ProductImageUpload},
+    { name: "Dashboard", icon: Home, component:  CreationForm},
     { name: "Sales", icon: DollarSign, component: ProductImageUpload},
-    { name: "Products", icon: Package, component: CreationForm},
+    { name: "Products", icon: Package, component: ProductManagementTable},
     { name: "Analytics", icon: BarChart, component: ProductImageUpload},
     { name: "Orders", icon: ShoppingCart, component: ProductImageUpload},
   ];
