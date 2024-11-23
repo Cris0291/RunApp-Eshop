@@ -12,16 +12,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Upload, Plus, X, AlertCircle } from 'lucide-react'
 import { motion } from "framer-motion"
-import { ProductCreationDto } from "./contracts"
+import { CreationProducts, ProductCreationDto } from "./contracts"
 import useCreateProductCommand from "./useCreateProductCommand";
+import StatusPopup from "@/app/ui/SatusPopup";
 
 const CATEGORIES = [
   "Electronics", "Clothing", "Books", "Home & Garden", "Toys & Games",
   "Sports & Outdoors", "Beauty & Personal Care", "Automotive", "Health & Wellness"
 ]
 
-export default function CreationForm() {
-  const {ProductsCraetionFunction, isCreating} = useCreateProductCommand()
+export default function CreationForm({onHandleCurrentProduct}: {onHandleCurrentProduct: (id: string, link: string) => void}) {
+  const {ProductsCraetionFunction, isCreating, isError} = useCreateProductCommand()
   const [hasPromotion, setHasPromotion] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [submittedErrors, setSubmittedErrors] = useState<string[]>([])
@@ -161,24 +162,6 @@ const removeBulletPoint = (index: number) => {
 
   });
 }
-
-
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
-  const handleImageSubmit = (event: React.FormEvent) => {
-    event.preventDefault()
-    // Here you would typically send the image data to your backend
-    console.log("Image form submitted")
-  }
 
   
  
@@ -408,42 +391,9 @@ const removeBulletPoint = (index: number) => {
                 <Plus className="mr-2 h-5 w-5" /> Create Product
               </Button>
             </form>
-
-            <div className="border-t-2 border-black pt-6">
-              <form onSubmit={handleImageSubmit} className="space-y-4">
-                <Label htmlFor="image" className="text-black font-semibold">Product Image</Label>
-                <div className="flex items-center space-x-4">
-                  <Button
-                    type="button"
-                    onClick={() => document.getElementById('image')?.click()}
-                    className="bg-black hover:bg-gray-800 text-white"
-                  >
-                    <Upload className="mr-2 h-4 w-4" /> Select Image
-                  </Button>
-                  <Input
-                    id="image"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleImageUpload}
-                  />
-                  {imagePreview ? (
-                    <img src={imagePreview} alt="Preview" className="h-20 w-20 object-cover rounded border-2 border-black" />
-                  ) : (
-                    <div className="h-20 w-20 bg-gray-200 rounded flex items-center justify-center text-gray-500 border-2 border-black">
-                      No Image
-                    </div>
-                  )}
-                </div>
-                <Button 
-                  type="submit" 
-                  className="w-full bg-black hover:bg-gray-800 text-white text-lg font-semibold py-4 transition-all duration-300"
-                  disabled={!imagePreview}
-                >
-                  Upload Image
-                </Button>
-              </form>
-            </div>
+            {
+              true && <StatusPopup status="success" message="test" actionLabel="This is just a test" onAction={() => {}}/>
+            }
           </CardContent>
         </Card>
       </motion.div>

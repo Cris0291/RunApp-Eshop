@@ -28,20 +28,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import CreationProductsWrapper from "./CreationProductsWrapper";
 
-import CreationForm from "./CreationForm";
-import ProductImageUpload from "./ProductImageUpload";
-import ProductManagementTable from "./ProductManagementTable";
+function CreationCenterDashboard() {
+  const [activeLink, setActiveLink] = useState<string>("Dasboard");
+  const [currentProduct, setCurrentProduct] = useState<string>("");
 
-function SalesCenterDashboard() {
-  const [activeLink, setActiveLink] = useState<{name: string, component: React.FC}>({name: "Dasboard", component: CreationForm});
+  const onHandleCurrentProduct= (id: string, link: string) => {
+    setCurrentProduct(id);
+    if(link !== activeLink) setActiveLink(link);
+  }
 
   const navItems = [
-    { name: "Dashboard", icon: Home, component:  CreationForm},
-    { name: "Sales", icon: DollarSign, component: ProductImageUpload},
-    { name: "Products", icon: Package, component: ProductManagementTable},
-    { name: "Analytics", icon: BarChart, component: ProductImageUpload},
-    { name: "Orders", icon: ShoppingCart, component: ProductImageUpload},
+    { name: "Dashboard", icon: Home},
+    { name: "Images", icon: DollarSign},
+    { name: "Products", icon: Package},
+    { name: "Analytics", icon: BarChart},
+    { name: "Orders", icon: ShoppingCart},
   ];
 
   return (
@@ -61,11 +64,11 @@ function SalesCenterDashboard() {
                         <Link
                           href="#"
                           className={`flex items-center justify-center p-2 rounded hover:bg-gray-800 ${
-                            activeLink.name === item.name
+                            activeLink === item.name
                               ? "bg-yellow-500 text-black"
                               : ""
                           }`}
-                          onClick={() => setActiveLink({name: item.name, component: item.component})}
+                          onClick={() => setActiveLink(item.name)}
                         >
                           <item.icon className="w-5 h-5" />
                         </Link>
@@ -132,11 +135,11 @@ function SalesCenterDashboard() {
               </DropdownMenu>
             </div>
           </div>
-          <activeLink.component/>
+          <CreationProductsWrapper item={activeLink} onHandleCurrentProduct={onHandleCurrentProduct} productId={currentProduct}/>
         </div>
       </main>
     </div>
   );
 }
 
-export default SalesCenterDashboard;
+export default CreationCenterDashboard;

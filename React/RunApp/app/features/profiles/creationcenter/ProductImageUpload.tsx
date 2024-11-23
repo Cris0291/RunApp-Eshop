@@ -8,14 +8,17 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Upload, X, Check } from 'lucide-react'
 import fileToDataString from "@/app/utils/fileToDataString"
+import { CreationProducts } from "./contracts"
+import useUploadProductImage from "./useUploadProductImage"
 
-export default function ProductImageUpload() {
+export default function ProductImageUpload({productId}: {productId: string}) {
   const [previewImgUrl, setPreviewimgUrl] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<File>();
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const {uploadImage, uploadingImage} = useUploadProductImage();
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -76,11 +79,14 @@ export default function ProductImageUpload() {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
-    setIsUploading(true)
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    setIsUploading(false)
-    setUploadSuccess(true)
+
+    const formData = new FormData();
+    formData.append("file", selectedImage as Blob);
+
+    uploadImage({formData, productId});
+
+    if(!uploadingImage){
+      setUploadSuccess(true)
     setTimeout(() => {
       setUploadSuccess(false)
       setPreviewimgUrl(null)
@@ -88,6 +94,7 @@ export default function ProductImageUpload() {
         fileInputRef.current.value = ""
       }
     }, 3000)
+    }
   }
 
   return (
