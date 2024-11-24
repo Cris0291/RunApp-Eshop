@@ -4,12 +4,13 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, Check, AlertTriangle } from 'lucide-react'
 import { Button } from "@/components/ui/button"
+import { ProductResponseDto } from "../features/profiles/creationcenter/contracts"
 
 interface StatusPopupProps {
   status: 'success' | 'failure'
   message: string
   actionLabel: string
-  onAction: () => void
+  onAction: (link: string) => void
   autoCloseDelay?: number
 }
 
@@ -47,7 +48,7 @@ export default function StatusPopup({
           exit={{ opacity: 0, y: 50 }}
           className="fixed bottom-4 right-4 z-50"
         >
-          <div className={`rounded-lg shadow-lg overflow-hidden max-w-md w-full ${status === 'failure' ? 'bg-red-500' : 'bg-white'}`}>
+          <div className={`rounded-lg shadow-lg overflow-hidden max-w-lg w-full ${status === 'failure' ? 'bg-red-500' : 'bg-white'}`}>
             <div className={`flex items-center justify-between p-4 ${bgColor} text-white`}>
               <div className="flex items-center">
                 {icon}
@@ -64,7 +65,7 @@ export default function StatusPopup({
               <p className="mb-4">{message}</p>
               <Button
                 onClick={() => {
-                  onAction()
+                  onAction("Images")
                   setIsVisible(false)
                 }}
                 className={`w-full ${status === 'success' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-white text-red-500 hover:bg-red-100'} text-white`}
