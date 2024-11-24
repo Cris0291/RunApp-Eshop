@@ -22,7 +22,8 @@ export type Review = {
 
 
 export type Image = {
-    id: string,
+    imageId: string,
+    productId: string,
     url: string
 }
 

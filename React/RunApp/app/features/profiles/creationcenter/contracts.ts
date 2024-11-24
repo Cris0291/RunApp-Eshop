@@ -31,6 +31,7 @@ export type CharacteristicsDto = {
 }
 
 export type ProductResponseDto = {
+    productId: string,
     name: string,
     description: string,
     price: number,
@@ -42,4 +43,9 @@ export type ProductResponseDto = {
     color: string,
     weight: number,
     type: string
+}
+
+export type newPromotionDto = {
+    newPriceWithDiscount: number,
+    newPromotionalText: string,
 }
