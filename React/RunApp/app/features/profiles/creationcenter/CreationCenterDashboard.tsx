@@ -29,13 +29,37 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import CreationProductsWrapper from "./CreationProductsWrapper";
+import { ProductResponseDto } from "./contracts";
+
+const defaultEmptyProduct: ProductResponseDto = {
+  productId: "",
+  name: "",
+  description: "",
+  price: 0,
+  bulletPoints: [''],
+  priceWithDiscount: undefined,
+  promotionalText: undefined,
+  categories: [],
+  brand: "",
+  color: "",
+  weight: 0,
+  type: ""
+}
 
 function CreationCenterDashboard() {
   const [activeLink, setActiveLink] = useState<string>("Dasboard");
-  const [currentProduct, setCurrentProduct] = useState<string>("");
+  const [productResponse, setProductResponse] = useState<ProductResponseDto>(defaultEmptyProduct)
 
-  const onHandleCurrentProduct= (id: string, link: string) => {
-    setCurrentProduct(id);
+  const onHandleCurrentProduct= (link: string, product: ProductResponseDto) => {
+    setProductResponse(product)
+    if(link !== activeLink) setActiveLink(link);
+  }
+
+  const onHandleAddAnImage = (product: ProductResponseDto) => {
+    setProductResponse(product);
+  }
+
+  const onHandleAddLink = (link: string) => {
     if(link !== activeLink) setActiveLink(link);
   }
 
@@ -135,7 +159,7 @@ function CreationCenterDashboard() {
               </DropdownMenu>
             </div>
           </div>
-          <CreationProductsWrapper item={activeLink} onHandleCurrentProduct={onHandleCurrentProduct} productId={currentProduct}/>
+          <CreationProductsWrapper item={activeLink} onHandleCurrentProduct={onHandleCurrentProduct} product={productResponse} onHandleAddAnImage={onHandleAddAnImage} onHandleAddLink={onHandleAddLink}/>
         </div>
       </main>
     </div>

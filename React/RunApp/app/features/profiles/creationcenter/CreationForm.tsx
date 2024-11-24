@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Upload, Plus, X, AlertCircle } from 'lucide-react'
 import { motion } from "framer-motion"
-import { CreationProducts, ProductCreationDto } from "./contracts"
+import {ProductCreationDto, ProductResponseDto } from "./contracts"
 import useCreateProductCommand from "./useCreateProductCommand";
 import StatusPopup from "@/app/ui/SatusPopup";
 
@@ -21,8 +21,8 @@ const CATEGORIES = [
   "Sports & Outdoors", "Beauty & Personal Care", "Automotive", "Health & Wellness"
 ]
 
-export default function CreationForm({onHandleCurrentProduct}: {onHandleCurrentProduct: (id: string, link: string) => void}) {
-  const {ProductsCraetionFunction, isCreating, isError} = useCreateProductCommand()
+export default function CreationForm({onHandleAddAnImage, onHandleAddLink}: {onHandleAddAnImage: (product: ProductResponseDto) => void, onHandleAddLink : (link: string) => void}) {
+  const {ProductsCraetionFunction, isCreating, isError, isSuccess, isIdle} = useCreateProductCommand()
   const [hasPromotion, setHasPromotion] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [submittedErrors, setSubmittedErrors] = useState<string[]>([])
@@ -45,7 +45,11 @@ const handleProductSubmit = (e: React.FormEvent) => {
   const errors = validateFormData();
 
   if(errors.length === 0){
-    ProductsCraetionFunction(formData);
+    ProductsCraetionFunction(formData, {
+      onSuccess: (data) => {
+        onHandleAddAnImage(data);
+      }
+    });
   }
 }
 
@@ -392,7 +396,7 @@ const removeBulletPoint = (index: number) => {
               </Button>
             </form>
             {
-              true && <StatusPopup status="success" message="test" actionLabel="This is just a test" onAction={() => {}}/>
+              isSuccess && !isError ?  <StatusPopup status="success" message="Your product has been successfully loaded!" actionLabel="Add an image" onAction={(link: string) => onHandleAddLink(link)}/> : isIdle ? "" : <StatusPopup status="failure" message="Failed to load data. Please try again." actionLabel="Retry" onAction={() => {}}/> 
             }
           </CardContent>
         </Card>
