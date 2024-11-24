@@ -6,12 +6,19 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { Upload, X, Check } from 'lucide-react'
+import { Upload, X, Check, ShoppingBag } from 'lucide-react'
 import fileToDataString from "@/app/utils/fileToDataString"
-import { CreationProducts } from "./contracts"
+import {ProductResponseDto } from "./contracts"
 import useUploadProductImage from "./useUploadProductImage"
 
-export default function ProductImageUpload({productId}: {productId: string}) {
+const product1 = {
+  id: '',
+  name: 'No product selected',
+  description: 'Please select a product to upload an image.',
+  price: 0
+}
+
+export default function ProductImageUpload({product}: {product: ProductResponseDto}) {
   const [previewImgUrl, setPreviewimgUrl] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<File>();
   const [isDragging, setIsDragging] = useState(false)
@@ -83,7 +90,7 @@ export default function ProductImageUpload({productId}: {productId: string}) {
     const formData = new FormData();
     formData.append("file", selectedImage as Blob);
 
-    uploadImage({formData, productId});
+    uploadImage({formData, productId: product.productId});
 
     if(!uploadingImage){
       setUploadSuccess(true)
@@ -103,8 +110,18 @@ export default function ProductImageUpload({productId}: {productId: string}) {
         <CardHeader className="bg-gradient-to-r from-yellow-400 to-yellow-500">
           <CardTitle className="text-2xl font-bold text-center text-white">Upload Product Image</CardTitle>
         </CardHeader>
+        <CardContent className="p-6">
+          <div className="mb-6 bg-gradient-to-r from-yellow-50 to-yellow-100 p-6 rounded-lg shadow-md">
+            <h3 className="text-xl font-semibold mb-4 flex items-center text-yellow-800">
+              <ShoppingBag className="mr-2 h-6 w-6" /> Product to Upload Image For
+            </h3>
+            <div className="space-y-2">
+              <p className="text-2xl font-bold text-gray-800">{product1?.name}</p>
+              <p className="text-gray-600">{product1?.description}</p>
+              <p className="text-xl font-semibold text-yellow-600">${product1?.price.toFixed(2)}</p>
+            </div>
+          </div>
         <form onSubmit={handleSubmit}>
-          <CardContent className="p-6">
             <motion.div 
               className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
                 isDragging ? "border-yellow-500 bg-yellow-50" : "border-gray-300 hover:border-yellow-500 hover:bg-yellow-50"
@@ -163,7 +180,7 @@ export default function ProductImageUpload({productId}: {productId: string}) {
               ref={fileInputRef}
               id="image-upload"
             />
-          </CardContent>
+          
           <CardFooter>
             <Button 
               type="submit" 
@@ -194,6 +211,7 @@ export default function ProductImageUpload({productId}: {productId: string}) {
             </Button>
           </CardFooter>
         </form>
+        </CardContent>
       </Card>
     </div>
   )
