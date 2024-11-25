@@ -14,6 +14,7 @@ namespace RunApp.Domain.CustomerProfileAggregate
         public List<Guid> Ratings { get; internal set; } = new();
         public List<Guid> Statuses { get; internal set; } = new();
         public List<Guid> BoughtProducts { get; internal set; } = new();
+        public List<Guid> CreatedProducts { get; internal set; } = new();
         public List<Guid> Orders { get; internal set; } = new();
         public string Name { get; private set; }
         public string Email { get; private set; }
@@ -35,6 +36,7 @@ namespace RunApp.Domain.CustomerProfileAggregate
                 Ratings = new(),
                 Statuses = new(),
                 BoughtProducts = new(),
+                CreatedProducts = new(),
                 Orders = new(),
             };
 
@@ -132,6 +134,11 @@ namespace RunApp.Domain.CustomerProfileAggregate
             {
                 BoughtProducts.Add(product);
             }
+        }
+        public void AddCreatedProduct(Guid productId)
+        {
+            if(CreatedProducts.Contains(productId)) throw new InvalidOperationException("Something unexpected happened, cannot create the same product twice");
+            CreatedProducts.Add(productId);
         }
     }
 }
