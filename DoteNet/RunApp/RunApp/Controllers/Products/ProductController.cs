@@ -73,14 +73,14 @@ namespace RunApp.Api.Controllers.Products
         [HttpPost(ApiEndpoints.Products.Create)]
         public async Task<IActionResult> CreateProduct(CreateProductRequest createProduct)
         {
-            Guid UserId = HttpContext.GetUserId();
-            CreateProductCommand productCommand = createProduct.ProductRequestToProductCommand(UserId);
+            Guid userId = HttpContext.GetUserId();
+            CreateProductCommand productCommand = createProduct.ProductRequestToProductCommand(userId);
             ErrorOr<Product> productorError =  await _mediator.Send(productCommand);
 
             return productorError.Match(product => CreatedAtAction(nameof(Get), new { id = product.ProductId }, product.ProductToProductResponse()),
               Problem); 
         }
-
+       
         [Authorize]
         [HttpPut(ApiEndpoints.Products.UpdateProduct)]
         public async Task<IActionResult> UpdateProduct([FromRoute] Guid id, UpdateProductRequest updateProduct)

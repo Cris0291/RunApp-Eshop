@@ -18,6 +18,7 @@ using RunnApp.Application.CustomerProfiles.Commands.UpdateAddress;
 using RunnApp.Application.CustomerProfiles.Commands.UpdatePaymentMethod;
 using RunnApp.Application.CustomerProfiles.Queries.GetUserAccountInfo;
 using RunnApp.Application.CustomerProfiles.Queries.GetUserBoughtProducts;
+using RunnApp.Application.CustomerProfiles.Queries.GetUserCreatedProducts;
 using RunnApp.Application.CustomerProfiles.Queries.GetUserLikes;
 using RunnApp.Application.CustomerProfiles.Queries.GetUserRatings;
 using RunnApp.Application.CustomerProfiles.Queries.GetUserReviews;
@@ -137,7 +138,7 @@ namespace RunApp.Api.Controllers.CustomerProfiles
         }
 
         [Authorize]
-        [HttpPost]
+        [HttpPost(ApiEndpoints.CustomerProfiles.ChangePassword)]
         public async Task<IActionResult> ChangePassword([FromBody] PasswordDtoRequest passwordDtoRequest)
         {
             var user = await _userManager.FindByEmailAsync(passwordDtoRequest.Email);
@@ -155,6 +156,15 @@ namespace RunApp.Api.Controllers.CustomerProfiles
                 Title = "An unexpected error happened",
                 Detail = string.Join(", ", errorDescriptions)
             });
+        }
+
+        [Authorize]
+        [HttpGet(ApiEndpoints.CustomerProfiles.GetCreatedProducts)]
+        public async Task<IActionResult> GetCreatedProducts()
+        {
+            Guid userId = HttpContext.GetUserId();
+
+            var result = await _mediator.Send(new GetUserCreatedProductsQuery(userId));
         }
     }
 }

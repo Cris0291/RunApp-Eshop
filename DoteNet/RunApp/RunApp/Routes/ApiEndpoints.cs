@@ -60,6 +60,8 @@
             public const string UpdatePaymentMethod = $"{UserBase}/payment";
             public const string UpdateAccountInfo = $"{UserBase}/account-info";
             public const string GetAccountInfo = $"{UserBase}/account";
+            public const string ChangePassword = $"{UserBase}/password";
+            public const string GetCreatedProducts = $"{UserBase}/created-products";
         }
         public static class Orders
         {
