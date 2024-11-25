@@ -4,12 +4,15 @@ import { useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Trash2, Upload, DollarSign, Tag } from 'lucide-react'
-import {newPromotionDto, ProductResponseDto } from "./contracts"
-import { useForm } from "react-hook-form"
+import { Trash2, Upload, DollarSign, Tag,  AlertCircle } from 'lucide-react'
+import {newCategoryDto, newPromotionDto, ProductResponseDto } from "./contracts"
+import { SubmitHandler, useForm } from "react-hook-form"
+import useAddNewDiscount from "./useAddNewDiscount"
+import useAddNewCategory from "./useAddNewCategory"
 
 interface Product {
   id: string
@@ -17,26 +20,30 @@ interface Product {
   price: number
   discountedPrice: number | null
   image: string | null
-  category: string
+  category: string[]
 }
 
 const categories = ["Electronics", "Clothing", "Home & Garden", "Sports", "Books"]
 
 export default function ProductManagementTable({onHandleCurrentProduct}: {onHandleCurrentProduct: (link: string, product: ProductResponseDto) => void}) {
   const [products, setProducts] = useState<Product[]>([
-    { id: "1", name: "Wireless Earbuds", price: 129.99, discountedPrice: 99.99, image: "/placeholder.svg?height=100&width=100", category: "Electronics" },
-    { id: "2", name: "Smart Watch", price: 199.99, discountedPrice: null, image: null, category: "Electronics" },
-    { id: "3", name: "4K TV", price: 799.99, discountedPrice: 699.99, image: "/placeholder.svg?height=100&width=100", category: "Electronics" },
-    { id: "4", name: "Bluetooth Speaker", price: 79.99, discountedPrice: null, image: null, category: "Electronics" },
-    { id: "5", name: "Gaming Console", price: 399.99, discountedPrice: 349.99, image: "/placeholder.svg?height=100&width=100", category: "Electronics" },
+    { id: "1", name: "Wireless Earbuds", price: 129.99, discountedPrice: 99.99, image: "/placeholder.svg?height=100&width=100", category: ["Electronics"] },
+    { id: "2", name: "Smart Watch", price: 199.99, discountedPrice: null, image: null, category: ["Electronics"] },
+    { id: "3", name: "4K TV", price: 799.99, discountedPrice: 699.99, image: "/placeholder.svg?height=100&width=100", category: ["Electronics"] },
+    { id: "4", name: "Bluetooth Speaker", price: 79.99, discountedPrice: null, image: null, category: ["Electronics"] },
+    { id: "5", name: "Gaming Console", price: 399.99, discountedPrice: 349.99, image: "/placeholder.svg?height=100&width=100", category: ["Electronics"] },
   ])
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [currentProductId, setCurrentProductId] = useState<string>("");
   const [isPriceDialogOpen, setIsPriceDialogOpen] = useState(false);
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
-  const [newDiscountedPrice, setNewDiscountedPrice] = useState<string>("");
   const [newCategory, setNewCategory] = useState<string>("");
-  const {register: registerDiscount, handleSubmit: handleSubmitDiscount, formState: {errors: errorsDiscount}} = useForm<newPromotionDto>()
+  const [discountErrors, setDiscountErrors] = useState<(string | undefined)[]>([]);
+  const [categoryErrors, setCategoryErrors] = useState<(string | undefined)[]>([]);
+  const {register: registerDiscount, handleSubmit: handleSubmitDiscount, formState: {errors: errorsDiscount}} = useForm<newPromotionDto>();
+  const {addDiscount} = useAddNewDiscount();
+  const {addCategory} = useAddNewCategory();
 
   const handleDeleteProduct = (id: string) => {
     setProducts(products.filter(product => product.id !== id))
@@ -46,48 +53,61 @@ export default function ProductManagementTable({onHandleCurrentProduct}: {onHand
     onHandleCurrentProduct("Images", product);
   }
 
-  const handlePriceUpdate = () => {
+  const handlePriceUpdate = (id: string) => {
+    setCurrentProductId(id);
     setIsPriceDialogOpen(true)
   }
 
-  const onSubmitPrice = () => {
-
+  const onSubmitPrice: SubmitHandler<newPromotionDto> = (data) => {
+    addDiscount({newDiscount: data, productId: currentProductId});
+    setIsPriceDialogOpen(false);
   }
 
   const onErrorPrice = () => {
-
+    const newErrors: (string | undefined)[] = [];
+    const values = Object.values(errorsDiscount);
+    values.forEach(value => newErrors.push(value.message));
+    setDiscountErrors(newErrors);
   }
 
-  const handlePriceSubmit = () => {
-    if (selectedProduct) {
-      setProducts(products.map(product => 
-        product.id === selectedProduct.id 
-          ? { ...product, discountedPrice: newDiscountedPrice ? parseFloat(newDiscountedPrice) : null } 
-          : product
-      ))
-      setIsPriceDialogOpen(false)
-    }
-  }
 
   const handleCategoryUpdate = (id: string) => {
-    const product = products.find(p => p.id === id)
-    if (product) {
-      setSelectedProduct(product)
-      setNewCategory(product.category)
-      setIsCategoryDialogOpen(true)
+    setCurrentProductId(id);
+    setIsCategoryDialogOpen(true);
+  }
+
+  const onSubmitCategory = (e: React.FormEvent) => {
+    e.preventDefault();
+
+
+    const errors = categoryValidation();
+
+    if(errors.length === 0){
+      const categoryData = {
+        category: newCategory
+      }
+  
+      addCategory({newCategory: categoryData, productId: currentProductId});
+      setIsCategoryDialogOpen(false);
     }
   }
 
-  const handleCategorySubmit = () => {
-    if (selectedProduct && newCategory) {
-      setProducts(products.map(product => 
-        product.id === selectedProduct.id 
-          ? { ...product, category: newCategory } 
-          : product
-      ))
-      setIsCategoryDialogOpen(false)
-    }
+  const categoryValidation = () => {
+    const newErrors: (string | undefined)[] = [];
+    
+    if(newCategory.trim().length === 0) newErrors.push("The new category cannot be empty");
+
+    const product = products.find(x => x.id === currentProductId);
+    if(product === undefined) newErrors.push("Selected product was not found. Something unexpected happened");
+
+    const isCategoryIncluded = product?.category.includes(newCategory);
+    if(isCategoryIncluded) newErrors.push("The selected category was already included. Please select another one");
+
+    setCategoryErrors(newErrors);
+
+    return newErrors;
   }
+
 
   return (
     <div className="container mx-auto p-4 bg-gray-50">
@@ -115,7 +135,7 @@ export default function ProductManagementTable({onHandleCurrentProduct}: {onHand
                       ? <span className="text-green-600 font-semibold">${product.discountedPrice.toFixed(2)}</span>
                       : <span className="text-gray-400">No discount</span>}
                   </TableCell>
-                  <TableCell className="text-black">{product.category}</TableCell>
+                  <TableCell className="text-black">{product.category[0]}</TableCell>
                   <TableCell>
                     {product.image 
                       ? <img src={product.image} alt={product.name} className="w-16 h-16 object-cover rounded-md" /> 
@@ -140,7 +160,7 @@ export default function ProductManagementTable({onHandleCurrentProduct}: {onHand
                         <Upload className="w-4 h-4" />
                       </Button>
                       <Button 
-                        onClick={() => handlePriceUpdate()}
+                        onClick={() => handlePriceUpdate(product.id)}
                         variant="outline"
                         size="sm"
                         className="bg-yellow-500 text-white hover:bg-yellow-600"
@@ -182,7 +202,7 @@ export default function ProductManagementTable({onHandleCurrentProduct}: {onHand
                 {...registerDiscount("newPriceWithDiscount", {
                   required: "New price with discount is required"
                 })}
-                className="col-span-3"
+                className="col-span-3 text-black"
                 placeholder="Enter discounted price or leave blank to remove"
               />
               </div>
@@ -199,9 +219,21 @@ export default function ProductManagementTable({onHandleCurrentProduct}: {onHand
                     />
                   </div>
           </div>
+          <div className="space-y-6">
+          {discountErrors.length > 0 && (
+             <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                 {discountErrors.map((error, index) => (
+                    <p key={index}>{error}</p>
+                    ))}
+              </AlertDescription>
+             </Alert>
+              )}
           <div className="flex justify-end space-x-2">
             <Button onClick={() => setIsPriceDialogOpen(false)} variant="outline" className="text-black">Cancel</Button>
-            <Button onClick={handlePriceSubmit} className="bg-yellow-500 text-white hover:bg-yellow-600">Update</Button>
+            <Button type="submit" className="bg-yellow-500 text-white hover:bg-yellow-600">Update</Button>
+          </div>
           </div>
         </form>
         </DialogContent>
@@ -212,12 +244,13 @@ export default function ProductManagementTable({onHandleCurrentProduct}: {onHand
           <DialogHeader>
             <DialogTitle className="text-black">Update Category for {selectedProduct?.name}</DialogTitle>
           </DialogHeader>
+          <form onSubmit={onSubmitCategory}>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="category" className="text-right text-black">
                 Category
               </Label>
-              <Select onValueChange={setNewCategory} defaultValue={selectedProduct?.category}>
+              <Select onValueChange={setNewCategory} value={newCategory}>
                 <SelectTrigger className="col-span-3 text-black">
                   <SelectValue placeholder="Select a category"/>
                 </SelectTrigger>
@@ -231,10 +264,21 @@ export default function ProductManagementTable({onHandleCurrentProduct}: {onHand
               </Select>
             </div>
           </div>
+          {categoryErrors.length > 0 && (
+             <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                 {categoryErrors.map((error, index) => (
+                    <p key={index}>{error}</p>
+                    ))}
+              </AlertDescription>
+             </Alert>
+              )}
           <div className="flex justify-end space-x-2">
             <Button onClick={() => setIsCategoryDialogOpen(false)} variant="outline" className="text-black">Cancel</Button>
-            <Button onClick={handleCategorySubmit} className="bg-yellow-500 text-white hover:bg-yellow-600">Update</Button>
+            <Button type="submit" className="bg-yellow-500 text-white hover:bg-yellow-600">Update</Button>
           </div>
+        </form>
         </DialogContent>
       </Dialog>
     </div>

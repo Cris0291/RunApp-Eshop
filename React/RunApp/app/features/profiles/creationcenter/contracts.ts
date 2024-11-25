@@ -49,3 +49,12 @@ export type newPromotionDto = {
     newPriceWithDiscount: number,
     newPromotionalText: string,
 }
+
+export type newCategoryDto = {
+    category: string
+}
+
+export type CategoryResponse = {
+    catergoryId: string,
+    category: string
+}

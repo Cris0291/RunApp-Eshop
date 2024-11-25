@@ -7,7 +7,7 @@ import { ProductCreationDto, ProductRequestDto } from "./contracts";
 export default function useCreateProductCommand(){
     const token = useAppSelector(getUserToken)
 
-    const {mutate: ProductsCraetionFunction, isPending: isCreating } = useMutation({
+    const {mutate: ProductsCraetionFunction, isPending: isCreating, isError, isSuccess, isIdle} = useMutation({
         mutationFn: (creteProductDto: ProductCreationDto) => {
             const product = {
                 name: creteProductDto.name,
@@ -29,5 +29,5 @@ export default function useCreateProductCommand(){
         }
     })
 
-    return {ProductsCraetionFunction, isCreating}
+    return {ProductsCraetionFunction, isCreating, isError, isSuccess, isIdle}
 }
