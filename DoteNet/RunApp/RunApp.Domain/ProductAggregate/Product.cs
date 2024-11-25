@@ -42,7 +42,7 @@ namespace RunApp.Domain.Products
         public ICollection<Category> Categories { get; internal set; }
 
 
-        public static ErrorOr<Product> CreateProduct(string name, string description, decimal price, ICollection<string> bulletpoints, decimal? priceWithDiscount, string? promotionalText, string brand, string type, string color, double weight, Guid storeProfileId)
+        public static ErrorOr<Product> CreateProduct(string name, string description, decimal price, ICollection<string> bulletpoints, decimal? priceWithDiscount, string? promotionalText, string brand, string type, string color, double weight, Guid userId)
         {
             decimal maximumDiscount = 0.7m;
             AddValidation(nameof(ProductError.DiscountPricesMustBeMaximum70Percent), () => priceWithDiscount < price - (price * maximumDiscount));
@@ -70,7 +70,7 @@ namespace RunApp.Domain.Products
                 Ratings = new(),
             };
 
-            result.RaiseEvent(new CreateStockEvent(result, storeProfileId));
+            result.RaiseEvent(new CreatedProductEvent(result, userId));
             return result;
         }
 
