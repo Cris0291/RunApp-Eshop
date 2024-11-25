@@ -11,7 +11,7 @@ namespace RunnApp.Application.CustomerProfiles.Events
         public async Task Handle(CreateOrderEvent notification, CancellationToken cancellationToken)
         {
             var user = await _profileRepository.GetCustomerProfile(notification.UserId);
-            if (user == null) throw new InvalidOperationException("User was not ffound with the given id");
+            if (user == null) throw new InvalidOperationException("User was not found with the given id");
 
             user.AddOrder(notification.OrderId);
 
