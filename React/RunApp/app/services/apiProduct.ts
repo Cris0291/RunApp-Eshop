@@ -42,6 +42,13 @@ export async function DeleteProduct({productId, token}: {productId: string, toke
         headers: {
             "Authorization": `Bearer ${token}`
         }
-    }).then(response => response);
+    }).then(response => response.status);
+}
 
+export async function GetCreatedProducts(token: string){
+    return axios.get<ProductResponseDto[]>(`api/user/created-products`, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(response => response.data);
 }

@@ -13,6 +13,8 @@ import {newCategoryDto, newPromotionDto, ProductResponseDto } from "./contracts"
 import { SubmitHandler, useForm } from "react-hook-form"
 import useAddNewDiscount from "./useAddNewDiscount"
 import useAddNewCategory from "./useAddNewCategory"
+import useDeleteCreatedProduct from "./useDeleteCreatedProduct"
+import useGetCreatedProducts from "./useGetCreatedProducts"
 
 interface Product {
   id: string
@@ -33,6 +35,7 @@ export default function ProductManagementTable({onHandleCurrentProduct}: {onHand
     { id: "4", name: "Bluetooth Speaker", price: 79.99, discountedPrice: null, image: null, category: ["Electronics"] },
     { id: "5", name: "Gaming Console", price: 399.99, discountedPrice: 349.99, image: "/placeholder.svg?height=100&width=100", category: ["Electronics"] },
   ])
+  const {productCreated, isLoading} = useGetCreatedProducts();
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [currentProductId, setCurrentProductId] = useState<string>("");
@@ -44,9 +47,10 @@ export default function ProductManagementTable({onHandleCurrentProduct}: {onHand
   const {register: registerDiscount, handleSubmit: handleSubmitDiscount, formState: {errors: errorsDiscount}} = useForm<newPromotionDto>();
   const {addDiscount} = useAddNewDiscount();
   const {addCategory} = useAddNewCategory();
+  const {deleteCreatedProduct} = useDeleteCreatedProduct();
 
   const handleDeleteProduct = (id: string) => {
-    setProducts(products.filter(product => product.id !== id))
+    deleteCreatedProduct(id);
   }
 
   const handleImageUpload = (product: any) => {
