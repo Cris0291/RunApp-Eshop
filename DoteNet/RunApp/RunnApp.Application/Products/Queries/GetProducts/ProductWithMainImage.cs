@@ -6,6 +6,6 @@ namespace RunnApp.Application.Products.Queries.GetProducts
     public class ProductWithMainImage
     {
         public Product Product { get; set; }
-        public Photo MainImage { get; set; }
+        public Photo? MainImage { get; set; }
     }
 }

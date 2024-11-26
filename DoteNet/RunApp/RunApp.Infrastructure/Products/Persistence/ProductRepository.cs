@@ -52,6 +52,11 @@ namespace RunApp.Infrastructure.Products.Persistence
 
             return await _appDbContext.Products.Where(x => boughtProductsSet.Contains(x.ProductId)).Select(x => new ProductDto(x.ProductId, x.Name)).ToListAsync();
         }
+        public IQueryable<Product> GetCreatedProducts(List<Guid> createdProdcucts)
+        {
+            var createdProductsSet = createdProdcucts.ToHashSet();
+            return _appDbContext.Products.Where(x => createdProductsSet.Contains(x.ProductId));
+        }
         public async Task<Product?> GetProductWithCategories(Guid productId, Guid categoryId)
         {
             return await _appDbContext.Products.Include(x => x.Categories.Where(x => x.CategoryId == categoryId)).SingleOrDefaultAsync(x => x.ProductId == productId);

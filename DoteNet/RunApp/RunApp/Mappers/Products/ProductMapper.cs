@@ -59,7 +59,7 @@ namespace RunApp.Api.Mappers.Products
         }
         public static UserBoughtProductsResponse ProductWithImageToProductResponse(this ProductWithMainImage productWithMainImage)
         {
-            return new UserBoughtProductsResponse(productWithMainImage.Product.ProductId, productWithMainImage.MainImage.Url, productWithMainImage.Product.ActualPrice, productWithMainImage.Product.Name);
+            return new UserBoughtProductsResponse(productWithMainImage.Product.ProductId, productWithMainImage.MainImage?.Url, productWithMainImage.Product.ActualPrice, productWithMainImage.Product.Name);
         }
     }
 }

@@ -165,6 +165,8 @@ namespace RunApp.Api.Controllers.CustomerProfiles
             Guid userId = HttpContext.GetUserId();
 
             var result = await _mediator.Send(new GetUserCreatedProductsQuery(userId));
+
+            return result.Match(value => Ok(value.ProductsWithImageToProductsResponse()), Problem);
         }
     }
 }
