@@ -6,26 +6,29 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react"
+import { useAppDispatch } from "@/app/hooks/reduxHooks"
+import { changeItemQuantity, decreaseItemQuantity, deleteItem, increaseItemQuantity } from "./cartSlice"
 
 interface Product {
-  id: number
+  id: string
   name: string
   price: number
   image: string
 }
 
 const initialProducts: Product[] = [
-  { id: 1, name: "Wireless Earbuds", price: 79.99, image: "/placeholder.svg?height=200&width=200" },
-  { id: 2, name: "Smart Watch", price: 199.99, image: "/placeholder.svg?height=200&width=200" },
-  { id: 3, name: "Bluetooth Speaker", price: 59.99, image: "/placeholder.svg?height=200&width=200" },
+  { id: "1", name: "Wireless Earbuds", price: 79.99, image: "/placeholder.svg?height=200&width=200" },
+  { id: "2", name: "Smart Watch", price: 199.99, image: "/placeholder.svg?height=200&width=200" },
+  { id: "3", name: "Bluetooth Speaker", price: 59.99, image: "/placeholder.svg?height=200&width=200" },
 ]
 
 function ShoppingCartPage() {
   const [cartItems, setCartItems] = useState(
     initialProducts.map(product => ({ ...product, quantity: 1 }))
   )
+  const dispatch = useAppDispatch();
 
-  const updateQuantity = (id: number, newQuantity: number) => {
+  const updateQuantity = (id: string, newQuantity: number) => {
     setCartItems(items =>
       items.map(item =>
         item.id === id ? { ...item, quantity: Math.max(0, newQuantity) } : item
@@ -33,7 +36,7 @@ function ShoppingCartPage() {
     )
   }
 
-  const removeItem = (id: number) => {
+  const removeItem = (id: string) => {
     setCartItems(items => items.filter(item => item.id !== id))
   }
 
@@ -68,7 +71,7 @@ function ShoppingCartPage() {
                     <Button
                       variant="outline"
                       size="icon"
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      onClick={() => dispatch(decreaseItemQuantity(item.id))}
                       aria-label="Decrease quantity"
                       className="border-yellow-400 text-black hover:bg-yellow-100 transition-colors duration-300"
                     >
@@ -78,13 +81,13 @@ function ShoppingCartPage() {
                       type="number"
                       min="0"
                       value={item.quantity}
-                      onChange={(e) => updateQuantity(item.id, parseInt(e.target.value))}
+                      onChange={(e) => dispatch(changeItemQuantity({productId: item.id, newQuantity: parseInt(e.target.value)}))}
                       className="w-16 text-center border-yellow-400 text-black"
                     />
                     <Button
                       variant="outline"
                       size="icon"
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      onClick={() => dispatch(increaseItemQuantity(item.id))}
                       aria-label="Increase quantity"
                       className="border-yellow-400 text-black hover:bg-yellow-100 transition-colors duration-300"
                     >
@@ -95,7 +98,7 @@ function ShoppingCartPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => removeItem(item.id)}
+                  onClick={() => dispatch(deleteItem(item.id))}
                   className="text-black hover:text-yellow-600 hover:bg-yellow-100 self-start sm:self-end transition-colors duration-300"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
