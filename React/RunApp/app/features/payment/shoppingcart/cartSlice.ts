@@ -8,7 +8,11 @@ type cartState = {
 }
 
 const initialState : cartState = {
-    products: []
+    products: [
+        { id: "1", name: "Wireless earbuds", quantity: 3, price: 79.99, priceWithDiscount: 20, totalPrice: 20, image: "/placeholder.svg?height=200&width=200" },
+        { id: "2", name: "Smart watch", quantity: 2,  price: 199.99, priceWithDiscount: 20, totalPrice: 20, image: "/placeholder.svg?height=200&width=200" },
+        { id: "3", name: "Bluetooth speaker", quantity: 1, price: 59.99, priceWithDiscount: 20, totalPrice: 20, image: "/placeholder.svg?height=200&width=200" },
+      ]
 }
 
 export const cartSlice = createSlice({
@@ -61,4 +65,6 @@ export const getTotalPrice = (state: RootState) => state.cart.products.reduce((s
     return sum + priceToReduce;
 } ,0)
 
-export const getTotalItems = (state: RootState) => state.cart.products.reduce((sum, item) => sum + item.quantity, 0)
+export const getTotalItems = (state: RootState) => state.cart.products.reduce((sum, item) => sum + item.quantity, 0);
+
+export const getCartItems = (state: RootState) => state.cart.products

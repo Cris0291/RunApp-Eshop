@@ -6,42 +6,17 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react"
-import { useAppDispatch } from "@/app/hooks/reduxHooks"
-import { changeItemQuantity, decreaseItemQuantity, deleteItem, increaseItemQuantity } from "./cartSlice"
+import { useAppDispatch, useAppSelector } from "@/app/hooks/reduxHooks"
+import { changeItemQuantity, decreaseItemQuantity, deleteItem, getCartItems, getTotalItems, getTotalPrice, increaseItemQuantity } from "./cartSlice"
+import useDebounce from "@/app/utils/useDebounce"
 
-interface Product {
-  id: string
-  name: string
-  price: number
-  image: string
-}
-
-const initialProducts: Product[] = [
-  { id: "1", name: "Wireless Earbuds", price: 79.99, image: "/placeholder.svg?height=200&width=200" },
-  { id: "2", name: "Smart Watch", price: 199.99, image: "/placeholder.svg?height=200&width=200" },
-  { id: "3", name: "Bluetooth Speaker", price: 59.99, image: "/placeholder.svg?height=200&width=200" },
-]
 
 function ShoppingCartPage() {
-  const [cartItems, setCartItems] = useState(
-    initialProducts.map(product => ({ ...product, quantity: 1 }))
-  )
   const dispatch = useAppDispatch();
+  const cartItems = useAppSelector(getCartItems);
+  const total = useAppSelector(getTotalPrice);
+  const itemCount = useAppSelector(getTotalItems);
 
-  const updateQuantity = (id: string, newQuantity: number) => {
-    setCartItems(items =>
-      items.map(item =>
-        item.id === id ? { ...item, quantity: Math.max(0, newQuantity) } : item
-      )
-    )
-  }
-
-  const removeItem = (id: string) => {
-    setCartItems(items => items.filter(item => item.id !== id))
-  }
-
-  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-white text-black">
