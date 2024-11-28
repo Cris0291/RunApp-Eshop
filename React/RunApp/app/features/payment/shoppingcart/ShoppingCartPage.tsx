@@ -55,7 +55,7 @@ function ShoppingCartPage() {
                     <Input
                       type="number"
                       min="0"
-                      value={item.quantity}
+                      value={item.quantity === null ? "" : item.quantity}
                       onChange={(e) => dispatch(changeItemQuantity({productId: item.id, newQuantity: parseInt(e.target.value)}))}
                       className="w-16 text-center border-yellow-400 text-black"
                     />

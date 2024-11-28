@@ -1,10 +1,13 @@
-import { createSlice } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, isAnyOf } from '@reduxjs/toolkit'
+import type { Action, PayloadAction } from '@reduxjs/toolkit'
 import { ProductForCart } from './contracts'
 import { RootState } from '@/app/utils/store'
+import { AppListenerEffectAPI, AppStartListening, startAppListening } from '@/app/utils/listenerMiddleware'
+import { updateItemQuantity } from '@/app/services/apiCart'
 
 type cartState = {
     products: ProductForCart[],
+    currentProductToBeIncreasedId: string,
 }
 
 const initialState : cartState = {
@@ -12,7 +15,8 @@ const initialState : cartState = {
         { id: "1", name: "Wireless earbuds", quantity: 3, price: 79.99, priceWithDiscount: 20, totalPrice: 20, image: "/placeholder.svg?height=200&width=200" },
         { id: "2", name: "Smart watch", quantity: 2,  price: 199.99, priceWithDiscount: 20, totalPrice: 20, image: "/placeholder.svg?height=200&width=200" },
         { id: "3", name: "Bluetooth speaker", quantity: 1, price: 59.99, priceWithDiscount: 20, totalPrice: 20, image: "/placeholder.svg?height=200&width=200" },
-      ]
+      ],
+      currentProductToBeIncreasedId: "",
 }
 
 export const cartSlice = createSlice({
@@ -27,19 +31,28 @@ export const cartSlice = createSlice({
         },
         increaseItemQuantity: (state, action: PayloadAction<string>) => {
             const product = state.products.find(x => x.id === action.payload)
-            if(product == undefined) throw new Error("Cart item was not found")
+            if(product == undefined) throw new Error("Cart item was not found");
+            if(product.quantity === null) throw new Error("Quantity should not be undefined");
+
+            state.currentProductToBeIncreasedId = product.id;
             product.quantity += 1
         
             product.totalPrice = product.quantity * (product.priceWithDiscount === undefined ? product.price : product.priceWithDiscount)
         },
         decreaseItemQuantity: (state, action: PayloadAction<string>) => {
             const product = state.products.find(x => x.id === action.payload)
-            if(product == undefined) throw new Error("Cart item was not found")
+            if(product == undefined) throw new Error("Cart item was not found");
+            if(product.quantity === null) throw new Error("Quantity should not be undefined");
             
-            product.quantity -= 1
+            state.currentProductToBeIncreasedId = product.id;
+            product.quantity -= 1;
+
             product.totalPrice = product.quantity * (product.priceWithDiscount === undefined ? product.price : product.priceWithDiscount)
 
-            if(product.quantity <= 0) cartSlice.caseReducers.deleteItem(state, action)
+            if(product.quantity <= 0) {
+                product.quantity = 1;
+                product.totalPrice = product.quantity * (product.priceWithDiscount === undefined ? product.price : product.priceWithDiscount)
+            }
         },
         clearCart: (state) => {
             state.products = []
@@ -48,10 +61,17 @@ export const cartSlice = createSlice({
             const product = state.products.find(x => x.id === action.payload.productId);
             if(product == undefined) throw new Error("Cart item was not found");
 
-            if(action.payload.newQuantity <= 0) cartSlice.caseReducers.deleteItem(state, {payload: action.payload.productId, type: action.type});
+            state.currentProductToBeIncreasedId = product.id;
 
             product.quantity = action.payload.newQuantity;
             product.totalPrice = product.quantity * (product.priceWithDiscount === undefined ? product.price : product.priceWithDiscount);
+
+            if(action.payload.newQuantity <= 0) {
+                product.quantity = 1;
+                product.totalPrice = product.quantity * (product.priceWithDiscount === undefined ? product.price : product.priceWithDiscount)
+            }
+
+            if(Number.isNaN(action.payload.newQuantity)) product.quantity = null;
         }
     }
 })
@@ -65,6 +85,28 @@ export const getTotalPrice = (state: RootState) => state.cart.products.reduce((s
     return sum + priceToReduce;
 } ,0)
 
-export const getTotalItems = (state: RootState) => state.cart.products.reduce((sum, item) => sum + item.quantity, 0);
+export const getTotalItems = (state: RootState) => state.cart.products.reduce((sum, item) => {
+    if(item.quantity === null) return (sum + 0);
 
-export const getCartItems = (state: RootState) => state.cart.products
+    return (sum + item.quantity);
+},0);
+
+export const getCartItems = (state: RootState) => state.cart.products;
+
+export const addChangeQuantityListener = (startAppListening: AppStartListening) => {
+    startAppListening({
+        matcher: isAnyOf(increaseItemQuantity, decreaseItemQuantity , changeItemQuantity),
+        effect: async (action, listenerApi) => {
+            listenerApi.cancelActiveListeners();
+
+            await listenerApi.delay(500);
+
+            const token = listenerApi.getState().user.token;
+
+            const cartState = listenerApi.getState().cart;
+            const product = cartState.products.find(x => x.id === cartState.currentProductToBeIncreasedId);
+            
+            if(product?.quantity !== null) await updateItemQuantity({productId: cartState.currentProductToBeIncreasedId, quantity: product?.quantity, token})
+        }
+    });
+}
