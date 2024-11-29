@@ -52,3 +52,11 @@ export async function GetCreatedProducts(token: string){
         }
     }).then(response => response.data);
 }
+
+export async function ExistProduct({productId, token}: {productId: string, token: string}){
+    return axios.get<number>(`api/products/${productId}/exist`, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(response => response.status)
+}
