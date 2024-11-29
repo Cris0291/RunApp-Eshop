@@ -1,3 +1,5 @@
+import { AddressSettingsForm, PaymentSettingsForm } from "../payment/checkout/contracts"
+
 export type FormValues = {
     name: string
     username: string
@@ -26,4 +28,14 @@ export type FormValues = {
     userName: string
     token: string
     id: string,
+  }
+
+  export type UserWithSettingsDto = {
+    name: string,
+    email: string,
+    userName: string
+    token: string,
+    id: string,
+    address?: AddressSettingsForm,
+    card?: PaymentSettingsForm,
   }

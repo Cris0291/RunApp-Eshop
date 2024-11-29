@@ -1,14 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { UpdateUserDto, UserDto } from './contracts'
+import { UpdateUserDto, UserDto, UserWithSettingsDto } from './contracts'
 import { RootState } from '@/app/utils/store'
+import { AddressSettingsForm, PaymentSettingsForm } from '../payment/checkout/contracts'
+import { AppStartListening } from '@/app/utils/listenerMiddleware'
 
-const initialState: UserDto = {
+const initialState: UserWithSettingsDto = {
     name: "",
     userName: "",
     email: "",
     token: "",
-    id: ""
+    id: "",
+    address: undefined,
+    card: undefined,
 }
 
 export const userSlice = createSlice({
@@ -26,6 +30,12 @@ export const userSlice = createSlice({
             state.name = action.payload.name,
             state.email = action.payload.email,
             state.userName = action.payload.userName
+        },
+        addUserAddress: (state, action: PayloadAction<AddressSettingsForm>) => {
+            state.address = action.payload;
+        },
+        addUserCard: (state, action: PayloadAction<PaymentSettingsForm>) => {
+            state.card = action.payload;
         }
     }
 })
