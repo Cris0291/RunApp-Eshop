@@ -47,3 +47,5 @@ export default userSlice.reducer
 export const getUserConfirmationOfRegistration = (state : RootState) => !(state.user.token.length === 0);
 export const getUserId = (state: RootState) => state.user.id;
 export const getUserToken = (state : RootState) => state.user.token;
+export const getUserAddress = (state: RootState) => state.user.address;
+export const getUserPaymentMethod = (state: RootState) => state.user.card; 

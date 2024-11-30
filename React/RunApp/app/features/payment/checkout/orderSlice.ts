@@ -3,16 +3,16 @@ import { AddressSettingsForm, OrderDto, OrderResponse, PaymentSettingsForm } fro
 import { RootState } from "@/app/utils/store"
 import { AppStartListening } from "@/app/utils/listenerMiddleware"
 import { CreateOrderRequest } from "@/app/services/apiOrders"
-import { addItem, addPendingProduct } from "../shoppingcart/cartSlice"
+import { addItem, addPendingProduct, deletePendingProduct } from "../shoppingcart/cartSlice"
 
 type OrderState = {
     currentOrder: OrderDto,
-    currentOrderId?: string,
+    currentOrderId: string,
 }
 
 const initialState : OrderState = {
     currentOrder: {},
-    currentOrderId: undefined,
+    currentOrderId: "",
 }
 
 export const orderSlice = createSlice({
@@ -49,6 +49,7 @@ export const createOrderListener = (startAppListening: AppStartListening) => {
 
             if(state.cart.pendingProductIfOrderDoesNotExist === undefined) throw new Error("Something unexpected happened. the item you are trying to add to the cart was not found");
             listenerApi.dispatch(addItem(state.cart.pendingProductIfOrderDoesNotExist));
+            listenerApi.dispatch(deletePendingProduct());
         }
     });
 }

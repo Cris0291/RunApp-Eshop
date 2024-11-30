@@ -80,17 +80,21 @@ export const cartSlice = createSlice({
         },
         addPendingProduct: (state, action: PayloadAction<ProductForCart>) => {
             state.pendingProductIfOrderDoesNotExist = action.payload;
+        },
+        deletePendingProduct: (state) => {
+            state.pendingProductIfOrderDoesNotExist = undefined;
         }
     }
 })
 
-export const {addItem, deleteItem, increaseItemQuantity, decreaseItemQuantity, clearCart, changeItemQuantity, addPendingProduct} = cartSlice.actions
+export const {addItem, deleteItem, increaseItemQuantity, decreaseItemQuantity, clearCart, changeItemQuantity, addPendingProduct, deletePendingProduct} = cartSlice.actions
 
 export default cartSlice.reducer;
 
 export const getTotalPrice = (state: RootState) => state.cart.products.reduce((sum, item) => {
     const priceToReduce =(item.priceWithDiscount === undefined ? item.price : item.priceWithDiscount);
-    return sum + priceToReduce;
+    const quantityPeritem = item.quantity === null ? 0 : item.quantity;
+    return sum + (priceToReduce * quantityPeritem);
 } ,0)
 
 export const getTotalItems = (state: RootState) => state.cart.products.reduce((sum, item) => {
@@ -109,13 +113,16 @@ export const addChangeQuantityListener = (startAppListening: AppStartListening) 
 
             await listenerApi.delay(500);
 
-            const token = listenerApi.getState().user.token;
+            const state = listenerApi.getState();
+            const token = state.user.token;
+            const cartState = state.cart;
+            const orderState = state.order;
 
-            const cartState = listenerApi.getState().cart;
             const product = cartState.products.find(x => x.id === cartState.currentProducId);
             if(product == undefined) throw new Error("Cart item was not found");
+            if(orderState.currentOrderId.trim().length === 0) throw new Error("Something unexpected happened, order was not added");
             
-            if(product.quantity !== null) await updateItemQuantity({productId: cartState.currentProducId, quantity: product.quantity, token});
+            if(product.quantity !== null) await updateItemQuantity({orderId: orderState.currentOrderId, quantity: product.quantity, token});
         }
     });
 }
@@ -124,15 +131,19 @@ export const addItemListener = (startAppListening: AppStartListening) => {
     startAppListening({
         actionCreator: addItem,
         effect: async (action, listenerApi) => {
-            const token = listenerApi.getState().user.token;
+            const state = listenerApi.getState();
+            const token = state.user.token;
+            const cartState = state.cart;
+            const orderState = state.order;
 
-            const cartState = listenerApi.getState().cart;
             const product = cartState.products.find(x => x.id === cartState.currentProducId);
             if(product == undefined) throw new Error("Cart item was not found");
 
             const result = await ExistProduct({productId: cartState.currentProducId, token});
 
-            if(result == 200) await addItemToCart({productForCart: product, orderId: "", token});
+            if(orderState.currentOrderId.trim().length === 0) throw new Error("Something unexpected happened, order was not added");
+
+            if(result == 200) await addItemToCart({productForCart: product, orderId: orderState.currentOrderId, token});
         }
     });
 }
@@ -141,12 +152,16 @@ export const deleteItemListener = (startAppListening: AppStartListening) => {
     startAppListening({
         actionCreator: deleteItem,
         effect: async (action, listenerApi) => {
-            const token = listenerApi.getState().user.token;
+            const state = listenerApi.getState();
+            const token = state.user.token;
+            const cartState = state.cart;
+            const orderState = state.order;
 
-            const cartState = listenerApi.getState().cart;
             const result = await ExistProduct({productId: cartState.currentProducId, token});
 
-            if(result == 200) await deleteItemToCart({token, orderId: "", DeleteItemDto: {ProductId: cartState.currentProducId}})
+            if(orderState.currentOrderId.trim().length === 0) throw new Error("Something unexpected happened, order was not added");
+
+            if(result == 200) await deleteItemToCart({token, orderId: orderState.currentOrderId, DeleteItemDto: {ProductId: cartState.currentProducId}})
         }
     });
 }
