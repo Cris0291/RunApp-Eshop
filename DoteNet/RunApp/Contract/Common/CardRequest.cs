@@ -1,5 +1,5 @@
 ﻿namespace Contracts.Common
 {
-    public record CardRequest(string HoldersName, string CardNumber, string CVV, DateTime ExpiryDate);
+    public record CardRequest(string CardName, string CardNumber, string CVV, DateTime ExpiryDate);
     
 }

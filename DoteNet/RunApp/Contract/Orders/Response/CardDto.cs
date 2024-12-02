@@ -1,4 +1,4 @@
 ﻿namespace Contracts.Orders.Response
 {
-    public record CardDto(string HoldersName, string CardNumber, string CVV, DateTime ExpityDate);
+    public record CardDto(string cardName, string CardNumber, string CVV, DateTime ExpiryDate);
 }

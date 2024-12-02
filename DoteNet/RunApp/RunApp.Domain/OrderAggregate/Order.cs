@@ -4,6 +4,9 @@ using RunApp.Domain.Common.ValueType;
 using RunApp.Domain.OrderAggregate.Events;
 using RunApp.Domain.OrderAggregate.LineItems;
 using RunApp.Domain.ProductAggregate.ProductErrors;
+using System.Diagnostics.Metrics;
+using System.IO;
+using System.Reflection.Emit;
 
 
 namespace RunApp.Domain.OrderAggregate
@@ -16,34 +19,16 @@ namespace RunApp.Domain.OrderAggregate
         public bool IsPaid { get; private set;}
         public DateTime DateOfPayment { get; private set; }
         public decimal TotalPrice { get; private set; }
-        public Address Address { get; private set; }
-        public Card PaymentMethod { get; private set; }
+        public Address? Address { get; private set; }
+        public Card? PaymentMethod { get; private set; }
         public List<LineItem> LineItems { get; private set;}
 
-        public static Order CreateOrder(Guid userId, string ZipCode, string Street, string City,
-                                     int BuildingNumber, string Country, string? AlternativeStreet,
-                                     int? AlternativeBuildingNumber, string HoldersName,
-                                     string CardNumber, string CVV, DateTime ExpiryDate)
+        public static Order CreateOrder(Guid userId, Address? address, Card? card)
         {
             return new Order
             {
-                Address = new Address
-                {
-                    ZipCode = ZipCode,
-                    Street = Street,
-                    City = City,
-                    HouseNumber = BuildingNumber,
-                    Country = Country,
-                    AlternativeStreet = AlternativeStreet,
-                    AlternativeHouseNumber = AlternativeBuildingNumber,
-                },
-                PaymentMethod = new Card
-                {
-                    CVV = CVV,
-                    HoldersName = HoldersName,
-                    CardNumber = CardNumber,
-                    ExpityDate = ExpiryDate
-                },
+                Address = address,
+                PaymentMethod = card,
                 IsPaid = false,
                 Id = userId,
             };
@@ -85,35 +70,62 @@ namespace RunApp.Domain.OrderAggregate
             item.Quantity = quantity;
             return item;
         }
-        public void ModifyAddress(string ZipCode, string Street, string City,
-                                     int BuildingNumber, string Country, string? AlternativeStreet,
-                                     int? AlternativeBuildingNumber)
+        public void ModifyAddress(string zipCode, string street, string city, string country, string state)
         {
-            Address.ZipCode = ZipCode;
-            Address.Street = Street;
-            Address.City = City;
-            Address.HouseNumber = BuildingNumber;
-            Address.Country = Country;
-            Address.AlternativeStreet = AlternativeStreet;
-            Address.AlternativeHouseNumber = AlternativeBuildingNumber;
+            if(Address == null)
+            {
+                Address = new Address
+                {
+                    ZipCode = zipCode,
+                    City = city,
+                    Street = street,
+                    Country = country,
+                    State = state
+                };
+            }
+            else
+            {
+                Address.ZipCode = zipCode;
+                Address.Street = street;
+                Address.City = city;
+                Address.Country = country;
+                Address.State = state;
+            }
         }
-        public void ModifyPaymentMethod(string HoldersName, string CardNumber, string CVV, DateTime ExpiryDate)
+        public void ModifyPaymentMethod(string holdersName, string cardNumber, string cvv, DateTime expiryDate)
         {
-            PaymentMethod.HoldersName = HoldersName;
-            PaymentMethod.CardNumber = CardNumber;
-            PaymentMethod.CVV = CVV;
-            PaymentMethod.ExpityDate = ExpiryDate;
+            if (PaymentMethod == null)
+            {
+                PaymentMethod = new Card
+                {
+                    HoldersName = holdersName,
+                    CardNumber = cardNumber,
+                    CVV = cvv,
+                    ExpiryDate = expiryDate,
+                };
+            }
+            else
+            {
+                PaymentMethod.HoldersName = holdersName;
+                PaymentMethod.CardNumber = cardNumber;
+                PaymentMethod.CVV = cvv;
+                PaymentMethod.ExpiryDate = expiryDate;
+            }
         }
         public void CommunicateToUserOrderCreation()
         {
             RaiseEvent(new CreateOrderEvent(Id, OrderId));
         }
-        public void PayOrder(Guid userId)
+        public ErrorOr<Order> PayOrder(Guid userId)
         {
             IsPaid = true;
 
             var boughtProducts = LineItems.Select(x => x.ProductId);
+            if (boughtProducts.Count() == 0) return Error.Validation(code: "CannotPayAnOrderThaHasNoItems", description: "Current order has no items. Please add some items to the cart");
+
             RaiseEvent(new AddBoughtProductsEvent(userId, boughtProducts));
+
+            return this;
         }
     }
 }

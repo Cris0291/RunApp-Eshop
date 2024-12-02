@@ -1,4 +1,4 @@
 ﻿namespace Contracts.Orders.Response
 {
-    public record AddressDto(string ZipCode, string Street, string City, int HouseNumber, string Country, string? AlternativeStreet, int? AlternativeHouseNumber);
+    public record AddressDto(string ZipCode, string Address, string City, string Country, string State);
 }

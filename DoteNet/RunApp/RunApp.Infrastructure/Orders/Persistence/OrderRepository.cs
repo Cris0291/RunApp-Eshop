@@ -13,7 +13,6 @@ namespace RunApp.Infrastructure.Orders.Persistence
         {
             await _appDbContext.AddAsync(order);
         }
-
         public async Task<Order?> GetOrder(Guid orderId)
         {
             return await _appDbContext.Orders.Include(x => x.LineItems).SingleOrDefaultAsync(x => x.OrderId == orderId);

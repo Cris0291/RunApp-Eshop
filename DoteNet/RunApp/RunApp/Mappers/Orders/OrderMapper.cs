@@ -10,13 +10,17 @@ namespace RunApp.Api.Mappers.Orders
 {
     public static class OrderMapper
     {
+        public static CreateOrderCommand FromOrderRequestToOrderCommand(this OrderRequestDto orderRequest, Guid userId)
+        {
+            return new CreateOrderCommand(userId, orderRequest.Address == null ? null : new OrderAddress(orderRequest.Address.ZipCode, orderRequest.Address.Address, orderRequest.Address.City, orderRequest.Address.Country, orderRequest.Address.State), orderRequest.Card == null ? null : new OrderCard(orderRequest.Card.CardName, orderRequest.Card.CardNumber, orderRequest.Card.CVV, orderRequest.Card.ExpiryDate));
+        }
         public static OrderDto FromOrderToOrderDto(this Order order)
         {
-            return new OrderDto(order.OrderId, order.Address.FromAddressToAddressDto(), order.PaymentMethod.FromCardToCardDto(), order.LineItems.FromLineItemsToLineItemDtoResponses().ToArray());
+            return new OrderDto(order.OrderId, order.Address == null ? null : order.Address.FromAddressToAddressDto(), order.PaymentMethod == null ? null : order.PaymentMethod.FromCardToCardDto());
         }
         public static AddressDto FromAddressToAddressDto(this Address address)
         {
-            return new AddressDto(address.ZipCode, address.Street, address.City, address.HouseNumber, address.Country, address.AlternativeStreet, address.AlternativeHouseNumber);
+            return new AddressDto(address.ZipCode, address.Street, address.City, address.Country, address.State);
         }
         public static CardDto FromCardToCardDto(this Card card)
         {

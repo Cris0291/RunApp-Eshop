@@ -25,12 +25,7 @@ namespace RunApp.Api.Controllers.Orders
         {
             Guid userId = HttpContext.GetUserId();
 
-            var order = await _mediator.Send(new CreateOrderCommand(userId, orderRequest.Address.ZipCode, orderRequest.Address.Street, 
-                                                                    orderRequest.Address.City, orderRequest.Address.BuildingNumber, 
-                                                                    orderRequest.Address.Country, orderRequest.Address.AlternativeStreet, 
-                                                                    orderRequest.Address.AlternativeBuildingNumber, orderRequest.Card.HoldersName, 
-                                                                    orderRequest.Card.CardNumber, orderRequest.Card.CVV, 
-                                                                    orderRequest.Card.ExpiryDate, orderRequest.Items.FromItemsResquestDtoToItems()));
+            var order = await _mediator.Send(orderRequest.FromOrderRequestToOrderCommand(userId));
 
             return order.Match(value =>
             {
@@ -42,9 +37,7 @@ namespace RunApp.Api.Controllers.Orders
         [HttpPut(ApiEndpoints.Orders.ModifyOrderAddress)]
         public async Task<IActionResult> ModifyOrderAddress([FromRoute] Guid orderId, [FromBody] AddressRequest address)
         {
-            var result = await _mediator.Send(new ModifyAddressCommand(orderId, address.ZipCode, address.Street,address.City, address.BuildingNumber,
-                                                                    address.Country, address.AlternativeStreet,
-                                                                    address.AlternativeBuildingNumber));
+            var result = await _mediator.Send(new ModifyAddressCommand(orderId, address.ZipCode, address.Address,address.City, address.Country, address.State));
 
             return result.Match(value => Ok(value.FromAddressToAddressDto()), Problem);
         }
@@ -53,7 +46,7 @@ namespace RunApp.Api.Controllers.Orders
         [HttpPut(ApiEndpoints.Orders.ModifyPaymentMethod)]
         public async Task<IActionResult> ModifyPaymentMethod([FromRoute]Guid orderId, [FromBody] CardRequest card)
         {
-            var result = await _mediator.Send(new ModifyPaymentMethodCommand(orderId, card.HoldersName, card.CardNumber, card.CVV, card.ExpiryDate));
+            var result = await _mediator.Send(new ModifyPaymentMethodCommand(orderId, card.CardName, card.CardNumber, card.CVV, card.ExpiryDate));
             return result.Match(value => Ok(value.FromCardToCardDto()), Problem);
         }
 

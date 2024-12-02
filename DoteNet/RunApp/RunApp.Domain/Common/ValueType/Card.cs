@@ -2,10 +2,10 @@
 {
     public class Card
     {
-        internal Card() { }
-        public string HoldersName { get; internal set; }
-        public string CardNumber { get; internal set; }
-        public string CVV { get; internal set; }
-        public DateTime ExpiryDate { get; internal set; }
+        public Card() { }
+        public string HoldersName { get; set; }
+        public string CardNumber { get; set; }
+        public string CVV { get; set; }
+        public DateTime ExpiryDate { get; set; }
     }
 }
