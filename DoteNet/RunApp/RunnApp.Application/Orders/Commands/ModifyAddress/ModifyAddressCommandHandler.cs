@@ -2,9 +2,6 @@
 using MediatR;
 using RunApp.Domain.Common.ValueType;
 using RunnApp.Application.Common.Interfaces;
-using System.Diagnostics.Metrics;
-using System.IO;
-using System.Reflection.Emit;
 
 namespace RunnApp.Application.Orders.Commands.ModifyAddress
 {
@@ -17,12 +14,10 @@ namespace RunnApp.Application.Orders.Commands.ModifyAddress
             var order = await _orderRepository.GetOrderWithoutItems(request.OrderId);
             if (order == null) throw new InvalidOperationException("Order was not found in the database");
 
-            order.ModifyAddress(request.ZipCode, request.Street, request.City,
-                                     request.BuildingNumber, request.Country, request.AlternativeStreet,
-                                     request.AlternativeBuildingNumber);
+            order.ModifyAddress(request.ZipCode, request.Street, request.City, request.Country, request.State);
 
             await _unitOfWorkPattern.CommitChangesAsync();
-            return order.Address;
+            return order.Address!;
         }
     }
 }

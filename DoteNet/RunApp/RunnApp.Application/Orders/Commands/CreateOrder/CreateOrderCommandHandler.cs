@@ -2,6 +2,7 @@
 using MediatR;
 using RunApp.Domain.OrderAggregate;
 using RunnApp.Application.Common.Interfaces;
+using RunApp.Domain.Common.ValueType;
 
 namespace RunnApp.Application.Orders.Commands.CreateOrder
 {
@@ -11,21 +12,24 @@ namespace RunnApp.Application.Orders.Commands.CreateOrder
         private readonly IOrderRepository _orderRepository = orderRepository;
         public async Task<ErrorOr<Order>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
         {
-            List<List<Error>> errors = new();
-            var order = Order.CreateOrder(request.UserId, request.ZipCode, request.Street, request.City,
-                                     request.BuildingNumber, request.Country, request.AlternativeStreet,
-                                     request.AlternativeBuildingNumber, request.HoldersName,
-                                     request.CardNumber, request.CVV, request.ExpiryDate);
-
-            foreach(var item in request.Items)
+            var address = request.OrderAddress == null ? null : new Address
             {
-                var errorOrOrder = order.AddItem(item.ProductId, item.ProductName, item.Quantity, item.Price, 
-                                                 item.PriceWithDiscount, item.Discount);
+                Country = request.OrderAddress.Country,
+                City = request.OrderAddress.City,
+                ZipCode = request.OrderAddress.ZipCode,
+                State = request.OrderAddress.State,
+                Street = request.OrderAddress.Address
+            };
 
-                if (errorOrOrder.IsError) errors.Add(errorOrOrder.Errors);
-            }
+            var card = request.OrderCard == null ? null : new Card
+            {
+                CardNumber = request.OrderCard.CardNumber,
+                HoldersName = request.OrderCard.CardName,
+                CVV = request.OrderCard.CVV,
+                ExpiryDate = request.OrderCard.ExpiryDate,
+            };
 
-            if (errors.Count > 0) return errors.SelectMany(x => x).ToList();
+            var order = Order.CreateOrder(request.UserId, address , card);
 
             await _orderRepository.CreateOrder(order);
             order.CommunicateToUserOrderCreation();

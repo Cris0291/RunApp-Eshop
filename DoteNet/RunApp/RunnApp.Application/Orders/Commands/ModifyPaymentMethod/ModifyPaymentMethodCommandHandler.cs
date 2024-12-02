@@ -17,7 +17,7 @@ namespace RunnApp.Application.Orders.Commands.ModifyPaymentMethod
             order.ModifyPaymentMethod(request.HoldersName, request.CardNumber, request.CVV, request.ExpiryDate);
 
             await _unitOfWorkPattern.CommitChangesAsync();
-            return order.PaymentMethod;
+            return order.PaymentMethod!;
         }
     }
 }

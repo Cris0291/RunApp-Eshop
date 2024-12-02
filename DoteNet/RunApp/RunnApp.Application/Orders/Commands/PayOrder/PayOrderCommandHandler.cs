@@ -14,11 +14,13 @@ namespace RunnApp.Application.Orders.Commands.PayOrder
             var order = await _orderRepository.GetOrder(request.OrderId);
             if (order == null) throw new InvalidOperationException("Order was not found in the database");
 
-            order.PayOrder(request.UserId);
+            var result = order.PayOrder(request.UserId);
+
+            if (result.IsError) return result.Errors;
 
             await _unitOfWorkPattern.CommitChangesAsync();
 
-            return order;
+            return result.Value;
         }
     }
 }
