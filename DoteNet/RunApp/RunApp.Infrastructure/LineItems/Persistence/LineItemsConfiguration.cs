@@ -18,9 +18,6 @@ namespace RunApp.Infrastructure.LineItems.Persistence
                 .WithMany()
                 .HasForeignKey(x => x.OrderId);
 
-            builder.Property(x => x.Discount)
-                .HasColumnType("decimal(5,2)");
-
             builder.Property(x => x.PriceWithDiscount)
                 .HasColumnType("decimal(10,2)");
 

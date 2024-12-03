@@ -33,7 +33,7 @@ namespace RunApp.Domain.OrderAggregate
                 Id = userId,
             };
         }
-        public ErrorOr<LineItem> AddItem(Guid productId, string productName, int quantity, decimal price, decimal? priceWithDiscount, decimal? discount)
+        public ErrorOr<LineItem> AddItem(Guid productId, string productName, int quantity, decimal price, decimal? priceWithDiscount)
         {
             decimal maximumDiscount = 0.7m;
             AddValidation(nameof(ProductError.DiscountPricesMustBeMaximum70Percent), () => priceWithDiscount < price - (price * maximumDiscount));
@@ -48,7 +48,6 @@ namespace RunApp.Domain.OrderAggregate
                 Quantity = quantity,
                 Price = price,
                 PriceWithDiscount = priceWithDiscount,
-                Discount = discount
             };
 
             LineItems.Add(item);

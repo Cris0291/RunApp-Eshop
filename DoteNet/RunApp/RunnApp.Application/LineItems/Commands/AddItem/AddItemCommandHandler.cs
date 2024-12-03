@@ -18,7 +18,7 @@ namespace RunnApp.Application.LineItems.Commands.AddItem
             if (isProductAdded) return Error.Failure(code: "ProductWasAlreadyAdded", description: "Product was already added");
 
 
-            var errorOrresult = order.AddItem(request.ProductId, request.ProductName, request.Quantity, request.Price, request.PriceWithDiscount, request.Discount);
+            var errorOrresult = order.AddItem(request.ProductId, request.ProductName, request.Quantity, request.Price, request.PriceWithDiscount);
             if (errorOrresult.IsError) return errorOrresult.Errors;
 
             await _unitOfWorkPattern.CommitChangesAsync();

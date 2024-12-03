@@ -19,7 +19,7 @@ namespace RunApp.Api.Controllers.LineItems
         [HttpPost(ApiEndpoints.Orders.AddItem)]
         public async Task<IActionResult> AddItem([FromBody] ItemResquestDto lineItem, [FromRoute] Guid orderId)
         {
-            var result  = await _mediator.Send(new AddItemCommand(orderId, lineItem.ProductId, lineItem.ProductName, lineItem.Quantity, lineItem.Price, lineItem.PriceWithDiscount, lineItem.Discount));
+            var result  = await _mediator.Send(new AddItemCommand(orderId, lineItem.ProductId, lineItem.ProductName, lineItem.Quantity, lineItem.Price, lineItem.PriceWithDiscount));
 
             return result.Match(value =>
             {

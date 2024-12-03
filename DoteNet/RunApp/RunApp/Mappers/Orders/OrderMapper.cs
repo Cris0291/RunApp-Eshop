@@ -28,7 +28,7 @@ namespace RunApp.Api.Mappers.Orders
         }
         public static LineItemDtoResponse FromLineItemToLineItemDtoResponse(this LineItem lineItem)
         {
-            return new LineItemDtoResponse(lineItem.LineItemID, lineItem.OrderId, lineItem.ProductId, lineItem.ProductName, lineItem.Quantity, lineItem.Price, lineItem.PriceWithDiscount, lineItem.Discount);
+            return new LineItemDtoResponse(lineItem.LineItemID, lineItem.OrderId, lineItem.ProductId, lineItem.ProductName, lineItem.Quantity, lineItem.Price, lineItem.PriceWithDiscount);
         }
         public static List<LineItemDtoResponse> FromLineItemsToLineItemDtoResponses(this List<LineItem> lineItems)
         {
