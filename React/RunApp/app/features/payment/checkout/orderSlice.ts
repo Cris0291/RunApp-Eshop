@@ -36,6 +36,7 @@ export const {createOrder, addOrder} = orderSlice.actions
 export default orderSlice.reducer;
 
 export const getIsCurrentOrder = (state: RootState) => state.order.currentOrderId !== undefined;
+export const getCurrentOrderId = (state: RootState) => state.order.currentOrderId;
 
 export const createOrderListener = (startAppListening: AppStartListening) => {
     startAppListening({

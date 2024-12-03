@@ -5,21 +5,36 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator";
-import { CheckCircle, CreditCard, DollarSign, Package, Truck } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { CheckCircle, CreditCard, DollarSign, Package, Truck, AlertCircle  } from "lucide-react";
 import { useState } from "react";
 import { useAppSelector } from "@/app/hooks/reduxHooks";
 import { getCartItems, getTotalPrice } from "../shoppingcart/cartSlice";
 import { getUserAddress, getUserPaymentMethod } from "../../registration/userSlice";
 import ShippingInfoForm from "./ShippingInfoForm";
 import PaymentInfoForm from "./PaymentInfoForm";
+import usePayOrder from "./usePayOrder";
+import { getCurrentOrderId } from "./orderSlice";
 
 export default function CheckoutPage(){
   const cartItems = useAppSelector(getCartItems);
   const totalPrice = useAppSelector(getTotalPrice);
   const userAddress = useAppSelector(getUserAddress);
   const userPaymentMethod = useAppSelector(getUserPaymentMethod);
-  const [paymentMethod, setPaymentMethod] = useState("credit-card");
+  const orderId = useAppSelector(getCurrentOrderId);
+  const [payErrors, SetPayErrors] = useState<(string | undefined)[]>([])
+  const {payOrder} = usePayOrder();
 
+  const onSubmitPayOrder = () => {
+    const newErrors: (string | undefined)[] = [];
+    if(userAddress === undefined) newErrors.push("Order address must be included before the order is ready");
+    if(userPaymentMethod === undefined) newErrors.push("Order payment method must be included before the order is ready");
+    if(orderId.trim().length === 0) newErrors.push("There are no items on the cart");
+
+    SetPayErrors(newErrors);
+
+    if(newErrors.length === 0) payOrder(orderId);
+  }
       
 
 return (
@@ -65,9 +80,11 @@ return (
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-2">
-                <p className="flex items-center"><CheckCircle className="mr-2 text-green-500"/> <strong>Name:</strong>John Doe</p>
-                <p className="flex items-center"><CheckCircle className="mr-2 text-green-500"/> <strong>Address:</strong> 123 Main St, Anytown, ST 12345</p>
-                <p className="flex items-center"><CheckCircle className="mr-2 text-green-500" /> <strong>Phone:</strong> (555) 123-4567</p>
+                <p className="flex items-center"><CheckCircle className="mr-2 text-green-500"/> <strong>Address: </strong>{userAddress.address}</p>
+                <p className="flex items-center"><CheckCircle className="mr-2 text-green-500"/> <strong>City: </strong>{userAddress.city}</p>
+                <p className="flex items-center"><CheckCircle className="mr-2 text-green-500" /> <strong>State: </strong>{userAddress.state}</p>
+                <p className="flex items-center"><CheckCircle className="mr-2 text-green-500" /> <strong>Zipcode: </strong>{userAddress.zipcode}</p>
+                <p className="flex items-center"><CheckCircle className="mr-2 text-green-500" /> <strong>Country: </strong>{userAddress.country}</p>
               </div>
             </CardContent>
           </Card>}
@@ -78,14 +95,15 @@ return (
           <Card className="bg-white shadow-lg rounded-lg overflow-hidden">
             <CardHeader className="bg-gray-50 border-b border-gray-200">
               <CardTitle className="text-xl text-gray-800 flex items-center">
-                <Truck className="mr-2 text-yellow-500"/> Shipping Information
+                <Truck className="mr-2 text-yellow-500"/> Payment Information
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-2">
-                <p className="flex items-center"><CheckCircle className="mr-2 text-green-500"/> <strong>Name:</strong>John Doe</p>
-                <p className="flex items-center"><CheckCircle className="mr-2 text-green-500"/> <strong>Address:</strong> 123 Main St, Anytown, ST 12345</p>
-                <p className="flex items-center"><CheckCircle className="mr-2 text-green-500" /> <strong>Phone:</strong> (555) 123-4567</p>
+                <p className="flex items-center"><CheckCircle className="mr-2 text-green-500"/> <strong>Card Number: </strong>{userPaymentMethod.cardnumber}</p>
+                <p className="flex items-center"><CheckCircle className="mr-2 text-green-500"/> <strong>Card Name: </strong>{userPaymentMethod.cardname}</p>
+                <p className="flex items-center"><CheckCircle className="mr-2 text-green-500" /> <strong>Expiry Date: </strong>{userPaymentMethod.expirydate}</p>
+                <p className="flex items-center"><CheckCircle className="mr-2 text-green-500" /> <strong>Cvv: </strong>{userPaymentMethod.cvv}</p>
               </div>
             </CardContent>
           </Card>}
@@ -118,9 +136,21 @@ return (
               </div>
             </CardContent>
             <CardFooter className="bg-gray-50 P-6">
-               <Button className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition-colors duration-300 text-lg font-semibold py-6" size="lg">
+              <div className="flex flex-col justify-center items-center w-full">
+            {payErrors.length > 0 && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    {payErrors.map((error, index) => (
+                    <p key={index}>{error}</p>
+                             ))}
+                  </AlertDescription>
+               </Alert>
+                       )} 
+               <Button className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition-colors duration-300 text-lg font-semibold py-6 mt-3" size="lg" onClick={onSubmitPayOrder} >
                  <DollarSign className="mr-2 h-5 w-5"/> Pay ${totalPrice.toFixed(2)}
                </Button>
+               </div>
             </CardFooter>
           </Card>
         </div>
