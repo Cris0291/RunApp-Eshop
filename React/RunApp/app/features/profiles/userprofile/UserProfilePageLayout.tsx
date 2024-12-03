@@ -24,26 +24,20 @@ import {
     User,
     CircleDollarSign
   } from "lucide-react";
-  import Link from "next/link";
-import { usePathname,useRouter } from "next/navigation";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import UserProfileLayoutWrapper from "./UserProfileLayoutWrapper";
 
 
 const navItems = [
-    { name: "Dashboard", icon: Home, path: "/userprofile/home" },
-    { name: "Sapp Sections", icon: MapPin, path: "/userprofile/sections"},
-    { name: "Discounts", icon:  CircleDollarSign, path: "/userprofile/discounts" },
-    { name: "Purchased", icon: ShoppingBag, path: "" },
+    { name: "Dashboard", icon: Home },
+    { name: "Sections", icon: MapPin},
+    { name: "Discounts", icon:  CircleDollarSign },
+    { name: "Settings", icon: ShoppingBag},
   ];
 
-export default function UserProfilePageLayout({children}: {children: React.ReactNode}){
-    const pathname = usePathname();
-    const router = useRouter();
-    const [activeLink, setActiveLink] = useState(() => {
-        const firstItem = navItems.find(x => x.path === pathname)
-        return firstItem?.name
-
-    });
+export default function UserProfilePageLayout(){
+    const [activeLink, setActiveLink] = useState("Dashboard");
     
 
 
@@ -77,14 +71,13 @@ export default function UserProfilePageLayout({children}: {children: React.React
               </DropdownMenu>
                 </div>
                 <nav className="flex-1 overflow-y-auto">
-                  <ul className="p-2 space-y-2">
+                  <ul className="p-1 space-y-2">
                     {navItems.map((item) => (
                       <li key={item.name}>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Link
-                              href={item.path}
-                              className={`flex items-center justify-center p-2 rounded-lg transition-colors duration-200 ${
+                            <Button
+                              className={`flex items-center justify-center rounded-lg transition-colors duration-200 ${
                                 activeLink === item.name
                                   ? "bg-pink-600 text-white"
                                   : "text-gray-400 hover:bg-gray-800 hover:text-white"
@@ -92,7 +85,7 @@ export default function UserProfilePageLayout({children}: {children: React.React
                               onClick={() => setActiveLink(item.name)}
                             >
                               <item.icon className="w-5 h-5" />
-                            </Link>
+                            </Button>
                           </TooltipTrigger>
                           <TooltipContent side="right">
                             <p>{item.name}</p>
@@ -102,15 +95,15 @@ export default function UserProfilePageLayout({children}: {children: React.React
                     ))}
                   </ul>
                 </nav>
-                <div className="p-4 border-t border-gray-800">
+                <div className="p-1 space-y-2 border-t border-gray-800">
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Link
-                        className="flex items-center justify-center text-gray-400 hover:text-white transition-colors duration-200"
-                        href="/userprofile/settings"
+                      <Button
+                        className=" flex items-center justify-center text-gray-400 hover:text-white transition-colors duration-200"
+                        onClick={() => setActiveLink("Settings")}
                       >
                         <Settings className="w-5 h-5" />
-                      </Link>
+                      </Button>
                     </TooltipTrigger>
                     <TooltipContent side="right">
                       <p>Settings</p>
@@ -122,7 +115,7 @@ export default function UserProfilePageLayout({children}: {children: React.React
           </TooltipProvider>
     
           <main className="flex-1 overflow-y-auto p-6">
-            {children}
+            <UserProfileLayoutWrapper item={activeLink}/>
           </main>
         </div>
       );
