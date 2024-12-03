@@ -1,7 +1,10 @@
-import UserProfilePage from "../features/profiles/userprofile/UserProfilePage";
+import UserProfilePageLayout from "../features/profiles/userprofile/UserProfilePageLayout";
+import AuthorizationAttribute from "../utils/AuthorizationAttribute";
 
 function UserProfile() {
-  return <UserProfilePage />;
+  return <AuthorizationAttribute>
+    <UserProfilePageLayout />
+    </AuthorizationAttribute>;
 }
 
 export default UserProfile;

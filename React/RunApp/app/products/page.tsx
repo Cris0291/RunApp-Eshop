@@ -1,5 +1,8 @@
 import Products from "../features/store/products/Products";
+import AuthorizationAttribute from "../utils/AuthorizationAttribute";
 
 export default function Store() {
-  return <Products />;
+  return <AuthorizationAttribute>
+    <Products />
+    </AuthorizationAttribute>;
 }
