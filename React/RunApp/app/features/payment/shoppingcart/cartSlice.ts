@@ -59,9 +59,6 @@ export const cartSlice = createSlice({
                 product.totalPrice = product.quantity * (product.priceWithDiscount === undefined ? product.price : product.priceWithDiscount)
             }
         },
-        clearCart: (state) => {
-            state.products = []
-        },
         changeItemQuantity: (state, action: PayloadAction<{productId: string, newQuantity: number}>) => {
             const product = state.products.find(x => x.id === action.payload.productId);
             if(product == undefined) throw new Error("Cart item was not found");
@@ -87,7 +84,7 @@ export const cartSlice = createSlice({
     }
 })
 
-export const {addItem, deleteItem, increaseItemQuantity, decreaseItemQuantity, clearCart, changeItemQuantity, addPendingProduct, deletePendingProduct} = cartSlice.actions
+export const {addItem, deleteItem, increaseItemQuantity, decreaseItemQuantity, changeItemQuantity, addPendingProduct, deletePendingProduct} = cartSlice.actions
 
 export default cartSlice.reducer;
 
@@ -122,7 +119,7 @@ export const addChangeQuantityListener = (startAppListening: AppStartListening) 
             if(product == undefined) throw new Error("Cart item was not found");
             if(orderState.currentOrderId.trim().length === 0) throw new Error("Something unexpected happened, order was not added");
             
-            if(product.quantity !== null) await updateItemQuantity({orderId: orderState.currentOrderId, quantity: product.quantity, token});
+            if(product.quantity !== null) await updateItemQuantity({orderId: orderState.currentOrderId, productId: cartState.currentProducId, quantity: product.quantity, token});
         }
     });
 }

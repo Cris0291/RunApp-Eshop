@@ -21,3 +21,8 @@ export type CartProductsResponse = {
 export type DeleteItemDto ={
     ProductId: string
 }
+
+export type ChangeItemQuantityRequestDto = {
+    quantity: number,
+    productId: string
+}

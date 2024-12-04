@@ -8,15 +8,34 @@ import { Separator } from "@/components/ui/separator"
 import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react"
 import { useAppDispatch, useAppSelector } from "@/app/hooks/reduxHooks"
 import { changeItemQuantity, decreaseItemQuantity, deleteItem, getCartItems, getTotalItems, getTotalPrice, increaseItemQuantity } from "./cartSlice"
-import useDebounce from "@/app/utils/useDebounce"
+import { useRouter } from "next/navigation"
+import Spinner from "@/app/ui/Spinner"
 
 
 function ShoppingCartPage() {
+  const [isRedirected, setIsRedirected] = useState(false);
+
+  const router = useRouter();
+
   const dispatch = useAppDispatch();
   const cartItems = useAppSelector(getCartItems);
   const total = useAppSelector(getTotalPrice);
   const itemCount = useAppSelector(getTotalItems);
 
+  const handleCheckout = () => {
+    if(cartItems.length > 0){
+      router.push("checkout");
+    }
+    else{
+      router.push("/products");
+    }
+    setIsRedirected(true);
+  }
+
+  const handleEmptyCart =() => {
+    router.push("/products");
+    setIsRedirected(true);
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-white text-black">
@@ -26,7 +45,7 @@ function ShoppingCartPage() {
       {cartItems.length === 0 ? (
         <Card className="bg-white border-yellow-400">
           <CardContent className="pt-6">
-            <p className="text-center text-black">Your cart is empty</p>
+            <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-500 transition-colors duration-300"  onClick={handleEmptyCart}>{isRedirected ? <Spinner/> : "Your cart is empty!!! Go buy some products"}</Button>
           </CardContent>
         </Card>
       ) : (
@@ -107,8 +126,8 @@ function ShoppingCartPage() {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-500 transition-colors duration-300" size="lg">
-                  Proceed to Checkout
+                <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-500 transition-colors duration-300" size="lg" onClick={handleCheckout} disabled={cartItems.length === 0}>
+                  {isRedirected ? <Spinner/> : cartItems.length > 0 ? "Proceed to Checkout" : "Your cart is empty!!! Go buy some products"}
                 </Button>
               </CardFooter>
             </Card>
