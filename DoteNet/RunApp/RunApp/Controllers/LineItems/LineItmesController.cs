@@ -42,7 +42,7 @@ namespace RunApp.Api.Controllers.LineItems
         {
             var result = await _mediator.Send(new ChangeItemQuantityCommand(orderId, changeQuantity.ProductId, changeQuantity.Quantity));
 
-            return result.Match(value => Ok(value.FromLineItemToLineItemDtoResponse()), Problem);
+            return result.MatchFirst(value => Ok(value.FromLineItemToLineItemDtoResponse()), Problem);
         }
 
     }

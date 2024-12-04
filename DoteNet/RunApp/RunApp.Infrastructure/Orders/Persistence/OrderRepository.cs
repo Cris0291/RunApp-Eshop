@@ -21,9 +21,10 @@ namespace RunApp.Infrastructure.Orders.Persistence
         {
             return await _appDbContext.Orders.SingleOrDefaultAsync(x => x.OrderId == orderId);
         }
-        public void DeleteItem(LineItem item)
+        public async Task DeleteItem(LineItem item)
         {
             _appDbContext.Remove(item);
+            await Task.CompletedTask;
         }
     }
 }

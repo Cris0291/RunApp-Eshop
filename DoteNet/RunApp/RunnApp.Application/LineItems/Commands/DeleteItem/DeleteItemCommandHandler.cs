@@ -17,7 +17,7 @@ namespace RunnApp.Application.LineItems.Commands.DeleteItem
             if (!isProductAdded) return Error.NotFound(code: "ItemWasNotFound", description: "Requested item could not be deleted since it was not found as a part of the order");
 
             var item = order.DeleteItem(request.ProductId);
-            _orderRepository.DeleteItem(item);
+            await _orderRepository.DeleteItem(item);
 
             await _unitOfWorkPattern.CommitChangesAsync();
 

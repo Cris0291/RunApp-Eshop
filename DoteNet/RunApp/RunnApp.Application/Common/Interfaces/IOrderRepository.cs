@@ -8,6 +8,6 @@ namespace RunnApp.Application.Common.Interfaces
         Task CreateOrder(Order order);
         Task<Order?> GetOrder(Guid orderId);
         Task<Order?> GetOrderWithoutItems(Guid orderId);
-        void DeleteItem(LineItem item);
+        Task DeleteItem(LineItem item);
     }
 }

@@ -34,13 +34,6 @@ namespace RunApp.Api.Mappers.Orders
         {
             return lineItems.Select(x => x.FromLineItemToLineItemDtoResponse()).ToList();
         }
-        public static Item FromItemResquestDtoToItem(this ItemResquestDto itemResquestDto)
-        {
-            return new Item(itemResquestDto.ProductId, itemResquestDto.ProductName, itemResquestDto.Quantity, itemResquestDto.Price, itemResquestDto.PriceWithDiscount, itemResquestDto.Discount);
-        }
-        public static Item[] FromItemsResquestDtoToItems(this ItemResquestDto[] itemsResquestDto)
-        {
-           return itemsResquestDto.Select(x => x.FromItemResquestDtoToItem()).ToArray();
-        }
+        
     }
 }
