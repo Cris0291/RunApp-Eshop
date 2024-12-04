@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Star, Truck, RefreshCcw, ChevronRight, ThumbsUp, ThumbsDown, Watch, Droplet, Shield, Clock, Pencil } from "lucide-react"
+import { Star, Truck, RefreshCcw, ChevronRight, ThumbsUp, ThumbsDown, Watch, Droplet, Shield, Clock, Pencil, Check } from "lucide-react"
 import { usePathname } from "next/navigation"
 import useGetProductQuery from "./useGetProductQuery"
 import { useAppDispatch, useAppSelector } from "@/app/hooks/reduxHooks"
@@ -17,11 +17,13 @@ import { addItem, deleteItem } from "../../payment/shoppingcart/cartSlice"
 import ReviewForm from "../../../ui/ReviewForm"
 import useCreateReviewCommand from "./useCreateReviewCommand"
 import LoadingModal from "@/app/ui/LoadingModal"
-import { getUserId } from "../../registration/userSlice"
-import StarRatingComponent from "./StarRatingComponent"
+import { getUserAddress, getUserId, getUserPaymentMethod } from "../../registration/userSlice"
 import useAddRatingCommand from "./useAddRatingCommand"
 import LikeButton from "@/app/ui/LikeButton"
 import useAddOrRemoveLikeHook from "@/app/hooks/useAddOrRemoveLikeHook"
+import useCreateOrderOrAddItem from "@/app/utils/useCreateOrderOrAddItem"
+import { useDispatch } from "react-redux"
+import { getIsCurrentOrder } from "../../payment/checkout/orderSlice"
 
 const productTest = {
   name: "Elegant Timepiece",
@@ -199,9 +201,13 @@ export default function ProductDisplay() {
   const [quantity, setQuantity] = useState(1)
   const [isAddedTocart, setIsAddedToCart] = useState(false);
   const [mainImage, setMainImage] = useState(productTest.images[0])
-  const dispatch = useAppDispatch();
+  const createOrderOrAddItem = useCreateOrderOrAddItem();
+  const dispatch = useDispatch();
   const {addRating} = useAddRatingCommand();
   const [currentReviewsPage, setCurrentReviewsPage] = useState(1);
+  const existOrder = useAppSelector(getIsCurrentOrder);
+  const userAddress = useAppSelector(getUserAddress);
+  const userPaymentMethod = useAppSelector(getUserPaymentMethod);
   const reviewsPerPage = 5;
 
   const lastIndex = currentReviewsPage * reviewsPerPage;
@@ -212,17 +218,11 @@ export default function ProductDisplay() {
   const isRendered = lastIndex < reviews.length
 
   const handleAddTocartState = () => {
-    const productForCart = {id: newProduct.id, quantity: quantity, price: newProduct.price, priceWithDiscount: newProduct.priceWithDiscount, 
+    const productForCart = {name: newProduct.name, id: newProduct.id, quantity: quantity, price: newProduct.price, priceWithDiscount: newProduct.priceWithDiscount, 
                             totalPrice: newProduct.price * quantity, image: ""}
-    dispatch(addItem(productForCart))
+    createOrderOrAddItem(productForCart, existOrder, userAddress, userPaymentMethod);
     setIsAddedToCart(true)
   }
-
-  const handleDeleteFromCartState = () => {
-    dispatch(deleteItem(newProduct.id))
-    setIsAddedToCart(false)
-  }
-
 
   const handleLike = (liked: boolean) => {
     AddOrRemoveLikeMutation({liked, productId: newProduct.id});
@@ -321,9 +321,9 @@ export default function ProductDisplay() {
                 <div className="flex space-x-4">
                 {
                   isAddedTocart ?  <>
-                  <Button className="flex-1 bg-pink-500 text-white hover:bg-pink-600 transition-colors duration-300 transform hover:scale-105" onClick={handleDeleteFromCartState}>
-                   Delete from Cart
-                 </Button>
+                  <div className="flex-1 text-center bg-green-500 text-white">
+                   Your item was added
+                 </div>
                 </>  :  
                 <>
                  <Button className="flex-1 bg-pink-500 text-white hover:bg-pink-600 transition-colors duration-300 transform hover:scale-105" onClick={handleAddTocartState}>
