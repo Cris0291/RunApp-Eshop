@@ -63,10 +63,13 @@ namespace RunApp.Api.Controllers.Products
             var products = await _mediator.Send(getProductsQuery);
             return products.Match(value => Ok(value.AllProductsToProductsResponse()), Problem);
         }
+
+        [Authorize]
+        [HttpGet(ApiEndpoints.Products.GetProductsWithDiscount)]
         public async Task<IActionResult> GetProductsWithDiscount()
         {
             var result = await _mediator.Send(new GetProductsWithDiscountQuery());
-            return Ok(result.ProductsToProductsResponse());
+            return Ok(result.ProductsWithImageAndDiscountToProductsResponse());
         }
 
         [Authorize]

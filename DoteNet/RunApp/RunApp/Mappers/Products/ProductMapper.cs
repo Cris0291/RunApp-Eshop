@@ -61,5 +61,21 @@ namespace RunApp.Api.Mappers.Products
         {
             return new UserBoughtProductsResponse(productWithMainImage.Product.ProductId, productWithMainImage.MainImage?.Url, productWithMainImage.Product.ActualPrice, productWithMainImage.Product.Name);
         }
+        public static IEnumerable<ProductsWithDiscount> ProductsWithImageAndDiscountToProductsResponse(this IEnumerable<ProductWithMainImage> productWithMainImages)
+        {
+            return productWithMainImages.Select(x => x.ProductWithImageAndDiscountToProductResponse()).ToList();
+        }
+        public static ProductsWithDiscount ProductWithImageAndDiscountToProductResponse(this ProductWithMainImage productWithMainImage)
+        {
+            string size = productWithMainImage.Product switch
+            {
+                { ActualPrice: var x } when x <= 50 => "small",
+                { ActualPrice: var x } when x > 50 && x <= 350 => "medium",
+                { ActualPrice: var x } when x > 350 => "large",
+                _ => "medium"
+            };
+
+            return new ProductsWithDiscount(productWithMainImage.Product.ProductId, productWithMainImage.Product.Name, productWithMainImage.MainImage?.Url, productWithMainImage.Product.ActualPrice, productWithMainImage.Product.PriceOffer?.Discount, productWithMainImage.Product.PriceOffer?.PriceWithDiscount, size);
+        }
     }
 }

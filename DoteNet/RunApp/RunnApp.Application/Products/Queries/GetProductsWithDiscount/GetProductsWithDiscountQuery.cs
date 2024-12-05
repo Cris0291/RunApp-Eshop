@@ -1,8 +1,7 @@
-﻿using ErrorOr;
-using MediatR;
-using RunApp.Domain.Products;
+﻿using MediatR;
+using RunnApp.Application.Products.Queries.GetProducts;
 
 namespace RunnApp.Application.Products.Queries.GetProductsWithDiscount
 {
-    public record GetProductsWithDiscountQuery() : IRequest<IEnumerable<Product>>;
+    public record GetProductsWithDiscountQuery() : IRequest<IEnumerable<ProductWithMainImage>>;
 }
