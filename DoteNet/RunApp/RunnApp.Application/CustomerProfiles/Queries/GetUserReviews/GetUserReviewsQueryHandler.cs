@@ -4,11 +4,12 @@ using RunnApp.Application.Common.Interfaces;
 
 namespace RunnApp.Application.CustomerProfiles.Queries.GetUserReviews
 {
-    public class GetUserReviewsQueryHandler(ICustomerProfileRepository profileRepository, IReviewsRepository reviewsRepository, IProductsRepository productsRepository) : IRequestHandler<GetUserReviewsQuery, ErrorOr<List<ReviewDto>>>
+    public class GetUserReviewsQueryHandler(ICustomerProfileRepository profileRepository, IReviewsRepository reviewsRepository, IProductsRepository productsRepository, ILeftJoinRepository leftJoinRepository) : IRequestHandler<GetUserReviewsQuery, ErrorOr<List<ReviewDto>>>
     {
         private readonly ICustomerProfileRepository _profileRepository = profileRepository;
         private readonly IReviewsRepository _reviewsRepository = reviewsRepository;
         private readonly IProductsRepository _productsRepository = productsRepository;
+        private readonly ILeftJoinRepository _leftJoinRepository = leftJoinRepository;
         public async Task<ErrorOr<List<ReviewDto>>> Handle(GetUserReviewsQuery request, CancellationToken cancellationToken)
         {
             var customer = await _profileRepository.GetCustomerProfile(request.UserId);
@@ -16,12 +17,15 @@ namespace RunnApp.Application.CustomerProfiles.Queries.GetUserReviews
 
             if (customer.Reviews.Count == 0) return new List<ReviewDto>();
 
-            var reviews = await _reviewsRepository.GetReviewsForCustomer(customer.Reviews);
+            var reviews =  _reviewsRepository.GetReviewsForCustomer(customer.Reviews);
 
             if (customer.BoughtProducts.Count == 0) return Error.Validation(code: "CannotReviewAProductThatHasNotBeenBought", description: "User can only review products that has bought");
-            var products = await _productsRepository.GetBoughtProducts(customer.BoughtProducts);
+            var products =  _productsRepository.GetBoughtProducts(customer.BoughtProducts);
 
-           return  reviews.CreateReviewDtoList(products);
+            var productsWithMainImage = _leftJoinRepository.GetProductsWithImage(products);
+            var productImageDto = productsWithMainImage.FromProductsToProductsWithImage();
+
+
         }
     }
 }
