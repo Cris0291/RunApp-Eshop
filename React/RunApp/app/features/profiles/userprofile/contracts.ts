@@ -1,26 +1,27 @@
 export type UserReviews = {
     reviewId: string,
-    coment: string,
-    date: string,
+    rating: number
+    comment: string,
+    reviewDate: string,
     reviewDescription: string;
-    product: ProductResponseForuserReview
-}
-
-export type ProductResponseForuserReview = {
-    productId: string,
-    name: string
+    productId?: string,
+    productName?: string,
+    productImage?: string
 }
 
 export type UserLikes = {
-    productImage: string,
-    productId: string,
-    productName: string,
-    productPrice: number,
-    likeId: string
+    productImage?: string,
+    productId?: string,
+    productName?: string,
+    productPrice?: number,
+    likeId: string,
+    like?: boolean
 }
 
-export type userBoughtProducts = {
+export type UserBoughtProducts = {
     productId: string,
-    productImage: string,
-    productPrice: number
+    productImage?: string,
+    productPrice: number,
+    name: string,
+    category: string
 }

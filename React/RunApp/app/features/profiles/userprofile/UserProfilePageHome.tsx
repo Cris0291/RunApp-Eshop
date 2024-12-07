@@ -30,11 +30,11 @@ import AnimatedButton from "@/app/ui/AnimatedButton";
 import { useAppDispatch } from "@/app/hooks/reduxHooks";
 import { setSearch } from "../../store/products/productsQuerySlice";
 import { useRouter } from "next/navigation";
+import { UserBoughtProducts, UserLikes, UserReviews } from "./contracts";
 
 function UserProfilePageHome() {
   const [unliked, setUnliked] = useState(false);
-  const [key, setKey] = useState<string>()
-  const [activeForm, setActiveForm] = useState(false)
+  const [key, setKey] = useState<string>();
   const {userReviews, loadingReviews} = useGetUserProfileReviews()
   const {userBoughtProducts, loadingProducts} = useGetuserBoughtProducts()
   const {userLikes, loadingLikes} = useGetUserProfileLikes()
@@ -59,44 +59,64 @@ function UserProfilePageHome() {
   }
 
 
-  const products = [
+  const userReviews1: UserReviews[] = [
     {
-      id: "1",
-      name: "Wireless Earbuds",
-      price: "$79.99",
-      image: "/placeholder.svg?height=50&width=50",
+      productId: "1",
+      productName: "Wireless Earbuds",
+      productImage: "/placeholder.svg?height=50&width=50",
+      comment: "test",
       rating: 4,
-      status: "Delivered",
-      categories: ["Yoga"]
+      reviewDate: "14/07/2027",
+      reviewDescription: "another test",
+      reviewId: "1"
     },
     {
-      id: "2",
-      name: "Smart Watch",
-      price: "$199.99",
-      image: "/placeholder.svg?height=50&width=50",
+      productId: "2",
+      productName: "Smart Watch",
+      productImage: "/placeholder.svg?height=50&width=50",
       rating: 5,
-      status: "Shipped",
-      categories: ["swimming"]
-    },
-    {
-      id: "3",
-      name: "Bluetooth Speaker",
-      price: "$59.99",
-      image: "/placeholder.svg?height=50&width=50",
-      rating: 3,
-      status: "Processing",
-      categories: ["Running"]
-    },
-    {
-      id: "4",
-      name: "Laptop Stand",
-      price: "$29.99",
-      image: "/placeholder.svg?height=50&width=50",
-      rating: 4,
-      status: "Delivered",
-      categories: ["test"]
+      reviewDate: "14/07/2027",
+      reviewDescription: "another test",
+      reviewId: "1",
+      comment: "test",
     },
   ];
+
+  const userBoughtProducts1: UserBoughtProducts[] = [
+    {
+      productId: "1",
+      name: "Wireless Earbuds",
+      productPrice: 79.99,
+      productImage: "/placeholder.svg?height=50&width=50",
+      category: "Yoga"
+    },
+    {
+      productId: "2",
+      name: "Smart Watch",
+      productPrice: 199.99,
+      productImage: "/placeholder.svg?height=50&width=50",
+      category: "swimming"
+    },
+  ];
+
+  const userLikes1: UserLikes[] = [
+    {
+      productId: "1",
+      productName: "Wireless Earbuds",
+      productPrice: 79.99,
+      productImage: "/placeholder.svg?height=50&width=50",
+      likeId: "4",
+      like: true,
+    },
+    {
+      productId: "2",
+      productName: "Smart Watch",
+      productPrice: 199.99,
+      productImage: "/placeholder.svg?height=50&width=50",
+      likeId: "5",
+      like: false,
+    },
+  ]
 
   return (
         <div className="container mx-auto space-y-6">
@@ -140,7 +160,7 @@ function UserProfilePageHome() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {products.map((product) => (
+                  {userLikes1.map((product) => (
                     <TableRow key={product.id}>
                       <TableCell>
                         <img
@@ -190,7 +210,7 @@ function UserProfilePageHome() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {products.map((product) => (
+                  {userReviews1.map((product) => (
                     <TableRow key={product.id}>
                       <TableCell>
                         <img
@@ -244,7 +264,7 @@ function UserProfilePageHome() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {products.map((product) => (
+                  {userBoughtProducts1.map((product) => (
                     <TableRow key={product.id}>
                       <TableCell>
                         <img

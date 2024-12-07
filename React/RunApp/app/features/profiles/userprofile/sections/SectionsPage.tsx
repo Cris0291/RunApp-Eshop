@@ -12,66 +12,73 @@ import {
     HelpCircle, 
     FileText, 
     CreditCard,
-    ChevronRight
+    ChevronRight,
+    FileChartColumnIncreasing
   } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 interface AppSection {
     title: string
     description: string
-    icon: React.ReactNode
+    icon: React.ReactNode,
+    path: string
   }
   
   const appSections: AppSection[] = [
     {
+      title: "Main",
+      description: "Go to the main page",
+      icon: <FileChartColumnIncreasing className="h-8 w-8 text-pink-500" />,
+      path: "/"
+    },
+    {
       title: "Products",
       description: "Manage your product catalog and inventory",
-      icon: <ShoppingCart className="h-8 w-8 text-pink-500" />,
+      icon: <Bell className="h-8 w-8 text-pink-500" />,
+      path: "/products"
     },
     {
-      title: "Customers",
-      description: "View and manage customer information and interactions",
+      title: "Creation Center",
+      description: "Create and manage your own products",
       icon: <Users className="h-8 w-8 text-pink-600" />,
-    },
-    {
-      title: "Analytics",
-      description: "Track and analyze your business performance metrics",
-      icon: <BarChart2 className="h-8 w-8 text-pink-500" />,
+      path: "/userprofile/creationcenter"
     },
     {
       title: "Settings",
       description: "Configure your app preferences and system settings",
       icon: <Settings className="h-8 w-8 text-pink-600" />,
+      path: "/userprofile"
     },
     {
-      title: "Notifications",
-      description: "Manage your alerts, messages, and communication preferences",
-      icon: <Bell className="h-8 w-8 text-pink-500" />,
+      title: "Cart",
+      description: "Manage the itmes you added to your cart",
+      icon: <ShoppingCart className="h-8 w-8 text-pink-500" />,
+      path:"/orders/cart"
     },
     {
-      title: "Support",
-      description: "Get help, contact our team, and access resources",
+      title: "Checkout",
+      description: "Manage your order ",
       icon: <MessageCircle className="h-8 w-8 text-pink-600" />,
-    },
-    {
-      title: "FAQ",
-      description: "Find answers to common questions and troubleshooting guides",
-      icon: <HelpCircle className="h-8 w-8 text-pink-500" />,
-    },
-    {
-      title: "Reports",
-      description: "Generate, view, and export comprehensive business reports",
-      icon: <FileText className="h-8 w-8 text-pink-600" />,
-    },
-    {
-      title: "Billing",
-      description: "Manage your subscriptions, payments, and billing information",
-      icon: <CreditCard className="h-8 w-8 text-pink-500" />,
+      path: "/orders/checkout"
     },
   ]
 
-export default function SectionPage(){
-    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+export default function SectionPage({onSetActiveLink}: {onSetActiveLink: (newLink: string) => void}){
+    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+    const router = useRouter();
+
+    const handleActiveRoute = (path: string, link: string) => {
+
+      switch (link){
+        case "Settings":
+          onSetActiveLink(link);
+          return;
+        default:
+          router.push(path);
+          break;
+      }
+    }
 
    return (
     <>
@@ -97,7 +104,7 @@ export default function SectionPage(){
                            </CardHeader>
                            <CardContent className="pt-4">
                             <p className="text-sm text-gray-600 mb-6 h-12 overflow-hidden">{section.description}</p>
-                            <Button className="w-full bg-gradient-to-r from-pink-400 to-pink-600 text-white hover:from-pink-500 hover:to-pink-700 transition-all duration-300 shadow-md hover:shadow-lg group-hover:translate-y-[2px]">
+                            <Button className="w-full bg-gradient-to-r from-pink-400 to-pink-600 text-white hover:from-pink-500 hover:to-pink-700 transition-all duration-300 shadow-md hover:shadow-lg group-hover:translate-y-[2px]" onClick={() => handleActiveRoute(section.path, section.title)}>
                                Go to {section.title}
                                <ChevronRight className={`ml-2 h-4 w-4 transition-transform duration-300 ${hoveredIndex === index ? "translate-x-1": ""}`}/>
                             </Button>

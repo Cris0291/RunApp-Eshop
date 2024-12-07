@@ -40,6 +40,9 @@ export default function UserProfilePageLayout(){
     const [activeLink, setActiveLink] = useState("Dashboard");
     
 
+    const handleActiveLink = (newLink: string) => {
+      setActiveLink(newLink);
+    }
 
 
     return (
@@ -115,7 +118,7 @@ export default function UserProfilePageLayout(){
           </TooltipProvider>
     
           <main className="flex-1 overflow-y-auto p-6">
-            <UserProfileLayoutWrapper item={activeLink}/>
+            <UserProfileLayoutWrapper item={activeLink} onSetActiveLink={handleActiveLink}/>
           </main>
         </div>
       );
