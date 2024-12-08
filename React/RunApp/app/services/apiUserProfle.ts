@@ -1,5 +1,5 @@
 import axios from "axios";
-import { userBoughtProducts, UserLikes, UserReviews } from "../features/profiles/userprofile/contracts";
+import { UserBoughtProducts, UserLikes, UserReviews } from "../features/profiles/userprofile/contracts";
 
 axios.defaults.baseURL = "http://localhost:5253"; 
 
@@ -20,7 +20,7 @@ export async function GetUserLikedProducts(token: string){
 }
 
 export async function GetUserBoughtProducts(token: string){
-    return axios.get<userBoughtProducts>("Todo this ednpoint", {
+    return axios.get<UserBoughtProducts>("api/user/bought-products", {
         headers: {
             "Authorization": `Bearer ${token}`
         }

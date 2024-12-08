@@ -1,5 +1,5 @@
 import axios from "axios"
-import { ProductForCard, ProductForCardWithDiscountt } from "../features/store/products/contracts";
+import { ProductForCard, ProductForCardWithDiscount } from "../features/store/products/contracts";
 
 
 axios.defaults.baseURL = "http://localhost:5253"; 
@@ -13,7 +13,7 @@ export default async  function getProducts(queryValues : string, token: string){
 }
 
 export async function getProductsWithDiscount(token: string){
-    return axios.get<ProductForCardWithDiscountt>("", {
+    return axios.get<ProductForCardWithDiscount>("", {
         headers: {
             "Authorization": `Bearer ${token}`
         }

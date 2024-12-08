@@ -1,10 +1,12 @@
 import axios from "axios";
-import { CartProductsResponse, DeleteItemDto, ProductForCart } from "../features/payment/shoppingcart/contracts";
+import { CartProductsResponse, ChangeItemQuantityRequestDto, DeleteItemDto, ProductForCart } from "../features/payment/shoppingcart/contracts";
 
 axios.defaults.baseURL = "http://localhost:5253";
 
-export async function updateItemQuantity({productId, quantity, token}: {productId: string, quantity: number, token: string}){
-    return axios.put(`api/oorders${productId}/lineitems`, quantity, {
+export async function updateItemQuantity({orderId, productId, quantity, token}: {orderId: string, productId: string, quantity: number, token: string}){
+    const changeQuantityDto: ChangeItemQuantityRequestDto = {productId, quantity};
+    
+    return axios.put(`api/oorders${orderId}/lineitems`, changeQuantityDto, {
         headers:{
             "Authorization": `Bearer ${token}`
         }

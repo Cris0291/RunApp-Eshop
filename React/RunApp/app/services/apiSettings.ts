@@ -24,11 +24,11 @@ export async function UpdateAccountInfo({accountInfo, token} : {accountInfo: Acc
 
 export async function UpdatePasswordInfo({passwordInfo, token}: {passwordInfo: PasswordUpdatedSettings, token: string}){
 
-    return axios.put<void>("api/user/password", passwordInfo, {
+    return axios.put<number>("api/user/password", passwordInfo, {
         headers: {
             "Authorization": `Bearer ${token}`
         }
-    })
+    }).then(response => response.status);
 
 }
 
@@ -50,19 +50,19 @@ export async function UpdateAddressInfo({addressInfo, token}: {addressInfo: Addr
 }
 
 export async function CreatePaymentMethod({paymentInfo, token}: {paymentInfo: PaymentSettingsForm, token: string}){
-    return axios.post<void>("api/user/payment", paymentInfo, {
+    return axios.post<number>("api/user/payment", paymentInfo, {
         headers: {
             "Authorization": `Bearer ${token}`
         }
-    }).then(response => response.data);
+    }).then(response => response.status);
 
 }
 
 export async function UpdatePaymentMethod({paymentInfo, token}: {paymentInfo: PaymentSettingsForm, token: string}){
-    return axios.put<void>("api/user/payment", paymentInfo, {
+    return axios.put<number>("api/user/payment", paymentInfo, {
         headers: {
             "Authorization": `Bearer ${token}`
         }
-    }).then(response => response.data);
+    }).then(response => response.status);
 
 }
