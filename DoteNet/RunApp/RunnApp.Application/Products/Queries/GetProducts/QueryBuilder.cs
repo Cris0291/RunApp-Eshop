@@ -1,6 +1,4 @@
-﻿using RunApp.Domain.Products;
-using RunnApp.Application.Common.SortingPagingFiltering;
-using System.Linq;
+﻿using RunnApp.Application.Common.SortingPagingFiltering;
 
 namespace RunnApp.Application.Products.Queries.GetProducts
 {
@@ -20,7 +18,7 @@ namespace RunnApp.Application.Products.Queries.GetProducts
                 PromotionalText = x.Product.PriceOffer == null ? null : x.Product.PriceOffer.PromotionalText,
                 Discount = x.Product.PriceOffer == null ? null : x.Product.PriceOffer.Discount,
                 CategoryNames = x.Product.Categories.Select(x => x.CategoryName),
-                MainImage = x.MainImage.Url,
+                MainImage = x.MainImage == null ? null : x.MainImage.Url,
                 UserLike = null,
             }); ; ;
         }
@@ -46,15 +44,12 @@ namespace RunnApp.Application.Products.Queries.GetProducts
         {
             IQueryable<ProductsJoin> newProducts = products;
             var categoriesSet = filterValues.Categories.ToHashSet();
-            var starsSet = filterValues.FilterByStars.ToHashSet();
+            var starsSet = filterValues.Stars.ToHashSet();
 
             foreach (var option in options)
             {
                 switch (option)
                 {
-                    case FilterByOptions.Likes:
-                        newProducts = newProducts.Where(x => x.Product.NumberOflikes >= filterValues.FilterByLikes);
-                        break;
                     case FilterByOptions.Categories:
                         newProducts = newProducts.Where(x => x.Product.CategoryNames.Any(c => categoriesSet.Contains(c)));
                         break;

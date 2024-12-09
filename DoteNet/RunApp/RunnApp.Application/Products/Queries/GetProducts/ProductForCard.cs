@@ -13,7 +13,7 @@ namespace RunnApp.Application.Products.Queries.GetProducts
         public decimal? PriceWithDiscount { get; set; }
         public string? PromotionalText { get; set; }
         public decimal? Discount { get; set; }
-        public string MainImage { get; set; }
+        public string? MainImage { get; set; }
         public bool? UserLike { get; set;}
         public IEnumerable<string> CategoryNames { get; set; }
     }

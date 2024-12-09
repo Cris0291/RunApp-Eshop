@@ -16,8 +16,8 @@ namespace RunnApp.Application.Products.Queries.GetProducts
         }
         public async Task<ErrorOr<IEnumerable<ProductsJoin>>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
         {
-            var filterMappinValues = new FilterMappingValues(request.Likes, request.Stars, request.Categories, request.PriceRange, request.Search);
-            var filterMappingOptions = GetFilterOptions(filterMappinValues);
+            var filterMappingValues = new FilterMappingValues(request.Stars, request.Categories, request.PriceRange, request.Search);
+            var filterMappingOptions = GetFilterOptions(filterMappingValues);
 
             var productsQuery = _productsRepository.GetProducts();
 
@@ -27,7 +27,7 @@ namespace RunnApp.Application.Products.Queries.GetProducts
             var productsAndStatus = _leftJoinRepository.GetProductsAndStatusLeftJoin(request.UserId, productForCardWithImage);
 
             var finalProductsQuery = productsAndStatus
-                 .AddFiltering(filterMappinValues, filterMappingOptions)
+                 .AddFiltering(filterMappingValues, filterMappingOptions)
                  .AddSortingBy(request.OrderByOptions);
 
             
@@ -42,6 +42,10 @@ namespace RunnApp.Application.Products.Queries.GetProducts
 
             foreach (var property in properties)
             {
+                if (property.Name == "Stars" && filterValues.Stars.Length == 0) continue;
+                if (property.Name == "Categories" && filterValues.Categories.Length == 0) continue;
+                if (property.Name == "PriceRange" && filterValues.PriceRange.Length == 0) continue;
+
                 if (!Enum.TryParse(property.Name, out FilterByOptions option)) throw new ArgumentException("Filter option and value did not matched");
                 filterOptions.Add(option);
             }

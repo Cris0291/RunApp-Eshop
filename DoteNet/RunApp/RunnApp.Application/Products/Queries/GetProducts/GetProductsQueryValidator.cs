@@ -7,9 +7,7 @@ namespace RunnApp.Application.Products.Queries.GetProducts
     {
         public GetProductsQueryValidator()
         {
-            RuleFor(x => x.search).NotEmpty().NotNull();
-            RuleFor(x => x.filterByLikes).GreaterThan(0);
-            RuleFor(x => x.filterByStars).GreaterThan(0);
+            RuleFor(x => x.Search).NotEmpty().NotNull();
         }
     }
 }
