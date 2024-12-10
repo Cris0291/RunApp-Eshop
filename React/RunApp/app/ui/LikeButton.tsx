@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -21,15 +21,21 @@ export default function LikeButton({
   color = 'pink',
   className
 }: LikeButtonProps) {
-  const [liked, setLiked] = useState(initialLiked)
+  const [liked, setLiked] = useState(initialLiked);
+  const [counter, setCounter] = useState(0);
 
   const handleClick = () => {
     setLiked(prev => !prev)
-    if (onLikeChange) {
-      onLikeChange(liked)
-    }
-    console.log(liked)
+    if(counter == 0) setCounter(prev => prev +1);
   }
+
+  useEffect(() => {
+    if(counter > 0){
+      if (onLikeChange) {
+        onLikeChange(liked)
+      }
+    }
+  }, [counter, liked])
 
   const sizeClasses = {
     sm: 'w-8 h-8',
@@ -63,7 +69,7 @@ export default function LikeButton({
         <Heart
           className={cn(
             iconSizes[size],
-            liked ? `fill-${color}-500 text-${color}-500` : `text-${color}-500`,
+            liked ? `fill-pink-500 text-pink-500` : `text-pink-500`,
             "transition-colors duration-300"
           )}
         />

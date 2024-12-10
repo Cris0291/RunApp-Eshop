@@ -4,20 +4,17 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Lock, UserPlus, LogIn } from 'lucide-react'
+import { useRouter } from "next/navigation"
 
 export default function AccessRestricted() {
+  const router = useRouter();
+
   const handleLogin = () => {
-    // Redirect to login page
-    console.log("Redirecting to login page")
-    // In a real application, you would use Next.js routing here
-    // For example: router.push('/login')
+    router.push("/login");
   }
 
   const handleRegister = () => {
-    // Redirect to registration page
-    console.log("Redirecting to registration page")
-    // In a real application, you would use Next.js routing here
-    // For example: router.push('/register')
+    router.push("/register");
   }
 
   return (

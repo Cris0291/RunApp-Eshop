@@ -68,7 +68,7 @@ export default function StatusPopup({
                   onAction("Images")
                   setIsVisible(false)
                 }}
-                className={`w-full ${status === 'success' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-white text-red-500 hover:bg-red-100'} text-white`}
+                className={`w-full ${status === 'success' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-white text-red-500 hover:bg-red-100'} text-black`}
               >
                 {actionLabel}
               </Button>
