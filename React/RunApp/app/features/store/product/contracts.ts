@@ -1,19 +1,23 @@
 export type Product = {
-    id: string,
+    productId: string,
     name: string,
     description: string,
-    price: number,
+    actualPrice: number,
     bulletPoints: string[],
     priceWithDiscount: number | undefined,
     promotionalText: string | undefined,
     discount: number | undefined,
-    numberOfreviews: number,
+    numberOfreviews: number | undefined,
+    numberOflikes: number | undefined,
     averageRating: number,
     reviews: Review[],
-    images: Image[],
+    mainImage?: string,
+    categories: string[],
 }
 
 export type Review = {
+    id: string,
+    userName: string
     comment: string,
     date: string,
     reviewDescription: string,

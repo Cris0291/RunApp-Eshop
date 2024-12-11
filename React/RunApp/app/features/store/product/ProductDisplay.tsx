@@ -24,14 +24,67 @@ import useAddOrRemoveLikeHook from "@/app/hooks/useAddOrRemoveLikeHook"
 import useCreateOrderOrAddItem from "@/app/utils/useCreateOrderOrAddItem"
 import { useDispatch } from "react-redux"
 import { getIsCurrentOrder } from "../../payment/checkout/orderSlice"
+import StatusPopup from "@/app/ui/SatusPopup"
+import { Product, Review } from "./contracts"
+import ProductNotFound from "@/app/ui/ProductNotFound"
+import NoImagePlaceholder from "@/app/ui/NoImagePlaceholder"
+import { iconsForCategories } from "@/app/utils/categories"
 
-const productTest = {
+const reviews: Review[] = [
+  {
+    id: "0",
+    userName: "test",
+    rating: 0,
+    date: "",
+    comment: "This watch exceeded my expectations. The craftsmanship is impeccable, and it looks even better in person. Highly recommended!",
+    reviewDescription: "Good",
+  },
+  {
+    id: "1",
+    userName: "A",
+    rating: 5,
+    date: "2023-05-15",
+    comment: "This watch exceeded my expectations. The craftsmanship is impeccable, and it looks even better in person. Highly recommended!",
+    reviewDescription: "Good quality",
+  },
+  {
+    id: "2",
+    userName: "B",
+    rating: 4,
+    date: "2023-05-10",
+    comment: "Great watch for the price. The only reason I'm not giving it 5 stars is because the strap took a while to break in. Otherwise, it's perfect.",
+    reviewDescription: "Bad",
+  },
+  {
+    id: "3",
+    userName: "C",
+    rating: 5,
+    date: "2023-05-05",
+    comment: "I've been wearing this watch daily for a month now, and it's holding up beautifully. The timekeeping is precise, and I love the classic design.",
+    reviewDescription: "neutral",
+  },
+  {
+    id: "4",
+    userName: "D",
+    rating: 0,
+    date: "",
+    comment: "This watch exceeded my expectations. The craftsmanship is impeccable, and it looks even better in person. Highly recommended!",
+    reviewDescription: "normal",
+  },
+]
+
+const productTest: Product = {
+  productId: "1",
   name: "Elegant Timepiece",
-  price: 299.99,
-  rating: 4.5,
-  reviews: 128,
+  actualPrice: 299.99,
+  priceWithDiscount: 100,
+  promotionalText: "Good test discounts",
+  discount: 60,
+  averageRating: 4.5,
+  numberOfreviews: 128,
+  numberOflikes: 50,
   description: "A sophisticated watch that combines classic design with modern functionality. Perfect for both casual and formal occasions.",
-  features: [
+  bulletPoints: [
     "Swiss movement",
     "Sapphire crystal glass",
     "Water-resistant up to 50 meters",
@@ -39,140 +92,18 @@ const productTest = {
     "1-year warranty"
   ],
   categories: [
-    { name: "Analog", icon: Watch },
-    { name: "Water Resistant", icon: Droplet },
-    { name: "Durable", icon: Shield },
-    { name: "Precise", icon: Clock },
+    "Yoga",
+    "HIIT",
   ],
-  images: [
-    "/placeholder.svg?height=400&width=400",
-    "/placeholder.svg?height=400&width=400",
-    "/placeholder.svg?height=400&width=400",
-    "/placeholder.svg?height=400&width=400"
-  ]
+  mainImage: "/placeholder.svg?height=400&width=400",
+  reviews: reviews,
 }
 
-const reviews = [
-  {
-    id: 0,
-    author: "test",
-    avatar: "/placeholder.svg?height=40&width=40",
-    rating: 0,
-    date: "",
-    content: "This watch exceeded my expectations. The craftsmanship is impeccable, and it looks even better in person. Highly recommended!",
-    helpful: 24,
-    notHelpful: 2
-  },
-  {
-    id: 1,
-    author: "A",
-    avatar: "/placeholder.svg?height=40&width=40",
-    rating: 5,
-    date: "2023-05-15",
-    content: "This watch exceeded my expectations. The craftsmanship is impeccable, and it looks even better in person. Highly recommended!",
-    helpful: 24,
-    notHelpful: 2
-  },
-  {
-    id: 2,
-    author: "B",
-    avatar: "/placeholder.svg?height=40&width=40",
-    rating: 4,
-    date: "2023-05-10",
-    content: "Great watch for the price. The only reason I'm not giving it 5 stars is because the strap took a while to break in. Otherwise, it's perfect.",
-    helpful: 18,
-    notHelpful: 1
-  },
-  {
-    id: 3,
-    author: "C",
-    avatar: "/placeholder.svg?height=40&width=40",
-    rating: 5,
-    date: "2023-05-05",
-    content: "I've been wearing this watch daily for a month now, and it's holding up beautifully. The timekeeping is precise, and I love the classic design.",
-    helpful: 30,
-    notHelpful: 0
-  },
-  {
-    id: 0,
-    author: "D",
-    avatar: "/placeholder.svg?height=40&width=40",
-    rating: 0,
-    date: "",
-    content: "This watch exceeded my expectations. The craftsmanship is impeccable, and it looks even better in person. Highly recommended!",
-    helpful: 24,
-    notHelpful: 2
-  },
-  {
-    id: 1,
-    author: "E",
-    avatar: "/placeholder.svg?height=40&width=40",
-    rating: 5,
-    date: "2023-05-15",
-    content: "This watch exceeded my expectations. The craftsmanship is impeccable, and it looks even better in person. Highly recommended!",
-    helpful: 24,
-    notHelpful: 2
-  },
-  {
-    id: 2,
-    author: "F",
-    avatar: "/placeholder.svg?height=40&width=40",
-    rating: 4,
-    date: "2023-05-10",
-    content: "Great watch for the price. The only reason I'm not giving it 5 stars is because the strap took a while to break in. Otherwise, it's perfect.",
-    helpful: 18,
-    notHelpful: 1
-  },
-  {
-    id: 3,
-    author: "G",
-    avatar: "/placeholder.svg?height=40&width=40",
-    rating: 5,
-    date: "2023-05-05",
-    content: "I've been wearing this watch daily for a month now, and it's holding up beautifully. The timekeeping is precise, and I love the classic design.",
-    helpful: 30,
-    notHelpful: 0
-  },
-  {
-    id: 0,
-    author: "H",
-    avatar: "/placeholder.svg?height=40&width=40",
-    rating: 0,
-    date: "",
-    content: "This watch exceeded my expectations. The craftsmanship is impeccable, and it looks even better in person. Highly recommended!",
-    helpful: 24,
-    notHelpful: 2
-  },
-  {
-    id: 1,
-    author: "I",
-    avatar: "/placeholder.svg?height=40&width=40",
-    rating: 5,
-    date: "2023-05-15",
-    content: "This watch exceeded my expectations. The craftsmanship is impeccable, and it looks even better in person. Highly recommended!",
-    helpful: 24,
-    notHelpful: 2
-  },
-  {
-    id: 2,
-    author: "J",
-    avatar: "/placeholder.svg?height=40&width=40",
-    rating: 4,
-    date: "2023-05-10",
-    content: "Great watch for the price. The only reason I'm not giving it 5 stars is because the strap took a while to break in. Otherwise, it's perfect.",
-    helpful: 18,
-    notHelpful: 1
-  },
-  {
-    id: 3,
-    author: "K",
-    avatar: "/placeholder.svg?height=40&width=40",
-    rating: 5,
-    date: "2023-05-05",
-    content: "I've been wearing this watch daily for a month now, and it's holding up beautifully. The timekeeping is precise, and I love the classic design.",
-    helpful: 30,
-    notHelpful: 0
-  }
+const categories1 = [
+  { name: "Analog", icon: Watch },
+  { name: "Water Resistant", icon: Droplet },
+  { name: "Durable", icon: Shield },
+  { name: "Precise", icon: Clock },
 ]
 
 function StarRating({ rating }: { rating: number }) {
@@ -195,12 +126,13 @@ function StarRating({ rating }: { rating: number }) {
 export default function ProductDisplay() {
   const pathname = usePathname();
   const userId = useAppSelector(getUserId);
-  const {isLoading, newProduct, error} = useGetProductQuery(pathname);
+  const {isLoading, product, error} = useGetProductQuery(pathname);
   const {AddOrRemoveLikeMutation} = useAddOrRemoveLikeHook();
   const {isPending, AddReview} = useCreateReviewCommand();
   const [quantity, setQuantity] = useState(1)
   const [isAddedTocart, setIsAddedToCart] = useState(false);
-  const [mainImage, setMainImage] = useState(productTest.images[0])
+  const [isError, setIsError] = useState(false)
+  const [mainImage, setMainImage] = useState(productTest.mainImage)
   const createOrderOrAddItem = useCreateOrderOrAddItem();
   const dispatch = useDispatch();
   const {addRating} = useAddRatingCommand();
@@ -217,15 +149,25 @@ export default function ProductDisplay() {
 
   const isRendered = lastIndex < reviews.length
 
-  const handleAddTocartState = () => {
-    const productForCart = {name: newProduct.name, id: newProduct.id, quantity: quantity, price: newProduct.price, priceWithDiscount: newProduct.priceWithDiscount, 
-                            totalPrice: newProduct.price * quantity, image: ""}
-    createOrderOrAddItem(productForCart, existOrder, userAddress, userPaymentMethod);
-    setIsAddedToCart(true)
+  const handleAddToCartState = () => {
+    
+    if(productTest !== undefined){
+      const productForCart = {name: productTest.name, id: productTest.productId, quantity: quantity, price: productTest.actualPrice, priceWithDiscount: productTest.priceWithDiscount, 
+        totalPrice: productTest.actualPrice * quantity, image: productTest.mainImage}
+    
+                            
+    if(!isNaN(quantity) && quantity !== 0){
+      createOrderOrAddItem(productForCart, existOrder, userAddress, userPaymentMethod);
+      setIsAddedToCart(true)
+    }
+    else{
+      setIsError(true);
+    }
+    }
   }
 
   const handleLike = (liked: boolean) => {
-    AddOrRemoveLikeMutation({liked, productId: newProduct.id});
+    if(productTest !== undefined)AddOrRemoveLikeMutation({liked, productId: productTest.productId});
   }
 
   const onSubmit = ({sentiment, content, rating}: {sentiment: string, content: string, rating: number}) => {
@@ -233,11 +175,15 @@ export default function ProductDisplay() {
     //Todo: check if i already have a review on this product
     //Todo: handle errors like the ones mention above or could not submitt review
 
-    const reviewDto = {comment: content, reviewDescription: sentiment, rating: rating}
-    AddReview({reviewDto, productId: newProduct.id})
+    if(productTest !== undefined){
+      const reviewDto = {comment: content, reviewDescription: sentiment, rating: rating}
+      AddReview({reviewDto, productId: productTest.productId})
+    }
   }
 
   return (
+    productTest == undefined ? 
+    <ProductNotFound/> : 
     <div className="min-h-screen bg-gradient-to-br from-white to-pink-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <Card className="overflow-hidden bg-white shadow-xl hover:shadow-2xl transition-shadow duration-300">
@@ -246,34 +192,15 @@ export default function ProductDisplay() {
               {/* Product Images */}
               <div className="space-y-4">
                 <div className="aspect-square relative overflow-hidden rounded-lg bg-gray-100 group">
+                  {productTest.mainImage === undefined ? <NoImagePlaceholder/> : 
                   <Image
-                    src={mainImage}
+                    src={productTest.mainImage}
                     alt={productTest.name}
                     layout="fill"
                     objectFit="cover"
                     className="group-hover:scale-105 transition-transform duration-300"
-                  />
+                  />}
                   <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-300" />
-                </div>
-                <div className="grid grid-cols-4 gap-4">
-                  {productTest.images.map((img, index) => (
-                    <button
-                      key={index}
-                      className={`aspect-square relative overflow-hidden rounded-lg bg-gray-100 group ${
-                        img === mainImage ? 'ring-2 ring-pink-500' : ''
-                      }`}
-                      onClick={() => setMainImage(img)}
-                    >
-                      <Image
-                        src={img}
-                        alt={`${productTest.name} view ${index + 1}`}
-                        layout="fill"
-                        objectFit="cover"
-                        className="group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-300" />
-                    </button>
-                  ))}
                 </div>
               </div>
 
@@ -281,10 +208,10 @@ export default function ProductDisplay() {
               <div className="space-y-6">
                 <h1 className="text-3xl font-bold text-gray-900 hover:text-pink-600 transition-colors duration-300">{productTest.name}</h1>
                 <div className="flex items-center space-x-2">
-                  <StarRating rating={productTest.rating} />
-                  <span className="text-sm text-gray-500 hover:text-pink-500 transition-colors duration-300">({productTest.reviews} reviews)</span>
+                  <StarRating rating={productTest.averageRating} />
+                  <span className="text-sm text-gray-500 hover:text-pink-500 transition-colors duration-300">({productTest.numberOfreviews} reviews)</span>
                 </div>
-                <p className="text-3xl font-bold text-gray-900 hover:text-pink-600 transition-colors duration-300">${productTest.price.toFixed(2)}</p>
+                <p className="text-3xl font-bold text-gray-900 hover:text-pink-600 transition-colors duration-300">${productTest.actualPrice.toFixed(2)}</p>
                 <p className="text-gray-600 hover:text-gray-800 transition-colors duration-300">{productTest.description}</p>
 
                 {/* Category Icons */}
@@ -292,11 +219,13 @@ export default function ProductDisplay() {
                   <h3 className="text-sm font-medium text-gray-900 mb-3">Product Categories</h3>
                   <div className="flex flex-wrap gap-4">
                     {productTest.categories.map((category) => (
-                      <div key={category.name} className="flex flex-col items-center group">
+                      <div key={category} className="flex flex-col items-center group">
                         <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center group-hover:bg-pink-200 transition-colors duration-300">
-                          <category.icon className="w-6 h-6 text-pink-500" />
+                          {iconsForCategories.map((categoryIcon) => (
+                            categoryIcon.name === category ? <categoryIcon.icon className="w-6 h-6 text-pink-500"/> : ""
+                          ))}
                         </div>
-                        <span className="mt-1 text-xs text-gray-600 group-hover:text-pink-600 transition-colors duration-300">{category.name}</span>
+                        <span className="mt-1 text-xs text-gray-600 group-hover:text-pink-600 transition-colors duration-300">{category}</span>
                       </div>
                     ))}
                   </div>
@@ -326,9 +255,10 @@ export default function ProductDisplay() {
                  </div>
                 </>  :  
                 <>
-                 <Button className="flex-1 bg-pink-500 text-white hover:bg-pink-600 transition-colors duration-300 transform hover:scale-105" onClick={handleAddTocartState}>
+                 <Button className="flex-1 bg-pink-500 text-white hover:bg-pink-600 transition-colors duration-300 transform hover:scale-105" onClick={handleAddToCartState}>
                   Add to Cart
                 </Button>
+                {isError ? <StatusPopup status="failure" message="Item quantity cannot be zero or empty" actionLabel="Change your item's quantity" onAction={() => setQuantity(1)}/> : ""}
                </> 
                 }
                 <LikeButton size="sm" onLikeChange={handleLike}/>
@@ -357,7 +287,7 @@ export default function ProductDisplay() {
               </TabsList>
               <TabsContent value="features" className="mt-6">
                 <ul className="list-disc pl-5 space-y-2 text-gray-600">
-                  {productTest.features.map((feature, index) => (
+                  {productTest.bulletPoints.map((feature, index) => (
                     <li key={index} className="hover:text-pink-600 transition-colors duration-300">{feature}</li>
                   ))}
                 </ul>
@@ -374,8 +304,8 @@ export default function ProductDisplay() {
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 hover:text-pink-600 transition-colors duration-300">Customer Reviews</h3>
                       <div className="flex items-center mt-1">
-                        <StarRating rating={productTest.rating} />
-                        <span className="ml-2 text-sm text-gray-500 hover:text-pink-500 transition-colors duration-300">{productTest.rating} out of 5</span>
+                        <StarRating rating={productTest.averageRating} />
+                        <span className="ml-2 text-sm text-gray-500 hover:text-pink-500 transition-colors duration-300">{productTest.averageRating} out of 5</span>
                       </div>
                     </div>
                     <ReviewForm onSubmit={onSubmit} isSubmitting={isPending}>
@@ -396,30 +326,29 @@ export default function ProductDisplay() {
 
                   {/* Individual Reviews */}
                   <div className="space-y-6">
-                    {currentReviews.map((review) => (
+                    {productTest.reviews.map((review) => (
                       <div key={review.id} className="border-t border-gray-200 pt-6 group">
                         <div className="flex items-center mb-4">
                           <Avatar className="h-10 w-10 group-hover:ring-2 group-hover:ring-pink-500 transition-all duration-300">
-                            <AvatarImage src={review.avatar} alt={review.author} />
-                            <AvatarFallback>{review.author[0]}</AvatarFallback>
+                            <AvatarFallback>{review.userName}</AvatarFallback>
                           </Avatar>
                           <div className="ml-4">
-                            <h4 className="text-sm font-semibold text-gray-900 group-hover:text-pink-600 transition-colors duration-300">{review.author}</h4>
+                            <h4 className="text-sm font-semibold text-gray-900 group-hover:text-pink-600 transition-colors duration-300">{review.userName}</h4>
                             <div className="flex items-center">
                               <StarRating rating={review.rating} />
                               <span className="ml-2 text-sm text-gray-500 group-hover:text-pink-500 transition-colors duration-300">{review.date}</span>
                             </div>
                           </div>
                         </div>
-                        <p className="text-gray-600 mb-4 group-hover:text-gray-800 transition-colors duration-300">{review.content}</p>
+                        <p className="text-gray-600 mb-4 group-hover:text-gray-800 transition-colors duration-300">{review.comment}</p>
                         <div className="flex items-center space-x-4">
                           <Button variant="outline" size="sm" className="text-gray-500 hover:bg-pink-50 hover:text-pink-600 transition-colors duration-300 transform hover:scale-105">
                             <ThumbsUp className="h-4 w-4 mr-2" />
-                            Helpful ({review.helpful})
+                            Helpful 
                           </Button>
                           <Button variant="outline" size="sm" className="text-gray-500 hover:bg-pink-50 hover:text-pink-600 transition-colors duration-300 transform hover:scale-105">
                             <ThumbsDown className="h-4 w-4 mr-2" />
-                              Not Helpful ({review.notHelpful})
+                              Not Helpful 
                           </Button>
                         </div>
                       </div>
@@ -442,4 +371,5 @@ export default function ProductDisplay() {
       </div>
     </div>
   )
+    
 }

@@ -12,21 +12,7 @@ export default function useGetProductQuery(query: string){
         queryKey: ["product"]
     });
 
-   const newProduct =product ?? {
-    id: "",
-    name: "",
-    description: "",
-    price: 0,
-    bulletPoints: [],
-    priceWithDiscount: undefined,
-    promotionalText: undefined,
-    discount: undefined,
-    numberOfreviews: 0,
-    averageRating: 0,
-    reviews: [],
-    images: [],
-}
 
-    return {isLoading, newProduct, error}
+    return {isLoading, product, error}
 }
 
