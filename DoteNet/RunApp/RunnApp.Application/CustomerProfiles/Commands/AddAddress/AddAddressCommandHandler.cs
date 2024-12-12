@@ -14,8 +14,7 @@ namespace RunnApp.Application.CustomerProfiles.Commands.AddAddress
             var user = await _profileRepository.GetCustomerProfile(request.UserId);
             if (user == null) throw new InvalidOperationException("User profile was not found with given id");
 
-            var address = user.AddAddress(request.ZipCode, request.Street, request.City,
-                                     request.BuildingNumber, request.Country, request.State);
+            var address = user.AddAddress(request.ZipCode, request.Street, request.City, request.Country, request.State);
 
             await _unitOfWorkPattern.CommitChangesAsync();
             return address;
