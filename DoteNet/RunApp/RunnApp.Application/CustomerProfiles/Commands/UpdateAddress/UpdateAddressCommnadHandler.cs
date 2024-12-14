@@ -14,8 +14,7 @@ namespace RunnApp.Application.CustomerProfiles.Commands.UpdateAddress
             var customer = await _customerProfileRepository.GetCustomerProfile(request.UserId);
             if (customer == null) return Error.NotFound(code: "UserProfileWasNotFoundWithGivenId", description: "User profile was not found with given id");
 
-            var address = customer.UpdateAddress(request.ZipCode, request.Street, request.City,
-                                     request.HouseNumber, request.Country, request.State);
+            var address = customer.UpdateAddress(request.ZipCode, request.Street, request.City, request.Country, request.State);
 
             await _unitOfWorkPattern.CommitChangesAsync();
             return address;
