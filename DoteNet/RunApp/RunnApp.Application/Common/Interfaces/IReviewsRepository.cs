@@ -10,6 +10,5 @@ namespace RunnApp.Application.Common.Interfaces
         Task<Review?> GetReview(Guid userId, Guid productId);
         Task RemoveReview(Review review);
         Task<List<Review>> GetReviewsForProduct(Guid productId);
-        Task<List<Review>> GetReviewsForCustomer(List<Guid> reviews);
     }
 }

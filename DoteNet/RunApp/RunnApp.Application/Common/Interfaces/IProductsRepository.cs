@@ -12,7 +12,7 @@ namespace RunnApp.Application.Common.Interfaces
         Task DeleteProduct(Product product);
         Task<bool> ExistProduct(Guid id);
         Task<Product> GetProductWithNoDefault(Guid id);
-        Task<List<ProductDto>> GetBoughtProducts(List<Guid> boughtProducts);
+        IQueryable<Product> GetBoughtProducts(List<Guid> boughtProducts);
         IQueryable<Product> GetCreatedProducts(List<Guid> createdProdcucts);
         Task<Product?> GetProductWithCategories(Guid productId);
         Task<Product?> GetProductWithCategories(Guid productId, Guid categoryId);
