@@ -13,6 +13,7 @@ import { useAppDispatch, useAppSelector } from "@/app/hooks/reduxHooks";
 import { getCurrentOrderId } from "./orderSlice";
 import useModifyOrderPaymentMethod from "./useModifyOrderPaymentMethod";
 import { addUserCard } from "../../registration/userSlice";
+import toast from "react-hot-toast";
 
 export default function PaymentInfoForm(){
   const dispatch = useAppDispatch();
@@ -30,7 +31,10 @@ export default function PaymentInfoForm(){
   const router = useRouter();
 
   const onPaymentInfoSubmit: SubmitHandler<PaymentResponse> = (data) => {
-    if(orderId.trim().length === 0) router.push("/userprofile/settings");
+    if(orderId.trim().length === 0){
+      toast.error("No order was created. Please add your personal info inthe settings page")
+      window.location.href = "/userprofile/settings"
+    } 
     updateOrderPamentMethod({orderId, paymentInfo: data}, {
       onSuccess: (data) => {
         dispatch(addUserCard(data))

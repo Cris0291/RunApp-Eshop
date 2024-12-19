@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useForm, SubmitHandler } from "react-hook-form"
 import { AddressSettingsForm } from "./contracts"
 import useModifyOrderAddress from "./useModifyOrderAddress"
@@ -15,6 +14,7 @@ import { useAppDispatch, useAppSelector } from "@/app/hooks/reduxHooks"
 import { getCurrentOrderId } from "./orderSlice"
 import { useRouter } from "next/navigation"
 import { addUserAddress } from "../../registration/userSlice"
+import toast from "react-hot-toast"
 
 export default function ShippingInfoForm() {
   const dispatch = useAppDispatch();
@@ -30,11 +30,13 @@ export default function ShippingInfoForm() {
       country: "",
     }
   });
-  const router = useRouter();
   
 
   const onAddressInfoSubmit: SubmitHandler<AddressSettingsForm> = (data) => {
-    if(orderId.trim().length === 0) router.push("/userprofile/settings")
+    if(orderId.trim().length === 0) {
+      toast.error("No order was created. Please add your personal info inthe settings page")
+      window.location.href = "/userprofile/settings"
+    }
     updateOrderAddress({orderId, addressInfo: data}, {
       onSuccess: (data) => {
         dispatch(addUserAddress(data));

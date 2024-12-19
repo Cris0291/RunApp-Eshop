@@ -1,41 +1,56 @@
 "use client"
 
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";;
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CheckCircle, CreditCard, DollarSign, Package, Truck, AlertCircle  } from "lucide-react";
-import { useState } from "react";
-import { useAppSelector } from "@/app/hooks/reduxHooks";
+import { CheckCircle, DollarSign, Package, Truck, AlertCircle  } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/app/hooks/reduxHooks";
 import { getCartItems, getTotalPrice } from "../shoppingcart/cartSlice";
 import { getUserAddress, getUserPaymentMethod } from "../../registration/userSlice";
 import ShippingInfoForm from "./ShippingInfoForm";
 import PaymentInfoForm from "./PaymentInfoForm";
 import usePayOrder from "./usePayOrder";
-import { getCurrentOrderId } from "./orderSlice";
+import { addError, getCurrentOrderId, getOrderError, payCurrentOrder } from "./orderSlice";
+import EmptyCartCard from "./EmptyCartcard";
+import toast from "react-hot-toast";
 
 export default function CheckoutPage(){
+  const dispatch = useAppDispatch();
   const cartItems = useAppSelector(getCartItems);
   const totalPrice = useAppSelector(getTotalPrice);
   const userAddress = useAppSelector(getUserAddress);
   const userPaymentMethod = useAppSelector(getUserPaymentMethod);
   const orderId = useAppSelector(getCurrentOrderId);
-  const [payErrors, SetPayErrors] = useState<(string | undefined)[]>([])
+  const [payErrors, SetPayErrors] = useState<(string | undefined)[]>([]);
+  const orderError = useAppSelector(getOrderError);
   const {payOrder} = usePayOrder();
 
   const onSubmitPayOrder = () => {
     const newErrors: (string | undefined)[] = [];
     if(userAddress === undefined) newErrors.push("Order address must be included before the order is ready");
     if(userPaymentMethod === undefined) newErrors.push("Order payment method must be included before the order is ready");
-    if(orderId.trim().length === 0) newErrors.push("There are no items on the cart");
+    if(cartItems.length === 0) newErrors.push("There are no items on the cart");
 
     SetPayErrors(newErrors);
 
-    if(newErrors.length === 0) payOrder(orderId);
+    if(newErrors.length === 0) payOrder(orderId, {
+      onSuccess: () => {
+        toast.success("Your order was paid correctly");
+        dispatch(payCurrentOrder());
+      },
+      onError: () => toast.error("Something unexpected happened. Your order could not be processed")
+    });
   }
       
+  useEffect(() => {
+      if(orderError !== undefined){
+        const tempOrderError = orderError;
+        dispatch(addError(undefined));
+        throw new Error(tempOrderError);
+      }
+    }, [orderError])
 
 return (
   <div className="min-h-screen bg-gray-100 text-gray-900 py-12">
@@ -52,26 +67,27 @@ return (
                 </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              {cartItems.map(item => (
-                <div key={item.id} className="flex items-center space-x-4 mb-4 pb-4 border-b border-gray-100 last:border-b-0 last:pb-0 last:mb-0">
-                 <div className="flex-grow">
-                   <h3 className="font-semibold text-lg">{item.name}</h3>
-                   <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
-                 </div>
-                 {item.priceWithDiscount === undefined ? 
-                 <p className="font-semibold text-lg">${(item.price * (item.quantity === null ? 0 : item.quantity)).toFixed(2)}</p> :
-                 <>
-                 <p className="text-black text-lg line-through">${(item.price * (item.quantity === null ? 0 : item.quantity)).toFixed(2)}</p>
-                 <p className="font-semibold text-red-500 text-lg">${(item.priceWithDiscount * (item.quantity === null ? 0 : item.quantity)).toFixed(2)}</p>
-                 </> }
-                </div>
-              ))}
+              {cartItems.length === 0 ? <EmptyCartCard onGoToStore={() => window.location.href = "/products"}/> : 
+                cartItems.map(item => (
+                  <div key={item.id} className="flex items-center space-x-4 mb-4 pb-4 border-b border-gray-100 last:border-b-0 last:pb-0 last:mb-0">
+                   <div className="flex-grow">
+                     <h3 className="font-semibold text-lg">{item.name}</h3>
+                     <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                   </div>
+                   {item.priceWithDiscount === undefined ? 
+                   <p className="font-semibold text-lg">${(item.price * (item.quantity === null ? 0 : item.quantity)).toFixed(2)}</p> :
+                   <>
+                   <p className="text-black text-lg line-through">${(item.price * (item.quantity === null ? 0 : item.quantity)).toFixed(2)}</p>
+                   <p className="font-semibold text-red-500 text-lg">${(item.priceWithDiscount * (item.quantity === null ? 0 : item.quantity)).toFixed(2)}</p>
+                   </> }
+                  </div>
+                ))}
             </CardContent>
           </Card>
 
-          {userAddress === undefined ?
+          {userAddress === undefined && cartItems.length !== 0 && orderId.trim().length !== 0?
           <ShippingInfoForm/>
-          :
+          : userAddress!== undefined && cartItems.length !== 0 && orderId.trim().length !== 0?
           <Card className="bg-white shadow-lg rounded-lg overflow-hidden">
             <CardHeader className="bg-gray-50 border-b border-gray-200">
               <CardTitle className="text-xl text-gray-800 flex items-center">
@@ -87,11 +103,11 @@ return (
                 <p className="flex items-center"><CheckCircle className="mr-2 text-green-500" /> <strong>Country: </strong>{userAddress.country}</p>
               </div>
             </CardContent>
-          </Card>}
+          </Card>: ""}
 
-          {userPaymentMethod === undefined ?
+          {userPaymentMethod === undefined && cartItems.length !== 0 && orderId.trim().length !== 0?
           <PaymentInfoForm/>
-          :
+          : userPaymentMethod !== undefined && cartItems.length !== 0 && orderId.trim().length !== 0?
           <Card className="bg-white shadow-lg rounded-lg overflow-hidden">
             <CardHeader className="bg-gray-50 border-b border-gray-200">
               <CardTitle className="text-xl text-gray-800 flex items-center">
@@ -106,7 +122,7 @@ return (
                 <p className="flex items-center"><CheckCircle className="mr-2 text-green-500" /> <strong>Cvv: </strong>{userPaymentMethod.cvv}</p>
               </div>
             </CardContent>
-          </Card>}
+          </Card>: ""}
         </div>
 
         <div>
@@ -147,7 +163,7 @@ return (
                   </AlertDescription>
                </Alert>
                        )} 
-               <Button className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition-colors duration-300 text-lg font-semibold py-6 mt-3" size="lg" onClick={onSubmitPayOrder} >
+               <Button className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition-colors duration-300 text-lg font-semibold py-6 mt-3" size="lg" onClick={onSubmitPayOrder} disabled={cartItems.length === 0}>
                  <DollarSign className="mr-2 h-5 w-5"/> Pay ${totalPrice.toFixed(2)}
                </Button>
                </div>
