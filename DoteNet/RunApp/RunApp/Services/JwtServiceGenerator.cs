@@ -1,6 +1,7 @@
 ﻿
 
 using Contracts.Common;
+using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using RunApp.Domain.StoreOwnerProfileAggregate;
 using RunApp.Domain.UserAggregate;
@@ -28,6 +29,33 @@ namespace RunApp.Api.Services
             return token;
         }
 
+        public ClaimsPrincipal? GetPrincipalFromJwtToken(string? token)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = true,
+                ValidAudience = _configuration["Jwt:Audience"],
+                ValidateIssuer = true,
+                ValidIssuer = _configuration["Jwt:Issuer"],
+
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"])),
+
+                ValidateLifetime = false
+            };
+
+            JwtSecurityTokenHandler jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
+
+            ClaimsPrincipal claimsPrincipal =  jwtSecurityTokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+
+            if(securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCulture))
+            {
+                throw new SecurityTokenException("Invalid Token");
+            }
+
+            return claimsPrincipal;
+
+        }
         private List<Claim> GenerateClaims(AppUser? user, StoreOwnerProfile? storeProfile, CustomClaim[]? customClaims = null)
         {
             var claims = new List<Claim>();
