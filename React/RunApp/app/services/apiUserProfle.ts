@@ -1,10 +1,8 @@
-import axios from "axios";
-import { UserBoughtProducts, UserLikes, UserReviews } from "../features/profiles/userprofile/contracts";
-
-axios.defaults.baseURL = "http://localhost:5253"; 
+import { SimpleBoughtProducts, UserBoughtProducts, UserLikes, UserReviews } from "../features/profiles/userprofile/contracts";
+import { axiosInstance } from "./axiosInstance";
 
 export default async function GetUserReviews(token: string){
-    return axios.get<UserReviews>("api/user/reviews", {
+    return axiosInstance.get<UserReviews>("api/user/reviews", {
         headers: {
             "Authorization": `Bearer ${token}`
         }
@@ -12,7 +10,7 @@ export default async function GetUserReviews(token: string){
 }
 
 export async function GetUserLikedProducts(token: string){
-    return axios.get<UserLikes>("api/user/likes", {
+    return axiosInstance.get<UserLikes>("api/user/likes", {
         headers: {
             "Authorization": `Bearer ${token}`
         }
@@ -20,7 +18,15 @@ export async function GetUserLikedProducts(token: string){
 }
 
 export async function GetUserBoughtProducts(token: string){
-    return axios.get<UserBoughtProducts>("api/user/bought-products", {
+    return axiosInstance.get<UserBoughtProducts>("api/user/bought-products", {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+    }).then(response => response.data)
+}
+
+export async function GetBoughtProducts(token: string){
+    return axiosInstance.get<SimpleBoughtProducts>("api/user/bought", {
         headers: {
             "Authorization": `Bearer ${token}`
         }

@@ -1,11 +1,10 @@
-import axios from "axios"
 import { ProductForCard, ProductForCardWithDiscount } from "../features/store/products/contracts";
+import { axiosInstance } from "./axiosInstance";
 
 
-axios.defaults.baseURL = "http://localhost:5253"; 
 
 export default async  function getProducts(queryValues : string, token: string){
-    return axios.get<ProductForCard>(`api/products?${queryValues}`, {
+    return axiosInstance.get<ProductForCard[]>(`api/products?${queryValues}`, {
         headers: {
             "Authorization": `Bearer ${token}`
         }
@@ -13,7 +12,7 @@ export default async  function getProducts(queryValues : string, token: string){
 }
 
 export async function getProductsWithDiscount(token: string){
-    return axios.get<ProductForCardWithDiscount>("", {
+    return axiosInstance.get<ProductForCardWithDiscount>("api/products/product-discount", {
         headers: {
             "Authorization": `Bearer ${token}`
         }

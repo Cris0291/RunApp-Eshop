@@ -1,9 +1,13 @@
-import axios from "axios";
 import { LoginFormValues } from "../features/login/contracts";
 import { UserDto } from "../features/registration/contracts";
+import { axiosInstance } from "./axiosInstance";
 
-axios.defaults.baseURL = "http://localhost:5253"; 
 
 export default function loginRequest(login : LoginFormValues) : Promise<UserDto>{
-    return axios.post("api/accounts/login", login).then(response => response.data)
+    return axiosInstance.post("api/accounts/login", login).then(response => response.data)
+}
+
+export async function refreshAccessToken(token: string, refreshToken: string){
+    return axiosInstance.post<UserDto>("api/accounts/generate-token", {Token: token, RefreshToken: refreshToken})
+    .then(response => response.data)
 }
