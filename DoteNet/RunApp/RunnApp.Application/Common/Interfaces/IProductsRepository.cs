@@ -18,5 +18,6 @@ namespace RunnApp.Application.Common.Interfaces
         Task<Product?> GetProductWithCategories(Guid productId, Guid categoryId);
         Task DeleteCategory(Category category);
         IQueryable<Product> GetLatestDiscounts();
+        IQueryable<Product> GetProductWithCategoriesQuery(Guid productId);
     }
 }

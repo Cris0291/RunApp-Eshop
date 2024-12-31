@@ -9,5 +9,6 @@ namespace RunnApp.Application.Common.Interfaces
         Task<Order?> GetOrder(Guid orderId);
         Task<Order?> GetOrderWithoutItems(Guid orderId);
         Task DeleteItem(LineItem item);
+        Task<Order?> GetCurrentOrder(Guid orderId);
     }
 }
