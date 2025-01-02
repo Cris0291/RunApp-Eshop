@@ -7,8 +7,6 @@ namespace Contracts.Accounts.Request
         [EmailAddress] 
         string Email,
         [Required(ErrorMessage = "{0} can't be null or empty")] 
-        string Password,
-        [Required(ErrorMessage = "{0} can't be null or empty")]
-        bool IsSalesProfile);
+        string Password);
     
 }
