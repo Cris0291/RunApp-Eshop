@@ -1,14 +1,11 @@
-﻿using Bogus.DataSets;
+﻿
 using Contracts.Products.Requests;
 using Contracts.Products.Responses;
-using Contracts.Rates.Response;
-using Contracts.Reviews.Responses;
 using RunApp.Domain.Products;
+using RunnApp.Application.CustomerProfiles.Queries.GetUserLikes;
 using RunnApp.Application.Products.Commands.CreateProduct;
 using RunnApp.Application.Products.Commands.UpdateProduct;
-using RunnApp.Application.Products.Queries.GetProduct;
 using RunnApp.Application.Products.Queries.GetProducts;
-using System.Drawing;
 
 namespace RunApp.Api.Mappers.Products
 {
@@ -17,11 +14,7 @@ namespace RunApp.Api.Mappers.Products
         public static ProductResponse ProductToProductResponse(this Product product)
         {
             IEnumerable<string> bulletpoints = product.BulletPoints.Select(bulletpoint => bulletpoint.BulletPoint);
-            return new ProductResponse(product.ProductId, product.Name, product.Description, product.ActualPrice, bulletpoints, product.PriceOffer != null ? product.PriceOffer.PriceWithDiscount : null, product.PriceOffer != null ? product.PriceOffer.PromotionalText : null, product.PriceOffer != null ? product.PriceOffer.Discount : null, product.Characteristic.Brand, product.Characteristic.Type, product.Characteristic.Color, product.Characteristic.Weight, product.Categories.Select(x => x.CategoryName).ToArray());
-        }
-        public static IEnumerable<ProductResponse> ProductsToProductsResponse(this IEnumerable<Product> products)
-        {
-            return products.Select(x => x.ProductToProductResponse());
+            return new ProductResponse(product.ProductId, product.Name, product.Description, product.ActualPrice, bulletpoints, product.PriceOffer != null ? product.PriceOffer.PriceWithDiscount : null, product.PriceOffer != null ? product.PriceOffer.PromotionalText : null, product.Characteristic.Brand, product.Characteristic.Type, product.Characteristic.Color, product.Characteristic.Weight, product.Categories.Select(x => x.CategoryName).ToArray());
         }
         public static IEnumerable<ProductForCard> AllProductsToProductsResponse(this IEnumerable<ProductsJoin> productsJoin)
         {
@@ -59,7 +52,15 @@ namespace RunApp.Api.Mappers.Products
         }
         public static UserBoughtProductsResponse ProductWithImageToProductResponse(this ProductWithMainImage productWithMainImage)
         {
-            return new UserBoughtProductsResponse(productWithMainImage.Product.ProductId, productWithMainImage.MainImage?.Url, productWithMainImage.Product.ActualPrice, productWithMainImage.Product.Name);
+            return new UserBoughtProductsResponse(productWithMainImage.Product.ProductId, productWithMainImage.MainImage?.Url, productWithMainImage.Product.ActualPrice, productWithMainImage.Product.Name, (productWithMainImage.Product.Categories.Select(x => x.CategoryName).ToArray())[0]);
+        }
+        public static IEnumerable<CreatedProductResponseDto> ProductsWithImageToCreatedProductsResponse(this IEnumerable<ProductWithMainImage> productWithMainImages)
+        {
+            return productWithMainImages.Select(x => x.ProductWithImageToCreatedProductResponse()).ToList();
+        }
+        public static CreatedProductResponseDto ProductWithImageToCreatedProductResponse(this ProductWithMainImage productWithMainImage)
+        {
+            return new CreatedProductResponseDto(productWithMainImage.Product.ProductId, productWithMainImage.MainImage?.Url, productWithMainImage.Product.ActualPrice, productWithMainImage.Product.Name, productWithMainImage.Product.PriceOffer?.PriceWithDiscount, productWithMainImage.Product.Categories.Select(x => x.CategoryName).ToArray());
         }
         public static IEnumerable<ProductsWithDiscount> ProductsWithImageAndDiscountToProductsResponse(this IEnumerable<ProductWithMainImage> productWithMainImages)
         {
@@ -76,6 +77,31 @@ namespace RunApp.Api.Mappers.Products
             };
 
             return new ProductsWithDiscount(productWithMainImage.Product.ProductId, productWithMainImage.Product.Name, productWithMainImage.MainImage?.Url, productWithMainImage.Product.ActualPrice, productWithMainImage.Product.PriceOffer?.Discount, productWithMainImage.Product.PriceOffer?.PriceWithDiscount, size);
+        }
+        public static IEnumerable<LikesWithProductResponse> LikesDtoToLikesResponse(this IEnumerable<ProductUserLikesDto> products)
+        {
+            return products.Select(x => x.LikeDtoToLikeResponse());
+        }
+        public static LikesWithProductResponse LikeDtoToLikeResponse(this ProductUserLikesDto product)
+        {
+            return new LikesWithProductResponse(product.Product?.Product.ProductId, product.Product?.Product.Name, product.Product?.MainImage?.Url, product.Product?.Product.ActualPrice, product.ProductStatus.ProductStatusId, product.ProductStatus.Like);
+        }
+        public static int[] FromQueryStarValuesToRequestQuery(this string filterByStars)
+        {
+            var stars = filterByStars.Split("%2C");
+            var intStars = stars.Select(x =>
+            {
+                bool isInt = int.TryParse(x, out int star);
+                if (!isInt) throw new InvalidOperationException("The given star did not represent a valid number");
+
+                return star;
+            }).ToArray();
+
+            return intStars;
+        }
+        public static string[] FromQueryCategoryValuesToRequestQuey(this string filterByCategory)
+        {
+            return filterByCategory.Split("%2C");
         }
     }
 }
