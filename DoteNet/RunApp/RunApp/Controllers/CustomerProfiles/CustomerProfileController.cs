@@ -1,5 +1,6 @@
 ﻿using Contracts.Common;
 using Contracts.CustomerProfile.Request;
+using Contracts.Products.Responses;
 using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using RunApp.Api.Mappers.CustomerProfiles;
 using RunApp.Api.Mappers.Orders;
 using RunApp.Api.Mappers.Products;
+using RunApp.Api.Mappers.Reviews;
 using RunApp.Api.Routes;
 using RunApp.Api.Services;
 using RunApp.Domain.UserAggregate;
@@ -16,11 +18,11 @@ using RunnApp.Application.CustomerProfiles.Commands.AddPaymentMethod;
 using RunnApp.Application.CustomerProfiles.Commands.UpdateAccountInfo;
 using RunnApp.Application.CustomerProfiles.Commands.UpdateAddress;
 using RunnApp.Application.CustomerProfiles.Commands.UpdatePaymentMethod;
+using RunnApp.Application.CustomerProfiles.Queries.GetSimpleBoughtProducts;
 using RunnApp.Application.CustomerProfiles.Queries.GetUserAccountInfo;
 using RunnApp.Application.CustomerProfiles.Queries.GetUserBoughtProducts;
 using RunnApp.Application.CustomerProfiles.Queries.GetUserCreatedProducts;
 using RunnApp.Application.CustomerProfiles.Queries.GetUserLikes;
-using RunnApp.Application.CustomerProfiles.Queries.GetUserRatings;
 using RunnApp.Application.CustomerProfiles.Queries.GetUserReviews;
 
 namespace RunApp.Api.Controllers.CustomerProfiles
@@ -37,17 +39,7 @@ namespace RunApp.Api.Controllers.CustomerProfiles
             Guid userId = HttpContext.GetUserId();
             var userReviews = await _mediator.Send(new GetUserReviewsQuery(userId));
 
-            return userReviews.MatchFirst(Ok, Problem);
-        }
-
-        [Authorize]
-        [HttpGet(ApiEndpoints.CustomerProfiles.GetUserRatings)]
-        public async Task<IActionResult> GetRatings()
-        {
-            Guid userId = HttpContext.GetUserId();
-            var userRatings = await _mediator.Send(new GetUserRatingsQuery(userId));
-
-            return userRatings.MatchFirst(Ok, Problem);
+            return userReviews.MatchFirst(value => Ok(value.ReviewsToUserReviewsResponse()), Problem);
         }
 
         [Authorize]
@@ -58,7 +50,7 @@ namespace RunApp.Api.Controllers.CustomerProfiles
 
             var userLikes = await _mediator.Send(new GetUserLikesQuery(userId));
 
-            return Ok(userLikes);
+            return Ok(userLikes.LikesDtoToLikesResponse());
         }
 
         [Authorize]
@@ -66,9 +58,19 @@ namespace RunApp.Api.Controllers.CustomerProfiles
         public async Task<IActionResult> GetBoughtProducts()
         {
             Guid userId = HttpContext.GetUserId();
-            var productWithImage =await _mediator.Send(new GetUserBoughtProductsQuery(userId));
+            var productWithImage = await _mediator.Send(new GetUserBoughtProductsQuery(userId));
 
-            return productWithImage.Match(value => Ok(value.ProductsWithImageToProductsResponse()), Problem);
+            return productWithImage.MatchFirst(value => Ok(value.ProductsWithImageToProductsResponse()), Problem);
+        }
+
+        [Authorize]
+        [HttpGet(ApiEndpoints.CustomerProfiles.GetBoughtProducts)]
+        public async Task<IActionResult> GetSimpleBoughtProducts()
+        {
+            Guid userId = HttpContext.GetUserId();
+            var result = await _mediator.Send(new GetSimpleBoughtProductsQuery(userId));
+
+            return result.MatchFirst(value => Ok(new SimpleBoughtProductsResponse(value.BoughtProducts, value.BoughtproductsWithReviews)), Problem);
         }
 
         [Authorize]
@@ -77,7 +79,7 @@ namespace RunApp.Api.Controllers.CustomerProfiles
         {
             Guid userId = HttpContext.GetUserId();
 
-            var result = await _mediator.Send(new AddAddressCommand(userId, addressRequest.ZipCode, addressRequest.Street, addressRequest.City, addressRequest.HouseNumber, addressRequest.Country, addressRequest.State));
+            var result = await _mediator.Send(new AddAddressCommand(userId, addressRequest.ZipCode, addressRequest.Address, addressRequest.City, addressRequest.Country, addressRequest.State));
 
             return result.Match(value => Ok(value.FromAddressToAddressResponse()), Problem);
         }
@@ -88,7 +90,7 @@ namespace RunApp.Api.Controllers.CustomerProfiles
         {
             Guid userId = HttpContext.GetUserId();
 
-            var result = await _mediator.Send(new AddPaymentMethodCommand(userId, cardRequest.HoldersName, cardRequest.CardNumber, cardRequest.CVV, cardRequest.ExpiryDate));
+            var result = await _mediator.Send(new AddPaymentMethodCommand(userId, cardRequest.CardName, cardRequest.CardNumber, cardRequest.CVV, cardRequest.ExpiryDate));
 
             return result.MatchFirst(value => Ok(value.FromCardToCardDto()), Problem);
         }
@@ -99,7 +101,7 @@ namespace RunApp.Api.Controllers.CustomerProfiles
         {
             Guid userId = HttpContext.GetUserId();
 
-            var result = await _mediator.Send(new UpdateAddressCommand(userId, addressRequest.ZipCode, addressRequest.Street, addressRequest.City, addressRequest.HouseNumber, addressRequest.Country, addressRequest.State));
+            var result = await _mediator.Send(new UpdateAddressCommand(userId, addressRequest.ZipCode, addressRequest.Address, addressRequest.City, addressRequest.Country, addressRequest.State));
 
             return result.MatchFirst(value => Ok(value.FromAddressToAddressResponse()), Problem);
         }
@@ -110,7 +112,7 @@ namespace RunApp.Api.Controllers.CustomerProfiles
         {
             Guid userId = HttpContext.GetUserId();
 
-            var result = await _mediator.Send(new UpdatePaymentMethodCommand(userId, cardRequest.HoldersName, cardRequest.CardNumber, cardRequest.CVV, cardRequest.ExpiryDate));
+            var result = await _mediator.Send(new UpdatePaymentMethodCommand(userId, cardRequest.CardName, cardRequest.CardNumber, cardRequest.CVV, cardRequest.ExpiryDate));
 
             return result.MatchFirst(value => Ok(value.FromCardToCardDto()), Problem);
         }
@@ -166,7 +168,7 @@ namespace RunApp.Api.Controllers.CustomerProfiles
 
             var result = await _mediator.Send(new GetUserCreatedProductsQuery(userId));
 
-            return result.Match(value => Ok(value.ProductsWithImageToProductsResponse()), Problem);
+            return result.Match(value => Ok(value.ProductsWithImageToCreatedProductsResponse()), Problem);
         }
     }
 }

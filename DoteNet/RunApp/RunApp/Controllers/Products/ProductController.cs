@@ -19,6 +19,7 @@ using RunnApp.Application.Products.Commands.AddCategory;
 using RunApp.Api.Mappers.Categories;
 using RunnApp.Application.Products.Commands.DeleteCategory;
 using RunnApp.Application.Products.Queries.GetProductsWithDiscount;
+using RunnApp.Application.Products.Queries.ExistProduct;
 
 
 
@@ -40,13 +41,12 @@ namespace RunApp.Api.Controllers.Products
         [HttpGet(ApiEndpoints.Products.GetProductById)]
         public async Task<IActionResult> Get([FromRoute] Guid id)
         {
-            
-           var productQuery = new GetProductQuery(id);
+            Guid userId = HttpContext.GetUserId();
+            var productQuery = new GetProductQuery(id, userId);
 
             var queryResponse = await _mediator.Send(productQuery);
 
-            return queryResponse.MatchFirst(product => Ok(queryResponse),
-            Problem);
+            return queryResponse.MatchFirst(Ok, Problem);
         }
 
         [Authorize]
@@ -55,10 +55,10 @@ namespace RunApp.Api.Controllers.Products
         {
             Guid userId = HttpContext.GetUserId();
 
-            var options  = getAllProducts.SortingType.ConverToEnum();
+            var options  = getAllProducts.SortBy.ConverToEnum();
             if (options.IsError) return Problem(options.Errors);
 
-            GetProductsQuery getProductsQuery = new GetProductsQuery(userId, options.Value, getAllProducts.filterByLikes, getAllProducts.filterByStars, getAllProducts.Categories, getAllProducts.PriceRange, getAllProducts.search);
+            GetProductsQuery getProductsQuery = new GetProductsQuery(userId, options.Value, getAllProducts.FilterByStars.FromQueryStarValuesToRequestQuery(), getAllProducts.FilterByCategory.FromQueryCategoryValuesToRequestQuey(), getAllProducts.FilterByPrice, getAllProducts.Search);
 
             var products = await _mediator.Send(getProductsQuery);
             return products.Match(value => Ok(value.AllProductsToProductsResponse()), Problem);
@@ -109,11 +109,11 @@ namespace RunApp.Api.Controllers.Products
         [HttpPost(ApiEndpoints.Products.AddPriceWithDiscount)]
         public async Task<IActionResult> AddDiscount([FromRoute] Guid id, ProductDiscountRequest discount)
         {
-            AddDiscountCommand discountCommand = new AddDiscountCommand(id, discount.PriceWithDiscount, discount.PromotionalText);
+            AddDiscountCommand discountCommand = new AddDiscountCommand(id, discount.NewPriceWithDiscount, discount.NewPromotionalText);
 
             var productWithDiscount = await _mediator.Send(discountCommand);
 
-           return productWithDiscount.Match(result => Ok(result.ProductToProductResponse()), Problem);
+           return productWithDiscount.Match(result => Ok(), Problem);
         }
 
         [Authorize]
@@ -139,6 +139,15 @@ namespace RunApp.Api.Controllers.Products
         {
             var result = await _mediator.Send(new DeleteCategoryCommand(deleteTag.ProductId, deleteTag.CategoryId));
             return result.Match(value => Ok(), Problem);
+        }
+
+        [Authorize]
+        [HttpGet(ApiEndpoints.Products.ExistProduct)]
+        public async Task<IActionResult> ExistProduct([FromRoute] Guid id)
+        {
+            var result = await _mediator.Send(new ExistProductQuery(id));
+
+            return result.MatchFirst(value => Ok(), Problem);
         }
     }
 }

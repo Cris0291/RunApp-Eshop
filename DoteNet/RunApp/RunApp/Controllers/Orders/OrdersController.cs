@@ -7,10 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using RunApp.Api.Mappers.Orders;
 using RunApp.Api.Routes;
 using RunApp.Api.Services;
-using RunnApp.Application.Orders.Commands.CreateOrder;
 using RunnApp.Application.Orders.Commands.ModifyAddress;
 using RunnApp.Application.Orders.Commands.ModifyPaymentMethod;
 using RunnApp.Application.Orders.Commands.PayOrder;
+using RunnApp.Application.Orders.Queries.GetOrder;
 
 namespace RunApp.Api.Controllers.Orders
 {
@@ -58,7 +58,18 @@ namespace RunApp.Api.Controllers.Orders
 
             var result = await _mediator.Send(new PayOrderCommand(userId, orderId));
 
-            return result.MatchFirst(value => Ok(value.FromOrderToOrderDto()), Problem);
+            return result.MatchFirst(value => Ok(), Problem);
+        }
+
+        [Authorize]
+        [HttpGet(ApiEndpoints.Orders.GetCurrentOrder)]
+        public async Task<IActionResult> GetOrder()
+        {
+            Guid userId = HttpContext.GetUserId();
+
+            var result = await _mediator.Send(new GetOrderQuery(userId));
+
+            return result.MatchFirst(value => Ok(value.FromOrderWrapperToOrderResponse()), Problem);
         }
     }
 }

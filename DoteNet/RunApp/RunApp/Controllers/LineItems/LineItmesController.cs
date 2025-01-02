@@ -19,7 +19,7 @@ namespace RunApp.Api.Controllers.LineItems
         [HttpPost(ApiEndpoints.Orders.AddItem)]
         public async Task<IActionResult> AddItem([FromBody] ItemResquestDto lineItem, [FromRoute] Guid orderId)
         {
-            var result  = await _mediator.Send(new AddItemCommand(orderId, lineItem.ProductId, lineItem.ProductName, lineItem.Quantity, lineItem.Price, lineItem.PriceWithDiscount));
+            var result  = await _mediator.Send(new AddItemCommand(orderId, lineItem.Id, lineItem.Name, lineItem.Quantity, lineItem.Price, lineItem.PriceWithDiscount, lineItem.TotalPrice));
 
             return result.Match(value =>
             {
@@ -42,7 +42,7 @@ namespace RunApp.Api.Controllers.LineItems
         {
             var result = await _mediator.Send(new ChangeItemQuantityCommand(orderId, changeQuantity.ProductId, changeQuantity.Quantity));
 
-            return result.MatchFirst(value => Ok(value.FromLineItemToLineItemDtoResponse()), Problem);
+            return result.Match(value => Ok(), Problem);
         }
 
     }

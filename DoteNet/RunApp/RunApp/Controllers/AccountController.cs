@@ -13,18 +13,21 @@ using RunApp.Domain.Common;
 using RunApp.Domain.UserAggregate;
 using RunApp.Domain.UserAggregate.Events;
 using RunnApp.Application.StoreOwnerProfiles.Commands.LoginStoreOwnerProfile;
+using System.Security.Claims;
+using System.Security.Cryptography;
 
 namespace RunApp.Api.Controllers
 {
 
     [AllowAnonymous]
     [ApiController]
-    public class AccountController(UserManager<AppUser> userManager, IJwtServiceGenerator jwtServiceGenerator, IHttpContextAccessor httpContextAccessor, ISender mediator) : ApiController
+    public class AccountController(UserManager<AppUser> userManager, IJwtServiceGenerator jwtServiceGenerator, IHttpContextAccessor httpContextAccessor, ISender mediator, IConfiguration configuration) : ApiController
     {
         private readonly UserManager<AppUser> _userManager = userManager;
         private readonly IJwtServiceGenerator _jwtServiceGenerator = jwtServiceGenerator;
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly ISender _mediator = mediator;
+        private readonly IConfiguration _configuration = configuration;
 
         [HttpPost(ApiEndpoints.Account.Register)]
         public async Task<IActionResult> Register(RegisterDto registerDto)
@@ -49,7 +52,12 @@ namespace RunApp.Api.Controllers
             {
                 var token = _jwtServiceGenerator.GenerateJwtToken(newUser);
                 AddCustomerProfileEvent(_httpContextAccessor, newUser);
-                UserDto userDto = new UserDto(newUser.UserName, newUser.NickName,token, newUser.Email);
+                var refreshToken = GenerateRefreshToken();
+                var refreshTokenExiprationDate = DateTime.Now.AddMinutes(Convert.ToInt32(_configuration["RefreshToken:EXPIRATION_MINUTES"]));
+                newUser.RefreshToken = refreshToken;
+                newUser.RefreshTokenExpirationDate = refreshTokenExiprationDate;
+                await _userManager.UpdateAsync(newUser);
+                UserDto userDto = new UserDto(newUser.UserName, newUser.NickName,token, newUser.Email, refreshToken, refreshTokenExiprationDate);
                 
                 return Ok(userDto);
             }
@@ -73,7 +81,12 @@ namespace RunApp.Api.Controllers
             var user = userOrError.Value;
 
             var token = _jwtServiceGenerator.GenerateJwtToken(user);
-            UserDto userDto = new UserDto(user.UserName!, user.NickName, token, user.Email!);
+            var refreshToken = GenerateRefreshToken();
+            var refreshTokenExiprationDate = DateTime.Now.AddMinutes(Convert.ToInt32(_configuration["RefreshToken:EXPIRATION_MINUTES"]));
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpirationDate = refreshTokenExiprationDate;
+            await _userManager.UpdateAsync(user);
+            UserDto userDto = new UserDto(user.UserName!, user.NickName, token, user.Email!, refreshToken, refreshTokenExiprationDate);
             return Ok(userDto);
         }
 
@@ -102,6 +115,37 @@ namespace RunApp.Api.Controllers
             return Ok();
         }
 
+        [HttpPost(ApiEndpoints.Account.GenerateNewToken)]
+        public async Task<IActionResult> GenerateNewAccessToken(TokenModelDto tokenModel)
+        {
+            if (tokenModel == null) return BadRequest("Invalid client request");
+
+            var principal = _jwtServiceGenerator.GetPrincipalFromJwtToken(tokenModel.Token);
+
+            if (principal == null)
+            {
+                return BadRequest("Invalid jwt access token");
+            }
+
+            string? email = principal.FindFirstValue(ClaimTypes.Email);
+
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if(user == null || user.RefreshToken != tokenModel.RefreshToken || user.RefreshTokenExpirationDate <= DateTime.Now)
+            {
+                return BadRequest("Invalid refresh token");
+            }
+
+            var token = _jwtServiceGenerator.GenerateJwtToken(user);
+            var refreshToken = GenerateRefreshToken();
+            var refreshTokenExiprationDate = DateTime.Now.AddMinutes(Convert.ToInt32(_configuration["RefreshToken:EXPIRATION_MINUTES"]));
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpirationDate = refreshTokenExiprationDate;
+            await _userManager.UpdateAsync(user);
+            UserDto userDto = new UserDto(user.UserName!, user.NickName, token, user.Email!, refreshToken, refreshTokenExiprationDate);
+            return Ok(userDto);
+        }
+
         private void AddCustomerProfileEvent(IHttpContextAccessor httpContextAccessor, AppUser user)
         {
             Queue<IDomainEvent> domainEventsQueue =  httpContextAccessor.HttpContext!.Items.TryGetValue("DomainEvents", out var events)  && events is Queue<IDomainEvent> domainEvents ? domainEvents : new Queue<IDomainEvent>();
@@ -123,6 +167,14 @@ namespace RunApp.Api.Controllers
             if(listOfErrors.Count > 0) return listOfErrors;
 
             return user;
+        }
+        private string GenerateRefreshToken()
+        {
+            byte[] bytes = new byte[64];
+            var randomNumberGenerator = RandomNumberGenerator.Create();
+
+            randomNumberGenerator.GetBytes(bytes);
+            return Convert.ToBase64String(bytes);
         }
     }
 }
