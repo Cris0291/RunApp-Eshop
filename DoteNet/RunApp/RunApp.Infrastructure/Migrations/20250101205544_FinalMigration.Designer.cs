@@ -12,8 +12,8 @@ using RunApp.Infrastructure.Common.Persistence;
 namespace RunApp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppStoreDbContext))]
-    [Migration("20240907165249_StockRelationMigration")]
-    partial class StockRelationMigration
+    [Migration("20250101205544_FinalMigration")]
+    partial class FinalMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,21 @@ namespace RunApp.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("CategoryProduct", b =>
+                {
+                    b.Property<Guid>("CategoriesCategoryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("CategoriesCategoryId", "ProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("CategoryProduct");
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
@@ -130,16 +145,20 @@ namespace RunApp.Infrastructure.Migrations
 
             modelBuilder.Entity("RunApp.Domain.CustomerProfileAggregate.CustomerProfile", b =>
                 {
-                    b.Property<Guid>("CustomerProfileId")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BoughtProducts")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreatedProducts")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -149,23 +168,138 @@ namespace RunApp.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Phone")
-                        .HasColumnType("int");
+                    b.Property<string>("Orders")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("CustomerProfileId");
+                    b.Property<string>("Ratings")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("Id")
-                        .IsUnique();
+                    b.Property<string>("Reviews")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Statuses")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
 
                     b.ToTable("CustomerProfiles");
                 });
 
-            modelBuilder.Entity("RunApp.Domain.CustomerProfileAggregate.ProductStatuses.ProductStatus", b =>
+            modelBuilder.Entity("RunApp.Domain.OrderAggregate.LineItems.LineItem", b =>
+                {
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("LineItemID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("OrderId1")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal?>("PriceWithDiscount")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalItemPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.HasKey("ProductId", "OrderId");
+
+                    b.HasAlternateKey("LineItemID");
+
+                    b.HasIndex("LineItemID");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("OrderId1");
+
+                    b.ToTable("LineItem");
+                });
+
+            modelBuilder.Entity("RunApp.Domain.OrderAggregate.Order", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("DateOfPayment")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("getutcdate()");
+
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("RunApp.Domain.PhotoAggregate.Photo", b =>
+                {
+                    b.Property<string>("PhotoId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("CustomerProfileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsAvatar")
+                        .HasColumnType("bit");
+
                     b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PhotoId");
+
+                    b.ToTable("Photos");
+                });
+
+            modelBuilder.Entity("RunApp.Domain.ProductAggregate.Categories.Category", b =>
+                {
+                    b.Property<Guid>("CategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CategoryId");
+
+                    b.ToTable("Category");
+                });
+
+            modelBuilder.Entity("RunApp.Domain.ProductStatusAggregate.ProductStatus", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool?>("Bought")
@@ -177,19 +311,65 @@ namespace RunApp.Infrastructure.Migrations
                     b.Property<bool?>("Like")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("ProductStatusId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool?>("Viewed")
                         .HasColumnType("bit");
 
                     b.HasKey("Id", "ProductId");
 
+                    b.HasAlternateKey("ProductStatusId");
+
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductStatus");
+                    b.HasIndex("ProductStatusId");
+
+                    b.ToTable("ProductStatuses");
                 });
 
-            modelBuilder.Entity("RunApp.Domain.ProductAggregate.Reviews.Review", b =>
+            modelBuilder.Entity("RunApp.Domain.Products.Product", b =>
                 {
                     b.Property<Guid>("ProductId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("ActualPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("AverageRatings")
+                        .HasColumnType("decimal(4,2)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NumberOfLikes")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NumberOfReviews")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Ratings")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Reviews")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ProductId");
+
+                    b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("RunApp.Domain.ReviewAggregate.Review", b =>
+                {
+                    b.Property<Guid?>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("Id")
@@ -204,41 +384,25 @@ namespace RunApp.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("getutcdate()");
 
-                    b.Property<double>("NumOfStars")
-                        .HasPrecision(2, 1)
-                        .HasColumnType("float(2)");
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
 
                     b.Property<string>("ReviewDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("ReviewId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("ProductId", "Id");
+
+                    b.HasAlternateKey("ReviewId");
 
                     b.HasIndex("Id");
 
-                    b.ToTable("Review");
-                });
+                    b.HasIndex("ReviewId");
 
-            modelBuilder.Entity("RunApp.Domain.Products.Product", b =>
-                {
-                    b.Property<Guid>("ProductId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("ActualPrice")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ProductId");
-
-                    b.ToTable("Products");
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("RunApp.Domain.StoreOwnerProfileAggregate.Sales.Sale", b =>
@@ -274,26 +438,17 @@ namespace RunApp.Infrastructure.Migrations
                     b.ToTable("Sale");
                 });
 
-            modelBuilder.Entity("RunApp.Domain.StoreOwnerProfileAggregate.Stocks.Stock", b =>
+            modelBuilder.Entity("RunApp.Domain.StoreOwnerProfileAggregate.Stocks.LogsStock.Log", b =>
                 {
-                    b.Property<Guid>("StockId")
+                    b.Property<Guid>("LogId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("AddedStock")
                         .HasColumnType("int");
 
-                    b.Property<string>("Brand")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProductName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProductType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("RemovedStock")
+                        .HasColumnType("int");
 
                     b.Property<int?>("SoldStock")
                         .HasColumnType("int");
@@ -308,20 +463,63 @@ namespace RunApp.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("getutcdate()");
 
-                    b.Property<Guid>("StockProductId")
+                    b.Property<Guid>("StockId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("StockRemoveDate")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
+                        .HasComputedColumnSql("case when [RemovedStock] is not null then [StockDate]\r\n                                              else null end", true);
+
+                    b.Property<DateTime?>("StockSoldDate")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
                         .HasComputedColumnSql("case when [SoldStock] is not null then [StockDate]\r\n                                              else null end", true);
+
+                    b.HasKey("LogId");
+
+                    b.HasIndex("StockId");
+
+                    b.ToTable("Log");
+                });
+
+            modelBuilder.Entity("RunApp.Domain.StoreOwnerProfileAggregate.Stocks.Stock", b =>
+                {
+                    b.Property<Guid>("StockId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProductType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RemovedQuantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SoldQuantity")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("StockProductId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("StoreOwnerProfileId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("TotalQuantity")
+                        .HasColumnType("int");
+
                     b.HasKey("StockId");
 
-                    b.HasIndex("StockProductId");
+                    b.HasIndex("StockProductId")
+                        .IsUnique();
 
                     b.HasIndex("StoreOwnerProfileId");
 
@@ -355,6 +553,9 @@ namespace RunApp.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TotalProductsSold")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalRemovedStock")
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalSalesInCash")
@@ -419,6 +620,13 @@ namespace RunApp.Infrastructure.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RefreshTokenExpirationDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -468,6 +676,21 @@ namespace RunApp.Infrastructure.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("CategoryProduct", b =>
+                {
+                    b.HasOne("RunApp.Domain.ProductAggregate.Categories.Category", null)
+                        .WithMany()
+                        .HasForeignKey("CategoriesCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RunApp.Domain.Products.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -529,31 +752,25 @@ namespace RunApp.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("RunApp.Domain.CustomerProfileAggregate.ValueTypes.Address", "ShippingAdress", b1 =>
+                    b.OwnsOne("RunApp.Domain.Common.ValueType.Card", "PaymentMethod", b1 =>
                         {
                             b1.Property<Guid>("CustomerProfileId")
                                 .HasColumnType("uniqueidentifier");
 
-                            b1.Property<int?>("AlternativeHouseNumber")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("AlternativeStreet")
+                            b1.Property<string>("CVV")
+                                .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<string>("City")
+                            b1.Property<string>("CardNumber")
+                                .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<string>("Country")
+                            b1.Property<DateTime>("ExpiryDate")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("HoldersName")
+                                .IsRequired()
                                 .HasColumnType("nvarchar(max)");
-
-                            b1.Property<int?>("HouseNumber")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("Street")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<int?>("ZipCode")
-                                .HasColumnType("int");
 
                             b1.HasKey("CustomerProfileId");
 
@@ -563,16 +780,51 @@ namespace RunApp.Infrastructure.Migrations
                                 .HasForeignKey("CustomerProfileId");
                         });
 
+                    b.OwnsOne("RunApp.Domain.Common.ValueType.Address", "ShippingAdress", b1 =>
+                        {
+                            b1.Property<Guid>("CustomerProfileId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("City")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Country")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("State")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Street")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("ZipCode")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("CustomerProfileId");
+
+                            b1.ToTable("CustomerProfiles");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CustomerProfileId");
+                        });
+
+                    b.Navigation("PaymentMethod");
+
                     b.Navigation("ShippingAdress");
                 });
 
-            modelBuilder.Entity("RunApp.Domain.CustomerProfileAggregate.ProductStatuses.ProductStatus", b =>
+            modelBuilder.Entity("RunApp.Domain.OrderAggregate.LineItems.LineItem", b =>
                 {
-                    b.HasOne("RunApp.Domain.CustomerProfileAggregate.CustomerProfile", null)
-                        .WithMany("Statuses")
-                        .HasForeignKey("Id")
+                    b.HasOne("RunApp.Domain.OrderAggregate.Order", null)
+                        .WithMany()
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("RunApp.Domain.OrderAggregate.Order", null)
+                        .WithMany("LineItems")
+                        .HasForeignKey("OrderId1");
 
                     b.HasOne("RunApp.Domain.Products.Product", null)
                         .WithMany()
@@ -581,7 +833,81 @@ namespace RunApp.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RunApp.Domain.ProductAggregate.Reviews.Review", b =>
+            modelBuilder.Entity("RunApp.Domain.OrderAggregate.Order", b =>
+                {
+                    b.HasOne("RunApp.Domain.CustomerProfileAggregate.CustomerProfile", null)
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("RunApp.Domain.Common.ValueType.Address", "Address", b1 =>
+                        {
+                            b1.Property<Guid>("OrderId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Country")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("State")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Street")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("ZipCode")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("OrderId");
+
+                            b1.ToTable("Orders");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OrderId");
+                        });
+
+                    b.OwnsOne("RunApp.Domain.Common.ValueType.Card", "PaymentMethod", b1 =>
+                        {
+                            b1.Property<Guid>("OrderId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("CVV")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("CardNumber")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<DateTime>("ExpiryDate")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("HoldersName")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("OrderId");
+
+                            b1.ToTable("Orders");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OrderId");
+                        });
+
+                    b.Navigation("Address");
+
+                    b.Navigation("PaymentMethod");
+                });
+
+            modelBuilder.Entity("RunApp.Domain.ProductStatusAggregate.ProductStatus", b =>
                 {
                     b.HasOne("RunApp.Domain.CustomerProfileAggregate.CustomerProfile", null)
                         .WithMany()
@@ -590,7 +916,7 @@ namespace RunApp.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("RunApp.Domain.Products.Product", null)
-                        .WithMany("Reviews")
+                        .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -660,6 +986,11 @@ namespace RunApp.Infrastructure.Migrations
                                 .HasColumnName("Discount")
                                 .HasComputedColumnSql("100 * (1-[PriceWithDiscount]/[ActualPrice])", true);
 
+                            b1.Property<DateTime>("DiscountDate")
+                                .ValueGeneratedOnAddOrUpdate()
+                                .HasColumnType("datetime2")
+                                .HasComputedColumnSql("getutcdate()", true);
+
                             b1.Property<decimal?>("PriceWithDiscount")
                                 .HasColumnType("decimal(10,2)")
                                 .HasColumnName("PriceWithDiscount");
@@ -681,7 +1012,21 @@ namespace RunApp.Infrastructure.Migrations
                     b.Navigation("Characteristic")
                         .IsRequired();
 
-                    b.Navigation("PriceOffer")
+                    b.Navigation("PriceOffer");
+                });
+
+            modelBuilder.Entity("RunApp.Domain.ReviewAggregate.Review", b =>
+                {
+                    b.HasOne("RunApp.Domain.CustomerProfileAggregate.CustomerProfile", null)
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RunApp.Domain.Products.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -702,11 +1047,20 @@ namespace RunApp.Infrastructure.Migrations
                     b.Navigation("ProductSold");
                 });
 
+            modelBuilder.Entity("RunApp.Domain.StoreOwnerProfileAggregate.Stocks.LogsStock.Log", b =>
+                {
+                    b.HasOne("RunApp.Domain.StoreOwnerProfileAggregate.Stocks.Stock", null)
+                        .WithMany("Logs")
+                        .HasForeignKey("StockId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("RunApp.Domain.StoreOwnerProfileAggregate.Stocks.Stock", b =>
                 {
                     b.HasOne("RunApp.Domain.Products.Product", null)
-                        .WithMany()
-                        .HasForeignKey("StockProductId")
+                        .WithOne()
+                        .HasForeignKey("RunApp.Domain.StoreOwnerProfileAggregate.Stocks.Stock", "StockProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -795,14 +1149,14 @@ namespace RunApp.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RunApp.Domain.CustomerProfileAggregate.CustomerProfile", b =>
+            modelBuilder.Entity("RunApp.Domain.OrderAggregate.Order", b =>
                 {
-                    b.Navigation("Statuses");
+                    b.Navigation("LineItems");
                 });
 
-            modelBuilder.Entity("RunApp.Domain.Products.Product", b =>
+            modelBuilder.Entity("RunApp.Domain.StoreOwnerProfileAggregate.Stocks.Stock", b =>
                 {
-                    b.Navigation("Reviews");
+                    b.Navigation("Logs");
                 });
 
             modelBuilder.Entity("RunApp.Domain.StoreOwnerProfileAggregate.StoreOwnerProfile", b =>

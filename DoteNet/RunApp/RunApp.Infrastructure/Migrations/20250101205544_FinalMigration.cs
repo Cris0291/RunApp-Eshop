@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RunApp.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class FinalMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,6 +31,8 @@ namespace RunApp.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     NickName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RefreshTokenExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -52,16 +54,52 @@ namespace RunApp.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Category",
+                columns: table => new
+                {
+                    CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CategoryName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Category", x => x.CategoryId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Photos",
+                columns: table => new
+                {
+                    PhotoId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsAvatar = table.Column<bool>(type: "bit", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CustomerProfileId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Photos", x => x.PhotoId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Products",
                 columns: table => new
                 {
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Reviews = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Ratings = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ActualPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NumberOfReviews = table.Column<int>(type: "int", nullable: false),
+                    AverageRatings = table.Column<decimal>(type: "decimal(4,2)", nullable: false),
+                    NumberOfLikes = table.Column<int>(type: "int", nullable: false),
                     PriceWithDiscount = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
                     PromotionalText = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Discount = table.Column<decimal>(type: "decimal(5,2)", nullable: true, computedColumnSql: "100 * (1-[PriceWithDiscount]/[ActualPrice])", stored: true)
+                    Discount = table.Column<decimal>(type: "decimal(5,2)", nullable: true, computedColumnSql: "100 * (1-[PriceWithDiscount]/[ActualPrice])", stored: true),
+                    Characteristic_Brand = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Characteristic_Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Characteristic_Color = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Characteristic_Weight = table.Column<decimal>(type: "decimal(6,2)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -178,23 +216,29 @@ namespace RunApp.Infrastructure.Migrations
                 name: "CustomerProfiles",
                 columns: table => new
                 {
-                    CustomerProfileId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Reviews = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Ratings = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Statuses = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BoughtProducts = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedProducts = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Orders = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NickName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phone = table.Column<int>(type: "int", nullable: true),
-                    ShippingAdress_ZipCode = table.Column<int>(type: "int", nullable: true),
+                    ShippingAdress_ZipCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ShippingAdress_Street = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ShippingAdress_City = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ShippingAdress_HouseNumber = table.Column<int>(type: "int", nullable: true),
                     ShippingAdress_Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ShippingAdress_AlternativeStreet = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ShippingAdress_AlternativeHouseNumber = table.Column<int>(type: "int", nullable: true),
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ShippingAdress_State = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentMethod_HoldersName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentMethod_CardNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentMethod_CVV = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentMethod_ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CustomerProfiles", x => x.CustomerProfileId);
+                    table.PrimaryKey("PK_CustomerProfiles", x => x.Id);
                     table.ForeignKey(
                         name: "FK_CustomerProfiles_AspNetUsers_Id",
                         column: x => x.Id,
@@ -212,6 +256,7 @@ namespace RunApp.Infrastructure.Migrations
                     TotalProductsSold = table.Column<int>(type: "int", nullable: false),
                     TotalSalesInCash = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
                     TotalStock = table.Column<int>(type: "int", nullable: false),
+                    TotalRemovedStock = table.Column<int>(type: "int", nullable: false),
                     IsAccountPaid = table.Column<bool>(type: "bit", nullable: false),
                     InitialInvestment = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
                     BussinesAdress_ZipCode = table.Column<int>(type: "int", nullable: false),
@@ -260,27 +305,23 @@ namespace RunApp.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductStatus",
+                name: "CategoryProduct",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Like = table.Column<bool>(type: "bit", nullable: true),
-                    Dislike = table.Column<bool>(type: "bit", nullable: true),
-                    Viewed = table.Column<bool>(type: "bit", nullable: true),
-                    Bought = table.Column<bool>(type: "bit", nullable: true)
+                    CategoriesCategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductStatus", x => new { x.Id, x.ProductId });
+                    table.PrimaryKey("PK_CategoryProduct", x => new { x.CategoriesCategoryId, x.ProductId });
                     table.ForeignKey(
-                        name: "FK_ProductStatus_CustomerProfiles_Id",
-                        column: x => x.Id,
-                        principalTable: "CustomerProfiles",
-                        principalColumn: "CustomerProfileId",
+                        name: "FK_CategoryProduct_Category_CategoriesCategoryId",
+                        column: x => x.CategoriesCategoryId,
+                        principalTable: "Category",
+                        principalColumn: "CategoryId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ProductStatus_Products_ProductId",
+                        name: "FK_CategoryProduct_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "ProductId",
@@ -288,27 +329,89 @@ namespace RunApp.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Review",
+                name: "Orders",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    IsPaid = table.Column<bool>(type: "bit", nullable: false),
+                    DateOfPayment = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getutcdate()"),
+                    TotalPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Address_ZipCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Address_Street = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Address_City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Address_Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Address_State = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentMethod_HoldersName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentMethod_CardNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentMethod_CVV = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentMethod_ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders", x => x.OrderId);
+                    table.ForeignKey(
+                        name: "FK_Orders_CustomerProfiles_Id",
+                        column: x => x.Id,
+                        principalTable: "CustomerProfiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductStatuses",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ProductStatusId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Like = table.Column<bool>(type: "bit", nullable: true),
+                    Dislike = table.Column<bool>(type: "bit", nullable: true),
+                    Viewed = table.Column<bool>(type: "bit", nullable: true),
+                    Bought = table.Column<bool>(type: "bit", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductStatuses", x => new { x.Id, x.ProductId });
+                    table.UniqueConstraint("AK_ProductStatuses_ProductStatusId", x => x.ProductStatusId);
+                    table.ForeignKey(
+                        name: "FK_ProductStatuses_CustomerProfiles_Id",
+                        column: x => x.Id,
+                        principalTable: "CustomerProfiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductStatuses_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "ProductId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Reviews",
                 columns: table => new
                 {
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ReviewId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NumOfStars = table.Column<double>(type: "float(2)", precision: 2, scale: 1, nullable: false),
+                    Rating = table.Column<int>(type: "int", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getutcdate()"),
                     ReviewDescription = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Review", x => new { x.ProductId, x.Id });
+                    table.PrimaryKey("PK_Reviews", x => new { x.ProductId, x.Id });
+                    table.UniqueConstraint("AK_Reviews_ReviewId", x => x.ReviewId);
                     table.ForeignKey(
-                        name: "FK_Review_CustomerProfiles_Id",
+                        name: "FK_Reviews_CustomerProfiles_Id",
                         column: x => x.Id,
                         principalTable: "CustomerProfiles",
-                        principalColumn: "CustomerProfileId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Review_Products_ProductId",
+                        name: "FK_Reviews_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "ProductId",
@@ -348,18 +451,21 @@ namespace RunApp.Infrastructure.Migrations
                 columns: table => new
                 {
                     StockId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AddedStock = table.Column<int>(type: "int", nullable: false),
-                    SoldStock = table.Column<int>(type: "int", nullable: false),
-                    StockChangeDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getutcdate()"),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TotalQuantity = table.Column<int>(type: "int", nullable: false),
+                    SoldQuantity = table.Column<int>(type: "int", nullable: false),
+                    RemovedQuantity = table.Column<int>(type: "int", nullable: false),
+                    ProductName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Brand = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProductType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StockProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StoreOwnerProfileId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Stock", x => x.StockId);
                     table.ForeignKey(
-                        name: "FK_Stock_Products_ProductId",
-                        column: x => x.ProductId,
+                        name: "FK_Stock_Products_StockProductId",
+                        column: x => x.StockProductId,
                         principalTable: "Products",
                         principalColumn: "ProductId",
                         onDelete: ReferentialAction.Cascade);
@@ -368,6 +474,62 @@ namespace RunApp.Infrastructure.Migrations
                         column: x => x.StoreOwnerProfileId,
                         principalTable: "StoreOwnerProfiles",
                         principalColumn: "StoreProfileId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LineItem",
+                columns: table => new
+                {
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    LineItemID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    PriceWithDiscount = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
+                    TotalItemPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    ProductName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LineItem", x => new { x.ProductId, x.OrderId });
+                    table.UniqueConstraint("AK_LineItem_LineItemID", x => x.LineItemID);
+                    table.ForeignKey(
+                        name: "FK_LineItem_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "OrderId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_LineItem_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "ProductId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Log",
+                columns: table => new
+                {
+                    LogId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StockAddedDate = table.Column<DateTime>(type: "datetime2", nullable: true, computedColumnSql: "case when [AddedStock] is not null then [StockDate]\r\n                                              else null end", stored: true),
+                    StockRemoveDate = table.Column<DateTime>(type: "datetime2", nullable: true, computedColumnSql: "case when [RemovedStock] is not null then [StockDate]\r\n                                              else null end", stored: true),
+                    StockSoldDate = table.Column<DateTime>(type: "datetime2", nullable: true, computedColumnSql: "case when [SoldStock] is not null then [StockDate]\r\n                                              else null end", stored: true),
+                    StockDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getutcdate()"),
+                    AddedStock = table.Column<int>(type: "int", nullable: true),
+                    SoldStock = table.Column<int>(type: "int", nullable: true),
+                    RemovedStock = table.Column<int>(type: "int", nullable: true),
+                    StockId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Log", x => x.LogId);
+                    table.ForeignKey(
+                        name: "FK_Log_Stock_StockId",
+                        column: x => x.StockId,
+                        principalTable: "Stock",
+                        principalColumn: "StockId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -411,20 +573,44 @@ namespace RunApp.Infrastructure.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CustomerProfiles_Id",
-                table: "CustomerProfiles",
-                column: "Id",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductStatus_ProductId",
-                table: "ProductStatus",
+                name: "IX_CategoryProduct_ProductId",
+                table: "CategoryProduct",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Review_Id",
-                table: "Review",
+                name: "IX_LineItem_LineItemID",
+                table: "LineItem",
+                column: "LineItemID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LineItem_OrderId",
+                table: "LineItem",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Log_StockId",
+                table: "Log",
+                column: "StockId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductStatuses_ProductId",
+                table: "ProductStatuses",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductStatuses_ProductStatusId",
+                table: "ProductStatuses",
+                column: "ProductStatusId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_Id",
+                table: "Reviews",
                 column: "Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_ReviewId",
+                table: "Reviews",
+                column: "ReviewId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Sale_ProductId",
@@ -437,9 +623,10 @@ namespace RunApp.Infrastructure.Migrations
                 column: "StoreOwnerProfileId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Stock_ProductId",
+                name: "IX_Stock_StockProductId",
                 table: "Stock",
-                column: "ProductId");
+                column: "StockProductId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Stock_StoreOwnerProfileId",
@@ -475,19 +662,37 @@ namespace RunApp.Infrastructure.Migrations
                 name: "Bulletpoints");
 
             migrationBuilder.DropTable(
-                name: "ProductStatus");
+                name: "CategoryProduct");
 
             migrationBuilder.DropTable(
-                name: "Review");
+                name: "LineItem");
+
+            migrationBuilder.DropTable(
+                name: "Log");
+
+            migrationBuilder.DropTable(
+                name: "Photos");
+
+            migrationBuilder.DropTable(
+                name: "ProductStatuses");
+
+            migrationBuilder.DropTable(
+                name: "Reviews");
 
             migrationBuilder.DropTable(
                 name: "Sale");
 
             migrationBuilder.DropTable(
-                name: "Stock");
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetRoles");
+                name: "Category");
+
+            migrationBuilder.DropTable(
+                name: "Orders");
+
+            migrationBuilder.DropTable(
+                name: "Stock");
 
             migrationBuilder.DropTable(
                 name: "CustomerProfiles");
