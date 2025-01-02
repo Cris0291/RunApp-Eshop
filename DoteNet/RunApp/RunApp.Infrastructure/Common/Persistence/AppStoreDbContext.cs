@@ -17,12 +17,12 @@ using RunApp.Domain.Common;
 using Microsoft.AspNetCore.Http;
 using RunApp.Infrastructure.LogsStock.Persistence;
 using RunApp.Infrastructure.Stocks.Persistence;
-using RunApp.Infrastructure.Ratings.Persistence;
 using RunApp.Domain.ReviewAggregate;
-using RunApp.Domain.RatingAggregate;
 using RunApp.Domain.ProductStatusAggregate;
 using RunApp.Domain.OrderAggregate;
 using RunApp.Domain.PhotoAggregate;
+using RunApp.Infrastructure.Orders.Persistence;
+using RunApp.Infrastructure.LineItems.Persistence;
 
 namespace RunApp.Infrastructure.Common.Persistence
 {
@@ -33,7 +33,6 @@ namespace RunApp.Infrastructure.Common.Persistence
         public DbSet<CustomerProfile> CustomerProfiles => Set<CustomerProfile>();
         public DbSet<StoreOwnerProfile> StoreOwnerProfiles => Set<StoreOwnerProfile>();
         public DbSet<Review> Reviews => Set<Review>();
-        public DbSet<Rating> Ratings => Set<Rating>();
         public DbSet<ProductStatus> ProductStatuses => Set<ProductStatus>();
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<Photo> Photos => Set<Photo>();
@@ -52,7 +51,9 @@ namespace RunApp.Infrastructure.Common.Persistence
             modelBuilder.ApplyConfiguration(new LogConfiguration());
             modelBuilder.ApplyConfiguration(new StoreOwnerProfileConfiguration());
             modelBuilder.ApplyConfiguration(new StockConfiguration());
-            modelBuilder.ApplyConfiguration(new RatingConfiguration());
+            modelBuilder.ApplyConfiguration(new LineItemsConfiguration());
+            modelBuilder.ApplyConfiguration(new OrdersConfiguration());
+
             base.OnModelCreating(modelBuilder);
         }
 

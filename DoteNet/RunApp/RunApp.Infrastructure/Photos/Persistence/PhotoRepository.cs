@@ -24,9 +24,9 @@ namespace RunApp.Infrastructure.Photos.Persistence
             _appStoreDbContext.Remove(photo);
             await Task.CompletedTask;
         }
-        public async Task<IEnumerable<Photo>> GetPhotosForProduct(Guid productId)
+        public async Task<Photo?> GetPhotoForProduct(Guid productId)
         {
-            return await _appStoreDbContext.Photos.Where(x => x.ProductId == productId).ToListAsync();
+            return await _appStoreDbContext.Photos.Where(x => x.ProductId == productId).SingleOrDefaultAsync();
         }
     }
 }

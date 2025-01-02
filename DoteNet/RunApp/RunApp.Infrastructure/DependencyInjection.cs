@@ -9,7 +9,6 @@ using RunApp.Domain.UserAggregate.Roles;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using RunApp.Infrastructure.CustomerProfiles.Persistence;
 using RunApp.Infrastructure.StoreOwnerProfiles.Persistence;
-using RunApp.Infrastructure.Ratings.Persistence;
 using RunApp.Infrastructure.ProductStatuses.Persistence;
 using RunApp.Infrastructure.Common.Queries.LeftJoinQuery;
 using RunApp.Infrastructure.Orders.Persistence;
@@ -29,7 +28,6 @@ namespace RunApp.Infrastructure
             services.AddScoped<IReviewsRepository, ReviewRepository>();
             services.AddScoped<ICustomerProfileRepository, CustomerProfileRepository>();
             services.AddScoped<IStoreOwnerProfileRepository, StoreOwnerProfileRepository>();
-            services.AddScoped<IRatingsRepository, RatingsRepository>();
             services.AddScoped<IProductStatusRepository, ProductStatusRepository>();
             services.AddScoped<ILeftJoinRepository, LeftJoinRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();

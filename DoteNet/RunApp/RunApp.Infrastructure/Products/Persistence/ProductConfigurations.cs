@@ -18,12 +18,14 @@ namespace RunApp.Infrastructure.Products.Persistence
 
             builder.OwnsOne(p => p.PriceOffer, px => px.Property(x => x.PriceWithDiscount).HasColumnType("decimal(10,2)").HasColumnName("PriceWithDiscount"));
             builder.OwnsOne(p => p.PriceOffer, px => px.Property(x => x.PromotionalText).HasColumnName("PromotionalText"));
-            builder.OwnsOne(p => p.PriceOffer, px => px.Property(x => x.DiscountDate).HasComputedColumnSql("getutcdate()", stored: true));
 
             builder.OwnsOne(p => p.Characteristic, px => px.Property(x => x.Weight).HasColumnType("decimal(6,2)"));
 
             builder.Property(p => p.ActualPrice)
                 .HasColumnType("decimal(10,2)");
+
+            builder.Property(p => p.AverageRatings)
+                .HasColumnType("decimal(4,2)");
 
             builder.HasMany<Sale>()
                 .WithOne(x => x.ProductSold)

@@ -3,7 +3,6 @@ using RunApp.Domain.ProductAggregate.Categories;
 using RunApp.Domain.Products;
 using RunApp.Infrastructure.Common.Persistence;
 using RunnApp.Application.Common.Interfaces;
-using RunnApp.Application.CustomerProfiles.Common;
 
 namespace RunApp.Infrastructure.Products.Persistence
 {
@@ -46,11 +45,11 @@ namespace RunApp.Infrastructure.Products.Persistence
         {
             return _appDbContext.Products.Include(x => x.Categories);
         }
-        public async Task<List<ProductDto>> GetBoughtProducts(List<Guid> boughtProducts)
+        public IQueryable<Product> GetBoughtProducts(List<Guid> boughtProducts)
         {
             var boughtProductsSet = boughtProducts.ToHashSet();
 
-            return await _appDbContext.Products.Where(x => boughtProductsSet.Contains(x.ProductId)).Select(x => new ProductDto(x.ProductId, x.Name)).ToListAsync();
+            return _appDbContext.Products.Where(x => boughtProductsSet.Contains(x.ProductId));
         }
         public IQueryable<Product> GetCreatedProducts(List<Guid> createdProdcucts)
         {
@@ -64,6 +63,10 @@ namespace RunApp.Infrastructure.Products.Persistence
         public async Task<Product?> GetProductWithCategories(Guid productId)
         {
             return await _appDbContext.Products.Include(x => x.Categories).SingleOrDefaultAsync(x => x.ProductId == productId);
+        }
+        public IQueryable<Product> GetProductWithCategoriesQuery(Guid productId)
+        {
+            return _appDbContext.Products.Include(x => x.Categories).Where(x => x.ProductId == productId);
         }
         public async Task DeleteCategory(Category category)
         {

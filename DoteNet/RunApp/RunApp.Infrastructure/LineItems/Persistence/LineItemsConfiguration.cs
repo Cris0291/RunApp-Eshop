@@ -18,13 +18,20 @@ namespace RunApp.Infrastructure.LineItems.Persistence
                 .WithMany()
                 .HasForeignKey(x => x.OrderId);
 
+            builder.HasKey(x => new {x.ProductId, x.OrderId});
+
             builder.Property(x => x.PriceWithDiscount)
+                .HasColumnType("decimal(10,2)");
+
+            builder.Property(x => x.TotalItemPrice)
                 .HasColumnType("decimal(10,2)");
 
             builder.Property(x => x.Price)
                 .HasColumnType("decimal(10,2)");
 
             builder.HasAlternateKey(x => x.LineItemID);
+
+            builder.HasIndex(x => x.LineItemID);
         }
     }
 }

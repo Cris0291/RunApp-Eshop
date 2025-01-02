@@ -16,9 +16,6 @@ namespace RunApp.Infrastructure.Orders.Persistence
 
             builder.Property(x => x.DateOfPayment)
                 .HasDefaultValueSql("getutcdate()");
-
-            builder.Property(x => x.TotalPrice)
-                .HasComputedColumnSql(@"select sum(coalesce([PriceWithDiscount], [Price])) from [LineItems]", stored: true);
         }
     }
 }
