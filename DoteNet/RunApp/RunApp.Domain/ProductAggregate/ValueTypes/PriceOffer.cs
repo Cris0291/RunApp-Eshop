@@ -9,6 +9,5 @@ namespace RunApp.Domain.ProductAggregate.ValueTypes
         public decimal? PriceWithDiscount { get; internal set; }
         public string? PromotionalText { get; internal set; }
         public decimal? Discount { get; internal set; }
-        public DateTime DiscountDate { get; internal set; }
     }
 }

@@ -31,9 +31,10 @@ namespace RunApp.Domain.OrderAggregate
                 PaymentMethod = card,
                 IsPaid = false,
                 Id = userId,
+                TotalPrice = 0,
             };
         }
-        public ErrorOr<LineItem> AddItem(Guid productId, string productName, int quantity, decimal price, decimal? priceWithDiscount)
+        public ErrorOr<LineItem> AddItem(Guid productId, string productName, int quantity, decimal price, decimal? priceWithDiscount, decimal totalItemPrice)
         {
             decimal maximumDiscount = 0.7m;
             AddValidation(nameof(ProductError.DiscountPricesMustBeMaximum70Percent), () => priceWithDiscount < price - (price * maximumDiscount));
@@ -48,7 +49,10 @@ namespace RunApp.Domain.OrderAggregate
                 Quantity = quantity,
                 Price = price,
                 PriceWithDiscount = priceWithDiscount,
+                TotalItemPrice = totalItemPrice,
             };
+
+            TotalPrice += totalItemPrice;
 
             LineItems.Add(item);
             return item;
@@ -61,13 +65,13 @@ namespace RunApp.Domain.OrderAggregate
         {
             return LineItems.Single(x => x.ProductId == productId);
         }
-        public ErrorOr<LineItem> ChangeItemQuantity(int quantity, Guid productId)
+        public ErrorOr<Success> ChangeItemQuantity(int quantity, Guid productId)
         {
             var item = LineItems.SingleOrDefault(x => x.ProductId == productId);
             if (item == null) return Error.NotFound(code: "ItemWasNotFound", description: "Requested item was not found in your order");
 
             item.Quantity = quantity;
-            return item;
+            return Result.Success;
         }
         public void ModifyAddress(string zipCode, string street, string city, string country, string state)
         {
@@ -115,7 +119,7 @@ namespace RunApp.Domain.OrderAggregate
         {
             RaiseEvent(new CreateOrderEvent(Id, OrderId));
         }
-        public ErrorOr<Order> PayOrder(Guid userId)
+        public ErrorOr<Success> PayOrder(Guid userId)
         {
             IsPaid = true;
 
@@ -124,7 +128,7 @@ namespace RunApp.Domain.OrderAggregate
 
             RaiseEvent(new AddBoughtProductsEvent(userId, boughtProducts));
 
-            return this;
+            return Result.Success;
         }
     }
 }

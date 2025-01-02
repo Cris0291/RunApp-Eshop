@@ -11,6 +11,7 @@ namespace RunApp.Domain.OrderAggregate.LineItems
         public int Quantity { get; internal set;}
         public decimal Price { get; internal set;}
         public decimal? PriceWithDiscount { get; internal set;}
+        public decimal TotalItemPrice { get; internal set; }
         public string ProductName { get; internal set;}
     }
 }

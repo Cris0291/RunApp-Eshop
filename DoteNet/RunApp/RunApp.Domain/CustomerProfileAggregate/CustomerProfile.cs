@@ -41,28 +41,24 @@ namespace RunApp.Domain.CustomerProfileAggregate
             };
 
         }
-        public Address AddAddress(string zipCode, string street, string city,
-                                     int buildingNumber, string country, string state)
+        public Address AddAddress(string zipCode, string street, string city, string country, string state)
         {
             ShippingAdress = new Address
             {
                 ZipCode = zipCode,
                 Street = street,
                 City = city,
-                HouseNumber = buildingNumber,
                 Country = country,
                 State = state
             };
 
             return ShippingAdress;
         }
-        public Address UpdateAddress(string zipCode, string street, string city,
-                                     int houseNumber, string country, string state)
+        public Address UpdateAddress(string zipCode, string street, string city, string country, string state)
         {
             ShippingAdress!.ZipCode = zipCode;
             ShippingAdress.Street = street;
             ShippingAdress.City = city;
-            ShippingAdress.HouseNumber = houseNumber;
             ShippingAdress.Country = country;
             ShippingAdress.State = state;
 
@@ -100,11 +96,11 @@ namespace RunApp.Domain.CustomerProfileAggregate
         {
             return BoughtProducts.Contains(productId);
         }
-        public void AddReview(Guid reviewId)
+        public void AddReview(Guid productId)
         {
-            if (Reviews.Contains(reviewId)) throw new InvalidOperationException("Cannot add more than one review per user");
+            if (Reviews.Contains(productId)) throw new InvalidOperationException("Cannot add more than one review per user");
 
-            Reviews.Add(reviewId);
+            Reviews.Add(productId);
         }
         public void DeleteReview(Guid reviewId)
         {

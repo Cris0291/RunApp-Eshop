@@ -26,7 +26,6 @@ namespace RunApp.Domain.Products
             PriceOffer = priceOffer;
             BulletPoints = bulletpoints;
         }
-        private int _totalRatings;
         public List<Guid> Reviews { get; internal set; }
         public List<Guid> Ratings { get; internal set; }
         public Guid ProductId { get; internal set; }
@@ -130,20 +129,19 @@ namespace RunApp.Domain.Products
         {
             NumberOfLikes = like ? NumberOfLikes++ : NumberOfLikes == 0 ? NumberOfLikes : NumberOfLikes--;
         }
-        public void AddRating(Guid raitingId, int rating)
-        {
-            if (Ratings.Contains(raitingId)) throw new InvalidOperationException("Cannot rate twice a product");
-            Ratings.Add(raitingId);
-
-            _totalRatings += rating;
-            AverageRatings = _totalRatings / Ratings.Count();
-        }
         public ErrorOr<Category> AddCategory(string category)
         {
             if (!Category.validCategories.Contains(category)) return Error.Validation(code: "CategoryWasNotValid", description: "Category was not valid");
-            if (Categories.Where(x => x.CategoryName == category).Count() > 0) return Error.Validation(code: "CategoryWasAlreadyAdded", description: "Cannot add the same category more than one time");
-
             var categoryToAdd = new Category { CategoryName = category };
+
+            if (Categories != null) 
+            {
+                if (Categories.Where(x => x.CategoryName == category).Count() > 0) return Error.Validation(code: "CategoryWasAlreadyAdded", description: "Cannot add the same category more than one time");
+                Categories.Add(categoryToAdd);
+                return categoryToAdd;
+            }
+
+            Categories = [];
             Categories.Add(categoryToAdd);
             return categoryToAdd;
         }
