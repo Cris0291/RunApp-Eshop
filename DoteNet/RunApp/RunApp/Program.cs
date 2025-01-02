@@ -7,6 +7,7 @@ using System.Text;
 using RunApp.Api.Services;
 using RunApp.Infrastructure.Middleware;
 using RunnApp.Application.Common.Authorization;
+using RunApp.Infrastructure.Common.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 

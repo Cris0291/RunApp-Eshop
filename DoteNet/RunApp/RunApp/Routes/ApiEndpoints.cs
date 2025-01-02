@@ -13,6 +13,7 @@
             public const string UpdateProduct = $"{ProductBase}/{{id:guid}}";
             public const string GetProducts = ProductBase;
             public const string GetProductsWithDiscount = $"{ProductBase}/product-discount";
+            public const string ExistProduct = $"{ProductBase}/{{id:guid}}/exist";
 
             public const string AddReview = $"{ProductBase}/{{id:guid}}/reviews";
             public const string DeleteReview = $"{ProductBase}/{{ProductId:guid}}/reviews";
@@ -30,7 +31,7 @@
             public const string DeleteCategory = $"{ProductBase}/{{ProductId:guid}}categories/{{CategoryId:guid}}";
 
             public const string AddPhoto = $"{ProductBase}/{{id:guid}}/photos";
-            public const string RemovePhoto = $"{ProductBase}/{{productId:guid}}/photos/{{photoId:string}}";
+            public const string RemovePhoto = $"{ProductBase}/{{productId:guid}}/photos/{{photoId}}";
 
         }
         public static class Account
@@ -40,6 +41,7 @@
             public const string LoginSalesProfile = $"{AccountBase}/login/sales";
             public const string Register = $"{AccountBase}/register";
             public const string Logout = $"{AccountBase}/logout";
+            public const string GenerateNewToken = $"{AccountBase}/generate-token";
         }
         public static class StoreOwnerProfiles
         {
@@ -52,9 +54,9 @@
         {
             private const string UserBase = $"{Base}/user";
             public const string GetUserReviews = $"{UserBase}/reviews";
-            public const string GetUserRatings = $"{UserBase}/ratings";
             public const string GetUserLikes = $"{UserBase}/likes";
             public const string GetUserBoughtProducts = $"{UserBase}/bought-products";
+            public const string GetBoughtProducts = $"{UserBase}/bought";
             public const string AddAddress = $"{UserBase}/address";
             public const string AddPaymenthMethod = $"{UserBase}/payment";
             public const string UpdateAddress = $"{UserBase}/address";
@@ -74,6 +76,7 @@
             public const string ModifyOrderAddress = $"{OrderBase}/{{id:guid}}/address";
             public const string ModifyPaymentMethod = $"{OrderBase}/{{id:guid}}/paymentmethod";
             public const string PayOrder = $"{OrderBase}/{{id:guid}}/checkout";
+            public const string GetCurrentOrder = $"{OrderBase}/current";
         }
     }
 }
