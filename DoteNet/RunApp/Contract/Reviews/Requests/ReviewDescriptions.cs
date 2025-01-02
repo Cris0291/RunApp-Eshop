@@ -6,10 +6,9 @@ namespace Contracts.Reviews.Requests
     public enum ReviewDescriptions
     {
         Excellent,
-        Awesome,
-        GoodQuality,
+        Good,
+        Average,
         Incomplete,
         Terrible,
-        BadProduct,
     }
 }

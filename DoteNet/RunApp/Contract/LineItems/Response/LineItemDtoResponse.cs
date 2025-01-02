@@ -1,4 +1,4 @@
 ﻿namespace Contracts.LineItems.Response
 {
-    public record LineItemDtoResponse(Guid LineItemID, Guid OrderId,  Guid ProductId, string ProductName, int Quantity, decimal Price, decimal? PriceWithDiscount);
+    public record LineItemDtoResponse(Guid LineItemID, Guid ProductId, string Name, int Quantity, decimal Price, decimal? PriceWithDiscount, decimal TotalPrice);
 }

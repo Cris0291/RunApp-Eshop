@@ -2,5 +2,5 @@
 
 namespace Contracts.Orders.Request
 {
-    public record OrderRequestDto(AddressRequest? Address, CardRequest? Card);
+    public record OrderRequestDto(AddressRequest? AddressRequest, CardRequest? CardRequest);
 }

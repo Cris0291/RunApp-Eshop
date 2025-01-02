@@ -2,5 +2,5 @@
 
 namespace Contracts.Orders.Response
 {
-    public record OrderDto(Guid OrderId, AddressDto? Address, CardDto? Card);
+    public record OrderDto(Guid OrderId, AddressDto? AddressRequest, CardDto? CardRequest);
 }
