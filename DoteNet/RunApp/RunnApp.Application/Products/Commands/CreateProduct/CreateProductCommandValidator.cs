@@ -14,6 +14,7 @@ namespace RunnApp.Application.Products.Commands.CreateProduct
             RuleFor(command => command.Type).NotNull().NotEmpty();
             RuleFor(command => command.Color).NotNull().NotEmpty();
             RuleFor(command => command.Weight).GreaterThan(0);
+            RuleFor(command => command.Categories).Must(x => x.Count() > 0);
         }
     }
 }
