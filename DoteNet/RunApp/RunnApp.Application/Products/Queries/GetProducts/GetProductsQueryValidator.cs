@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using RunnApp.Application.Common.SortingPagingFiltering;
 
 namespace RunnApp.Application.Products.Queries.GetProducts
 {

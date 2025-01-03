@@ -43,15 +43,15 @@ namespace RunnApp.Application.Products.Queries.GetProducts
         public static IQueryable<ProductsJoin> AddFiltering(this IQueryable<ProductsJoin> products, FilterMappingValues filterValues, IEnumerable<FilterByOptions> options)
         {
             IQueryable<ProductsJoin> newProducts = products;
-            var categoriesSet = filterValues.Categories.ToHashSet();
-            var starsSet = filterValues.Stars.ToHashSet();
+            var categoriesSet = filterValues.Categories?.ToHashSet();
+            var starsSet = filterValues.Stars?.ToHashSet();
 
             foreach (var option in options)
             {
                 switch (option)
                 {
                     case FilterByOptions.Categories:
-                        newProducts = newProducts.Where(x => x.Product.CategoryNames.Any(c => categoriesSet.Contains(c)));
+                        newProducts = newProducts.Where(x => x.Product.CategoryNames.Any(c => categoriesSet!.Contains(c)));
                         break;
                     case FilterByOptions.Search:
                         newProducts = filterValues.Search == "all" ? newProducts : newProducts = newProducts.Where(x => x.Product.Name.Contains(filterValues.Search));
@@ -60,7 +60,7 @@ namespace RunnApp.Application.Products.Queries.GetProducts
                         newProducts = newProducts.Where(x => x.Product.ActualPrice >= filterValues.PriceRange[0] && x.Product.ActualPrice <= filterValues.PriceRange[1]);
                         break;
                     case FilterByOptions.Stars:
-                        newProducts = newProducts.Where(x => starsSet.Contains((int)Math.Round(x.Product.AverageRatings)));
+                        newProducts = newProducts.Where(x => starsSet!.Contains((int)Math.Round(x.Product.AverageRatings)));
                         break;
                     default:
                         return products;

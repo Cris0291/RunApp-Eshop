@@ -42,9 +42,8 @@ namespace RunnApp.Application.Products.Queries.GetProducts
 
             foreach (var property in properties)
             {
-                if (property.Name == "Stars" && filterValues.Stars.Length == 0) continue;
-                if (property.Name == "Categories" && filterValues.Categories.Length == 0) continue;
-                if (property.Name == "PriceRange" && filterValues.PriceRange.Length == 0) continue;
+                if (property.Name == "Stars" && filterValues.Stars == null) continue;
+                if (property.Name == "Categories" && filterValues.Categories == null) continue;
 
                 if (!Enum.TryParse(property.Name, out FilterByOptions option)) throw new ArgumentException("Filter option and value did not matched");
                 filterOptions.Add(option);

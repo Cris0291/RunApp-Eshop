@@ -3,7 +3,7 @@ using ErrorOr;
 
 namespace RunnApp.Application.Products.Queries.GetProduct
 {
-    public record GetProductQuery(Guid ProductId) : IRequest<ErrorOr<ProductItemDto>>;
+    public record GetProductQuery(Guid ProductId, Guid UserId) : IRequest<ErrorOr<ProductItemDto>>;
 
 
 }

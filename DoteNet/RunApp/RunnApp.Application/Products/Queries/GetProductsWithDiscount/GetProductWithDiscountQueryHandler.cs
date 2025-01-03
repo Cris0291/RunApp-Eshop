@@ -1,6 +1,4 @@
-﻿using ErrorOr;
-using MediatR;
-using RunApp.Domain.Products;
+﻿using MediatR;
 using RunnApp.Application.Common.Interfaces;
 using RunnApp.Application.Products.Queries.GetProducts;
 

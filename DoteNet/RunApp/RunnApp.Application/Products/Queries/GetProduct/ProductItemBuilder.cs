@@ -1,34 +1,36 @@
-﻿using RunApp.Domain.PhotoAggregate;
+﻿using RunApp.Domain.CustomerProfileAggregate;
+using RunApp.Domain.PhotoAggregate;
 using RunApp.Domain.Products;
 using RunApp.Domain.ReviewAggregate;
+using RunnApp.Application.Products.Queries.GetProducts;
+using System.Xml.Linq;
 
 namespace RunnApp.Application.Products.Queries.GetProduct
 {
     public static class ProductItemBuilder
     {
-        public static ProductItemDto CreateProductItemDto(this Product product, IEnumerable<Photo> photos, IEnumerable<Review> reviews)
+        public static IQueryable<ProductItemDto> CreateProductItemDto(this IQueryable<ProductWithMainImage> productWithImage)
         {
-            return new ProductItemDto
-            {
-                Name = product.Name,
-                ProductId = product.ProductId,
-                ActualPrice = product.ActualPrice,
-                Description = product.Description,
-                NumberOfReviews = product.NumberOfReviews,
-                NumberOflikes = product.NumberOfLikes,
-                AverageRatings = product.AverageRatings,
-                PriceWithDiscount = product.PriceOffer?.PriceWithDiscount,
-                Discount = product.PriceOffer?.Discount,
-                PromotionalText = product.PriceOffer?.PromotionalText,
-                Images = photos.Select(x => x.Url).ToList(),
-                CategoryNames = product.Categories.Select(x => x.CategoryName).ToList(),
-                BulletPoints = product.BulletPoints.Select(x => x.BulletPoint).ToList(),
-                Reviews = reviews.Select(x => x.CreateReviewDto())
-            };
+            return productWithImage.Select(x => new ProductItemDto {
+                ProductId = x.Product.ProductId,
+                Name = x.Product.Name,
+                ActualPrice = x.Product.ActualPrice,
+                NumberOfReviews = x.Product.NumberOfReviews,
+                NumberOflikes = x.Product.NumberOfLikes,
+                AverageRatings = x.Product.AverageRatings,
+                PriceWithDiscount = x.Product.PriceOffer == null ? null : x.Product.PriceOffer.PriceWithDiscount,
+                PromotionalText = x.Product.PriceOffer == null ? null : x.Product.PriceOffer.PromotionalText,
+                Discount = x.Product.PriceOffer == null ? null : x.Product.PriceOffer.Discount,
+                CategoryNames = x.Product.Categories.Select(x => x.CategoryName),
+                MainImage = x.MainImage == null ? null : x.MainImage.Url,
+                BulletPoints = x.Product.BulletPoints.Select(x => x.BulletPoint).ToList(),
+                Reviews = null,
+            });
+            
         }
-        public static ReviewDto CreateReviewDto(this Review review)
+        public static IQueryable<ReviewDto> CreateReviewDto(this IQueryable<ReviewAndCustomerDto> reviews)
         {
-            return new ReviewDto(review.Comment, review.Date, review.ReviewDescription.Name, review.Rating);
+            return reviews.Select(review => new ReviewDto(review.Review.Comment, review.Review.Date, review.Review.ReviewDescription.Name, review.Review.Rating, review.Review.ReviewId, review.CustomerProfile!.Name));
         }
     }
 }

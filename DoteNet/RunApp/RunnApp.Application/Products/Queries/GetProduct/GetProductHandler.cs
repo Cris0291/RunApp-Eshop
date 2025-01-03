@@ -1,33 +1,36 @@
 ﻿using ErrorOr;
 using MediatR;
-using RunApp.Domain.Products;
 using RunnApp.Application.Common.Interfaces;
 
 namespace RunnApp.Application.Products.Queries.GetProduct
 {
-    public class GetProductHandler : IRequestHandler<GetProductQuery, ErrorOr<ProductItemDto>>
+    public class GetProductHandler(ILeftJoinRepository leftJoinRepository, IProductsRepository productsRepository, IReviewsRepository reviewsRepository) : IRequestHandler<GetProductQuery, ErrorOr<ProductItemDto>>
     {
-        private readonly IProductsRepository _productsRepository;
-        private readonly IReviewsRepository _reviewRepository;
-        private readonly IPhotoRepository _photoRepository;
-        public GetProductHandler(IProductsRepository productsRepository, IReviewsRepository reviewsRepository, IPhotoRepository photoRepository)
-        {
-            _productsRepository = productsRepository;
-            _reviewRepository = reviewsRepository;
-            _photoRepository = photoRepository;
-        }
+        private readonly ILeftJoinRepository _leftJoinRepository = leftJoinRepository;
+        private readonly IProductsRepository _productsRepository = productsRepository;
+        private readonly IReviewsRepository _reviewsRepository = reviewsRepository;
         public async Task<ErrorOr<ProductItemDto>> Handle(GetProductQuery request, CancellationToken cancellationToken)
         {
-            Product? product = await _productsRepository.GetProductWithCategories(request.ProductId);
-            if(product is null) return Error.NotFound(code: "ProductWasNotFoundWithGivenId", description: $"Requested product was not found {request.ProductId}");
+            var existProduct = await _productsRepository.ExistProduct(request.ProductId);
+            if(!existProduct) return Error.NotFound(code: "ProductWasNotFoundWithGivenId", description: $"Requested product was not found {request.ProductId}");
 
-            var reviews = await _reviewRepository.GetReviewsForProduct(request.ProductId);
+            var product = _productsRepository.GetProductWithCategoriesQuery(request.ProductId);
+            var productsWithImage = _leftJoinRepository.GetProductsWithImage(product);
 
-            var photos = await _photoRepository.GetPhotosForProduct(request.ProductId);
+            var productItemDtoQuery = productsWithImage.CreateProductItemDto();
 
-            var productItem = product.CreateProductItemDto(photos, reviews);
+            var existReviews = await _reviewsRepository.ExistReviewsForProduct(request.ProductId);
+            if (!existReviews)  return (await _leftJoinRepository.ExecuteQuery(productItemDtoQuery))[0];
 
-            return productItem;
+            var reviewsWithCustomers = _leftJoinRepository.GetReviewsWithCustomer(request.ProductId);
+            var reviewsDtoQuery = reviewsWithCustomers.CreateReviewDto();
+
+            var productItemDto =  (await _leftJoinRepository.ExecuteQuery(productItemDtoQuery))[0];
+            var reviewsDto = await _leftJoinRepository.ExecuteQuery(reviewsDtoQuery);
+
+            productItemDto.Reviews = reviewsDto;
+
+            return productItemDto;
         }
     }
 }

@@ -12,9 +12,9 @@
         public decimal? PriceWithDiscount { get; set; }
         public string? PromotionalText { get; set; }
         public decimal? Discount { get; set; }
-        public IEnumerable<string> Images { get; set; }
+        public string? MainImage { get; set; }
         public IEnumerable<string> CategoryNames { get; set; }
         public IEnumerable<string> BulletPoints { get; set; }
-        public IEnumerable<ReviewDto> Reviews { get; set; }
+        public IEnumerable<ReviewDto>? Reviews { get; set; }
     }
 }
