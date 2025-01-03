@@ -1,4 +1,4 @@
 ﻿namespace Contracts.CustomerProfile.Request
 {
-    public record AccountInfoRequest(string Name, string Email, string NickName);
+    public record AccountInfoRequest(string Name, string OldEmail, string NewEmail, string NickName);
 }
