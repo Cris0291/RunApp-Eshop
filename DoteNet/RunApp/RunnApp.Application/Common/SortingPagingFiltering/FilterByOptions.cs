@@ -2,7 +2,6 @@
 {
     public enum FilterByOptions
     {
-        Likes,
         Stars,
         Categories,
         Search,
