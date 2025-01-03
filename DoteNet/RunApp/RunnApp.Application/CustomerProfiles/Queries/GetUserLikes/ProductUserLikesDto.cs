@@ -1,11 +1,11 @@
-﻿using RunApp.Domain.Products;
-using RunApp.Domain.ProductStatusAggregate;
+﻿using RunApp.Domain.ProductStatusAggregate;
+using RunnApp.Application.Products.Queries.GetProducts;
 
 namespace RunnApp.Application.CustomerProfiles.Queries.GetUserLikes
 {
     public class ProductUserLikesDto
     {
-        public Product Product { get; set; }
+        public ProductWithMainImage? Product { get; set; }
         public ProductStatus ProductStatus { get; set; }
     }
 }

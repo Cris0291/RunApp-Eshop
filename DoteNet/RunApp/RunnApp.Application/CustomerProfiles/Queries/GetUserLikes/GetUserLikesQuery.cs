@@ -1,5 +1,4 @@
-﻿using ErrorOr;
-using MediatR;
+﻿using MediatR;
 
 namespace RunnApp.Application.CustomerProfiles.Queries.GetUserLikes
 {

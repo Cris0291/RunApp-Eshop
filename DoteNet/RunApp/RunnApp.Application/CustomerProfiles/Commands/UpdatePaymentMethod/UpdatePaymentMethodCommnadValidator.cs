@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
 
-namespace RunnApp.Application.CustomerProfiles.Commands.AddPaymentMethod
+namespace RunnApp.Application.CustomerProfiles.Commands.UpdatePaymentMethod
 {
-    public class AddPaymentMethodCommandValidator : AbstractValidator<AddPaymentMethodCommand>
+    public class UpdatePaymentMethodCommandValidator : AbstractValidator<UpdatePaymentMethodCommand>
     {
-        public AddPaymentMethodCommandValidator()
+        public UpdatePaymentMethodCommandValidator()
         {
             RuleFor(x => x.HoldersName).NotEmpty().NotNull();
             RuleFor(x => x.CardNumber).Matches(@"^\d{13,19}$").WithMessage("Card number must be between 13 and 19 digits.");

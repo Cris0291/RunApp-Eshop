@@ -8,7 +8,9 @@ namespace RunnApp.Application.CustomerProfiles.Commands.UpdateAccountInfo
         {
             RuleFor(x => x.Name).NotNull().NotEmpty();
             RuleFor(x => x.NickName).NotNull().NotEmpty();
-            RuleFor(x => x.Email).Matches("/\\S+@\\S+\\.\\S+/");
+            RuleFor(x => x.Email).NotEmpty().WithMessage("Email is required.")
+            .Matches(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+            .WithMessage("Invalid email format.");
         }
     }
 }

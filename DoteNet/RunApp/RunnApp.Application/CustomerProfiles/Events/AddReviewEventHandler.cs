@@ -14,7 +14,7 @@ namespace RunnApp.Application.CustomerProfiles.Events
             var customer = await _customerProfileRepository.GetCustomerProfile(notification.customerProfileId);
             if (customer == null) throw new InvalidOperationException("User was not found");
 
-            customer.AddReview(notification.ReviewId);
+            customer.AddReview(notification.ProductId);
 
             await _unitOfWorkPattern.CommitChangesAsync();
         }
