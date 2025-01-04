@@ -5,13 +5,16 @@ using RunnApp.Application.Common.Interfaces;
 
 namespace RunnApp.Application.Orders.Queries.GetOrder
 {
-    public class GetOrderQueryHandler(IOrderRepository orderRepository) : IRequestHandler<GetOrderQuery, ErrorOr<OrderWrapperDto>>
+    public class GetOrderQueryHandler(IOrderRepository orderRepository, ICustomerProfileRepository customerProfile) : IRequestHandler<GetOrderQuery, ErrorOr<OrderWrapperDto>>
     {
         private readonly IOrderRepository _orderRepository = orderRepository;
+        private readonly ICustomerProfileRepository _customerProfile = customerProfile;
         public async Task<ErrorOr<OrderWrapperDto>> Handle(GetOrderQuery request, CancellationToken cancellationToken)
         {
-            var result = await _orderRepository.GetCurrentOrder(request.UserId);
-            if (result != null && result.LineItems.Count == 0) return Error.Validation(code: "CannotHaveAnEmptyOrder", description: "Cannot have an empty order");
+            var user = await _customerProfile.GetCustomerProfile(request.UserId);
+            if (user == null) throw new InvalidOperationException("User was not found with the given id");
+
+            var result = await _orderRepository.GetCurrentOrder(user.Orders);
 
             return new OrderWrapperDto { Order = result };
         }

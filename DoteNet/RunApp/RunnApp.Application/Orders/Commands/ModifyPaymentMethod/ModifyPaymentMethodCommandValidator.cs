@@ -7,8 +7,8 @@ namespace RunnApp.Application.Orders.Commands.ModifyPaymentMethod
         public ModifyPaymentMethodCommandValidator()
         {
             RuleFor(x => x.HoldersName).NotEmpty().NotNull();
-            RuleFor(x => x.CardNumber).Matches("/^(?:\\d[ -]*?){13,16}$/");
-            RuleFor(x => x.CVV).Matches("/^[0-9]{3,4}$/");
+            RuleFor(x => x.CardNumber).Matches(@"^\d{13,19}$").WithMessage("Card number must be between 13 and 19 digits.");
+            RuleFor(x => x.CVV).Matches(@"^\d{3}$").WithMessage("Invalid CVV format for the given card type.");
             RuleFor(x => x.ExpiryDate).Matches(@"^(0[1-9]|1[0-2])\/\d{2}(\d{2})?$").WithMessage("Expiration date must be in MM/YY or MM/YYYY format.")
             .Must(BeAValidExpirationDate).WithMessage("Expiration date cannot be in the past.");
         }
