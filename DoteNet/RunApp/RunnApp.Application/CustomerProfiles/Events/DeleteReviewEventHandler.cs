@@ -13,7 +13,7 @@ namespace RunnApp.Application.CustomerProfiles.Events
             var customer  = await _customerProfileRepository.GetCustomerProfile(notification.CustomerProfileId);
             if(customer == null) throw new InvalidOperationException("Customer was not found");
 
-            customer.DeleteReview(notification.ReviewId);
+            customer.DeleteReview(notification.ProductId);
 
             int wasDeleted = await _unitOfWorkPattern.CommitChangesAsync();
             if (wasDeleted == 0) throw new InvalidOperationException("Review could not be deleted");
