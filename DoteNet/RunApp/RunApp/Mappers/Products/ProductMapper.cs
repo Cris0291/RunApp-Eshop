@@ -88,7 +88,7 @@ namespace RunApp.Api.Mappers.Products
         }
         public static int[] FromQueryStarValuesToRequestQuery(this string filterByStars)
         {
-            var stars = filterByStars.Split("%2C");
+            var stars = filterByStars.Split(",");
             var intStars = stars.Select(x =>
             {
                 bool isInt = int.TryParse(x, out int star);
@@ -101,7 +101,7 @@ namespace RunApp.Api.Mappers.Products
         }
         public static string[] FromQueryCategoryValuesToRequestQuey(this string filterByCategory)
         {
-            return filterByCategory.Split("%2C");
+            return filterByCategory.Split(",");
         }
     }
 }

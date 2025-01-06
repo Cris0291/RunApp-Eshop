@@ -16,19 +16,19 @@
             public const string ExistProduct = $"{ProductBase}/{{id:guid}}/exist";
 
             public const string AddReview = $"{ProductBase}/{{id:guid}}/reviews";
-            public const string DeleteReview = $"{ProductBase}/{{ProductId:guid}}/reviews";
+            public const string DeleteReview = $"{ProductBase}/{{id:guid}}/reviews";
             public const string UpdateReview = $"{ProductBase}/{{id:guid}}/reviews";
 
             public const string AddPriceWithDiscount = $"{ProductBase}/{{id:guid}}/discounts";
             public const string DeletePriceWithDiscount = $"{ProductBase}/{{id:guid}}/discounts";
 
             public const string AddOrRemoveProductLike = $"{ProductBase}/{{id:guid}}/likes/like";
-            public const string AddOrRemoveProductDislike = $"{ProductBase}/{{id:guid}}/likes/Dislike";
+            public const string AddOrRemoveProductDislike = $"{ProductBase}/{{id:guid}}/likes/dislike";
 
             public const string AddRating = $"{ProductBase}/{{id:guid}}/rates";
 
             public const string AddCategory = $"{ProductBase}/{{id:guid}}/categories";
-            public const string DeleteCategory = $"{ProductBase}/{{ProductId:guid}}categories/{{CategoryId:guid}}";
+            public const string DeleteCategory = $"{ProductBase}/{{ProductId:guid}}/categories/{{CategoryId:guid}}";
 
             public const string AddPhoto = $"{ProductBase}/{{id:guid}}/photos";
             public const string RemovePhoto = $"{ProductBase}/{{productId:guid}}/photos/{{photoId}}";
