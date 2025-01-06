@@ -38,10 +38,10 @@ namespace RunApp.Api.Controllers.Reviews
 
         [Authorize]
         [HttpDelete(ApiEndpoints.Products.DeleteReview)]
-        public async Task<IActionResult> DeleteReview([FromRoute] Guid ProductId)
+        public async Task<IActionResult> DeleteReview([FromRoute] Guid id)
         {
             Guid userId = HttpContext.GetUserId();
-            ErrorOr<Success> errorOr = await _mediator.Send(new DeleteReviewCommand(userId, ProductId));
+            ErrorOr<Success> errorOr = await _mediator.Send(new DeleteReviewCommand(userId, id));
             return errorOr.MatchFirst(value => Ok(), Problem);
         }
 

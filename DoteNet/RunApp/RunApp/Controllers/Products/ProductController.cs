@@ -58,7 +58,7 @@ namespace RunApp.Api.Controllers.Products
             var options  = getAllProducts.SortBy.ConverToEnum();
             if (options.IsError) return Problem(options.Errors);
 
-            GetProductsQuery getProductsQuery = new GetProductsQuery(userId, options.Value, getAllProducts.FilterByStars.FromQueryStarValuesToRequestQuery(), getAllProducts.FilterByCategory.FromQueryCategoryValuesToRequestQuey(), getAllProducts.FilterByPrice, getAllProducts.Search);
+            GetProductsQuery getProductsQuery = new GetProductsQuery(userId, options.Value, getAllProducts.FilterByStars?.FromQueryStarValuesToRequestQuery(), getAllProducts.FilterByCategory?.FromQueryCategoryValuesToRequestQuey(), getAllProducts.FilterByPrice, getAllProducts.Search);
 
             var products = await _mediator.Send(getProductsQuery);
             return products.Match(value => Ok(value.AllProductsToProductsResponse()), Problem);

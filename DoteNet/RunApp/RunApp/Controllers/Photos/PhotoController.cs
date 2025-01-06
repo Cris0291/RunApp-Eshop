@@ -14,21 +14,21 @@ namespace RunApp.Api.Controllers.Photos
     {
         private readonly ISender _mediator = mediator;
 
-        [Authorize("StoreProfile")]
+        [Authorize]
         [HttpPost(ApiEndpoints.Products.AddPhoto)]
-        public async Task<IActionResult> AddProductPhoto([FromBody] PhotoRequestDto photoRequest)
+        public async Task<IActionResult> AddProductPhoto([FromRoute] Guid id , [FromForm] IFormFile photoRequest)
         {
-            Guid storeOwnerId = HttpContext.GetStoreOwnerId();
-            var result = await _mediator.Send(new AddProductPhotoCommand(photoRequest.ProductId, storeOwnerId, photoRequest.photo));
+            Guid userId = HttpContext.GetUserId();
+            var result = await _mediator.Send(new AddProductPhotoCommand(id, userId, photoRequest));
 
             return result.MatchFirst(value => Ok(value.PhotoResultToPhotoResponse()), Problem);
         }
-        [Authorize("StoreProfile")]
+        [Authorize]
         [HttpDelete(ApiEndpoints.Products.RemovePhoto)]
         public async Task<IActionResult> RemovePhoto([FromRoute] Guid productId, [FromRoute] string photoId)
         {
-            Guid storeOwnerId = HttpContext.GetStoreOwnerId();
-            var result = await _mediator.Send(new RemoveProductPhotoCommand(productId, storeOwnerId, photoId));
+            Guid userId = HttpContext.GetUserId();
+            var result = await _mediator.Send(new RemoveProductPhotoCommand(productId, userId, photoId));
 
             return result.MatchFirst(value => Ok(), Problem);
         }

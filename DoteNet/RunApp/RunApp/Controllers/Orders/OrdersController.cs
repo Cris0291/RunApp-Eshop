@@ -1,6 +1,5 @@
 ﻿using Contracts.Common;
 using Contracts.Orders.Request;
-using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -35,28 +34,28 @@ namespace RunApp.Api.Controllers.Orders
 
         [Authorize]
         [HttpPut(ApiEndpoints.Orders.ModifyOrderAddress)]
-        public async Task<IActionResult> ModifyOrderAddress([FromRoute] Guid orderId, [FromBody] AddressRequest address)
+        public async Task<IActionResult> ModifyOrderAddress([FromRoute] Guid id, [FromBody] AddressRequest address)
         {
-            var result = await _mediator.Send(new ModifyAddressCommand(orderId, address.ZipCode, address.Address,address.City, address.Country, address.State));
+            var result = await _mediator.Send(new ModifyAddressCommand(id, address.ZipCode, address.Address,address.City, address.Country, address.State));
 
             return result.Match(value => Ok(value.FromAddressToAddressDto()), Problem);
         }
 
         [Authorize]
         [HttpPut(ApiEndpoints.Orders.ModifyPaymentMethod)]
-        public async Task<IActionResult> ModifyPaymentMethod([FromRoute]Guid orderId, [FromBody] CardRequest card)
+        public async Task<IActionResult> ModifyPaymentMethod([FromRoute]Guid id, [FromBody] CardRequest card)
         {
-            var result = await _mediator.Send(new ModifyPaymentMethodCommand(orderId, card.CardName, card.CardNumber, card.CVV, card.ExpiryDate));
+            var result = await _mediator.Send(new ModifyPaymentMethodCommand(id, card.CardName, card.CardNumber, card.CVV, card.ExpiryDate));
             return result.Match(value => Ok(value.FromCardToCardDto()), Problem);
         }
 
         [Authorize]
         [HttpPatch(ApiEndpoints.Orders.PayOrder)]
-        public async Task<IActionResult> PayOrder([FromRoute] Guid orderId)
+        public async Task<IActionResult> PayOrder([FromRoute] Guid id)
         {
             Guid userId = HttpContext.GetUserId();
 
-            var result = await _mediator.Send(new PayOrderCommand(userId, orderId));
+            var result = await _mediator.Send(new PayOrderCommand(userId, id));
 
             return result.MatchFirst(value => Ok(), Problem);
         }

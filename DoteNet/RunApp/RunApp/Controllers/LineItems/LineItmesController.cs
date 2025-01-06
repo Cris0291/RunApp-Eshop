@@ -17,9 +17,9 @@ namespace RunApp.Api.Controllers.LineItems
 
         [Authorize]
         [HttpPost(ApiEndpoints.Orders.AddItem)]
-        public async Task<IActionResult> AddItem([FromBody] ItemResquestDto lineItem, [FromRoute] Guid orderId)
+        public async Task<IActionResult> AddItem([FromBody] ItemResquestDto lineItem, [FromRoute] Guid id)
         {
-            var result  = await _mediator.Send(new AddItemCommand(orderId, lineItem.Id, lineItem.Name, lineItem.Quantity, lineItem.Price, lineItem.PriceWithDiscount, lineItem.TotalPrice));
+            var result  = await _mediator.Send(new AddItemCommand(id, lineItem.Id, lineItem.Name, lineItem.Quantity, lineItem.Price, lineItem.PriceWithDiscount, lineItem.TotalPrice));
 
             return result.Match(value =>
             {
@@ -29,18 +29,18 @@ namespace RunApp.Api.Controllers.LineItems
 
         [Authorize]
         [HttpDelete(ApiEndpoints.Orders.DeleteItem)]
-        public async Task<IActionResult> DeleteItem([FromRoute] Guid orderId, [FromBody] DeleteItemRequestDto deleteItem)
+        public async Task<IActionResult> DeleteItem([FromRoute] Guid id, [FromBody] DeleteItemRequestDto deleteItem)
         {
-            var result = await _mediator.Send(new DeleteItemCommand(orderId, deleteItem.ProductId));
+            var result = await _mediator.Send(new DeleteItemCommand(id, deleteItem.ProductId));
 
             return result.MatchFirst(value => Ok(), Problem);
         }
 
         [Authorize]
         [HttpPut(ApiEndpoints.Orders.ChangeItemQuantity)]
-        public async Task<IActionResult> ChangeQuatity([FromRoute] Guid orderId, [FromBody] ChangeQuantityRequestDto changeQuantity)
+        public async Task<IActionResult> ChangeQuatity([FromRoute] Guid id, [FromBody] ChangeQuantityRequestDto changeQuantity)
         {
-            var result = await _mediator.Send(new ChangeItemQuantityCommand(orderId, changeQuantity.ProductId, changeQuantity.Quantity));
+            var result = await _mediator.Send(new ChangeItemQuantityCommand(id, changeQuantity.ProductId, changeQuantity.Quantity));
 
             return result.Match(value => Ok(), Problem);
         }

@@ -121,10 +121,23 @@ namespace RunApp.Api.Controllers.CustomerProfiles
         [HttpPut(ApiEndpoints.CustomerProfiles.UpdateAccountInfo)]
         public async Task<IActionResult> UpdateAccount([FromBody] AccountInfoRequest accountInfo)
         {
+            var user = await _userManager.FindByEmailAsync(accountInfo.OldEmail);
+            if (user == null) return BadRequest("User was not found");
+            user.Email = accountInfo.NewEmail;
+            user.UserName = accountInfo.Name;
+            user.NickName = accountInfo.NickName;
+            var resultUpdate = await _userManager.UpdateAsync(user);
+            if (!resultUpdate.Succeeded)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Status = 500,
+                    Title = "An unexpected error happened",
+                    Detail = string.Join(", ", resultUpdate.Errors.Select(x => x.Description))
+                });
+            }
             Guid userId = HttpContext.GetUserId();
-
-            var result = await _mediator.Send(new UpdateAccountInfoCommand(userId, accountInfo.Name, accountInfo.Email, accountInfo.NickName));
-
+            var result = await _mediator.Send(new UpdateAccountInfoCommand(userId, accountInfo.Name, accountInfo.NewEmail, accountInfo.NickName));
             return result.MatchFirst(value => Ok(value.FromCustomerToAccountResponse()), Problem);
         }
 
@@ -145,8 +158,8 @@ namespace RunApp.Api.Controllers.CustomerProfiles
         {
             var user = await _userManager.FindByEmailAsync(passwordDtoRequest.Email);
             if(user == null) return BadRequest("User was not found");
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var result = await _userManager.ResetPasswordAsync(user, token, passwordDtoRequest.Password);
+
+            var result = await _userManager.ChangePasswordAsync(user, passwordDtoRequest.OldPassword, passwordDtoRequest.NewPassword);
 
             if (result.Succeeded) return Ok();
 
