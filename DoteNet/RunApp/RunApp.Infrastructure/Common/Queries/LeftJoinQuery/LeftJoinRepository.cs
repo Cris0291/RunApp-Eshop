@@ -23,7 +23,7 @@ namespace RunApp.Infrastructure.Common.Queries.LeftJoinQuery
             IQueryable<ProductStatus> productStatus = _appStoreDbContext.ProductStatuses.Where(x => x.Id == UserId);
             IQueryable<Product> products = _appStoreDbContext.Products;
             IQueryable<ProductWithMainImage>  productsWithImage = GetProductsWithImage(products);
-            Expression<Func<ProductStatus, Guid>> statusKey = (productStatus) => productStatus.ProductId.HasValue ? productStatus.ProductId.Value : Guid.Empty;
+            Expression<Func<ProductStatus, Guid>> statusKey = (productStatus) => productStatus.ProductId;
             Expression<Func<ProductWithMainImage, Guid>> productKey = (product) => product.Product.ProductId;
             Expression<Func<ProductStatus, ProductWithMainImage?, ProductUserLikesDto>> resultSelector = (productStatus, product) => new ProductUserLikesDto { Product = product, ProductStatus = productStatus };
 
@@ -35,7 +35,7 @@ namespace RunApp.Infrastructure.Common.Queries.LeftJoinQuery
         {
             IQueryable<ProductStatus> productStatus = _appStoreDbContext.ProductStatuses.Where(x => x.Id == UserId);
             Expression<Func<ProductForCard, Guid>> productKey = (product) => product.ProductId;
-            Expression<Func<ProductStatus, Guid>> statusKey = (productStatus) => productStatus.ProductId.HasValue ? productStatus.ProductId.Value : Guid.Empty;
+            Expression<Func<ProductStatus, Guid>> statusKey = (productStatus) => productStatus.ProductId;
             Expression<Func<ProductForCard, ProductStatus?, ProductsJoin>> resultSelector = (productForCard, productStatus) => new ProductsJoin { Product = productForCard, ProductStatus = productStatus };
 
             return products.CreateOuterJoinQuery(productStatus, productKey, statusKey, resultSelector);
@@ -62,7 +62,7 @@ namespace RunApp.Infrastructure.Common.Queries.LeftJoinQuery
         public IQueryable<ProductWithMainImage> GetBoughtProductWithImage(IEnumerable<Guid> boughtProducts)
         {
             var productsSet = boughtProducts.ToHashSet();
-            IQueryable<Product> products = _appStoreDbContext.Products.Where(x => productsSet.Contains(x.ProductId));
+            IQueryable<Product> products = _appStoreDbContext.Products.Include(x => x.Categories).Where(x => productsSet.Contains(x.ProductId));
             IQueryable<Photo> photos = _appStoreDbContext.Photos;
             Expression<Func<Product, Guid>> productKey = (product) => product.ProductId;
             Expression<Func<Photo, Guid>> photoKey = (photo) => photo.ProductId;
@@ -73,9 +73,9 @@ namespace RunApp.Infrastructure.Common.Queries.LeftJoinQuery
         public IQueryable<ReviewWithProductImage> GetUserReviewsWithProductImage(IQueryable<ProductImageDto> products, IEnumerable<Guid> userReviews)
         {
             var reviewsSet = userReviews.ToHashSet();
-            IQueryable<Review> reviews = _appStoreDbContext.Reviews.Where(x => reviewsSet.Contains(x.ReviewId));
-            Expression<Func<Review, Guid>> reviewKey = (review) => review.ProductId.HasValue ? review.ProductId.Value : Guid.Empty;
-            Expression<Func<ProductImageDto, Guid>> productKey = (product) => product.ProductId;
+            IQueryable<Review> reviews = _appStoreDbContext.Reviews.Where(x => reviewsSet.Contains(x.ProductId));
+            Expression<Func<Review, Guid>> reviewKey = (review) => review.ProductId;
+            Expression <Func<ProductImageDto, Guid>> productKey = (product) => product.ProductId;
             Expression<Func<Review, ProductImageDto?, ReviewWithProductImage>> resultSelector = (review, product) => new ReviewWithProductImage {Review = review, ProductImage = product };
 
             return reviews.CreateOuterJoinQuery(products, reviewKey, productKey, resultSelector);
