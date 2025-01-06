@@ -12,7 +12,7 @@ using RunApp.Infrastructure.Common.Persistence;
 namespace RunApp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppStoreDbContext))]
-    [Migration("20250101205544_FinalMigration")]
+    [Migration("20250103212227_FinalMigration")]
     partial class FinalMigration
     {
         /// <inheritdoc />
@@ -200,9 +200,6 @@ namespace RunApp.Infrastructure.Migrations
                     b.Property<Guid>("LineItemID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("OrderId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(10,2)");
 
@@ -227,14 +224,13 @@ namespace RunApp.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.HasIndex("OrderId1");
-
                     b.ToTable("LineItem");
                 });
 
             modelBuilder.Entity("RunApp.Domain.OrderAggregate.Order", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("OrderId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("DateOfPayment")
@@ -242,16 +238,18 @@ namespace RunApp.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("getutcdate()");
 
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool>("IsPaid")
                         .HasColumnType("bit");
-
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("decimal(10,2)");
 
-                    b.HasKey("Id");
+                    b.HasKey("OrderId");
+
+                    b.HasIndex("Id");
 
                     b.ToTable("Orders");
                 });
@@ -621,10 +619,9 @@ namespace RunApp.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("RefreshToken")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("RefreshTokenExpirationDate")
+                    b.Property<DateTime?>("RefreshTokenExpirationDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("SecurityStamp")
@@ -765,8 +762,9 @@ namespace RunApp.Infrastructure.Migrations
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<DateTime>("ExpiryDate")
-                                .HasColumnType("datetime2");
+                            b1.Property<string>("ExpiryDate")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("HoldersName")
                                 .IsRequired()
@@ -816,21 +814,19 @@ namespace RunApp.Infrastructure.Migrations
 
             modelBuilder.Entity("RunApp.Domain.OrderAggregate.LineItems.LineItem", b =>
                 {
-                    b.HasOne("RunApp.Domain.OrderAggregate.Order", null)
-                        .WithMany()
+                    b.HasOne("RunApp.Domain.OrderAggregate.Order", "Order")
+                        .WithMany("LineItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("RunApp.Domain.OrderAggregate.Order", null)
-                        .WithMany("LineItems")
-                        .HasForeignKey("OrderId1");
 
                     b.HasOne("RunApp.Domain.Products.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("RunApp.Domain.OrderAggregate.Order", b =>
@@ -887,8 +883,9 @@ namespace RunApp.Infrastructure.Migrations
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<DateTime>("ExpiryDate")
-                                .HasColumnType("datetime2");
+                            b1.Property<string>("ExpiryDate")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("HoldersName")
                                 .IsRequired()
@@ -985,11 +982,6 @@ namespace RunApp.Infrastructure.Migrations
                                 .HasColumnType("decimal(5,2)")
                                 .HasColumnName("Discount")
                                 .HasComputedColumnSql("100 * (1-[PriceWithDiscount]/[ActualPrice])", true);
-
-                            b1.Property<DateTime>("DiscountDate")
-                                .ValueGeneratedOnAddOrUpdate()
-                                .HasColumnType("datetime2")
-                                .HasComputedColumnSql("getutcdate()", true);
 
                             b1.Property<decimal?>("PriceWithDiscount")
                                 .HasColumnType("decimal(10,2)")

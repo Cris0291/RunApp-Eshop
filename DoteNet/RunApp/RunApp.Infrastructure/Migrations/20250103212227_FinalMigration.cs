@@ -31,8 +31,8 @@ namespace RunApp.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     NickName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RefreshTokenExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RefreshTokenExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -234,7 +234,7 @@ namespace RunApp.Infrastructure.Migrations
                     PaymentMethod_HoldersName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PaymentMethod_CardNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PaymentMethod_CVV = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PaymentMethod_ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    PaymentMethod_ExpiryDate = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -332,8 +332,8 @@ namespace RunApp.Infrastructure.Migrations
                 name: "Orders",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     OrderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     IsPaid = table.Column<bool>(type: "bit", nullable: false),
                     DateOfPayment = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getutcdate()"),
                     TotalPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
@@ -345,7 +345,7 @@ namespace RunApp.Infrastructure.Migrations
                     PaymentMethod_HoldersName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PaymentMethod_CardNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PaymentMethod_CVV = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PaymentMethod_ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    PaymentMethod_ExpiryDate = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -488,7 +488,7 @@ namespace RunApp.Infrastructure.Migrations
                     Price = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     PriceWithDiscount = table.Column<decimal>(type: "decimal(10,2)", nullable: true),
                     TotalItemPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    ProductName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProductName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -591,6 +591,11 @@ namespace RunApp.Infrastructure.Migrations
                 name: "IX_Log_StockId",
                 table: "Log",
                 column: "StockId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_Id",
+                table: "Orders",
+                column: "Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductStatuses_ProductId",

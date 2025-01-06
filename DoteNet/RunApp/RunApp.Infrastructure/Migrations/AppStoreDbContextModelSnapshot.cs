@@ -195,10 +195,9 @@ namespace RunApp.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("LineItemID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("OrderId1")
-                        .HasColumnType("uniqueidentifier");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(10,2)");
@@ -224,14 +223,13 @@ namespace RunApp.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.HasIndex("OrderId1");
-
                     b.ToTable("LineItem");
                 });
 
             modelBuilder.Entity("RunApp.Domain.OrderAggregate.Order", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("OrderId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("DateOfPayment")
@@ -239,16 +237,18 @@ namespace RunApp.Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("getutcdate()");
 
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool>("IsPaid")
                         .HasColumnType("bit");
-
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("decimal(10,2)");
 
-                    b.HasKey("Id");
+                    b.HasKey("OrderId");
+
+                    b.HasIndex("Id");
 
                     b.ToTable("Orders");
                 });
@@ -366,7 +366,7 @@ namespace RunApp.Infrastructure.Migrations
 
             modelBuilder.Entity("RunApp.Domain.ReviewAggregate.Review", b =>
                 {
-                    b.Property<Guid?>("ProductId")
+                    b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("Id")
@@ -813,21 +813,19 @@ namespace RunApp.Infrastructure.Migrations
 
             modelBuilder.Entity("RunApp.Domain.OrderAggregate.LineItems.LineItem", b =>
                 {
-                    b.HasOne("RunApp.Domain.OrderAggregate.Order", null)
-                        .WithMany()
+                    b.HasOne("RunApp.Domain.OrderAggregate.Order", "Order")
+                        .WithMany("LineItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("RunApp.Domain.OrderAggregate.Order", null)
-                        .WithMany("LineItems")
-                        .HasForeignKey("OrderId1");
 
                     b.HasOne("RunApp.Domain.Products.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("RunApp.Domain.OrderAggregate.Order", b =>
