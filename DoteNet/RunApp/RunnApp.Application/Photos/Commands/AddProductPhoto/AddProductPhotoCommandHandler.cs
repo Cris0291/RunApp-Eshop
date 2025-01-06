@@ -13,9 +13,9 @@ namespace RunnApp.Application.Photos.Commands.AddProductPhoto
         public async Task<ErrorOr<PhotoResult>> Handle(AddProductPhotoCommand request, CancellationToken cancellationToken)
         {
             var photoResult = await _photoAccessor.AddPhoto(request.photo);
-            if (photoResult == null) return Error.NotFound(code: "PhotoFileWsNotFound", description: "Requested photo was not found");
+            if (photoResult == null) return Error.NotFound(code: "PhotoFileWasNotProvided", description: "Requested photo was not provided");
 
-            var photo = Photo.CreatePhotoEntity(photoResult.PhotoId, photoResult.Url, request.ProductId, request.StoreOwnerId);
+            var photo = Photo.CreatePhotoEntity(photoResult.PhotoId, photoResult.Url, request.ProductId, request.UserId);
 
             await _photoRepository.AddPhoto(photo);
 

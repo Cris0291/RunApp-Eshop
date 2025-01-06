@@ -11,11 +11,11 @@ namespace RunnApp.Application.Photos.Commands.RemoveProductPhoto
         private readonly IUnitOfWorkPattern _unitOfWorkPattern = unitOfWorkPattern;
         public async Task<ErrorOr<Success>> Handle(RemoveProductPhotoCommand request, CancellationToken cancellationToken)
         {
-            var result = await _photoAccessor.DeletePhoto(request.PhotoId);
-            if (result.IsError) return result.Errors;
-
             var photo = await _photoRepository.GetPhoto(request.PhotoId);
             if (photo == null) return Error.NotFound(code: "RequestedPhotoWasNotFound", description: "Requested Photo was not found");
+
+            var result = await _photoAccessor.DeletePhoto(request.PhotoId);
+            if (result.IsError) return result.Errors;
 
             await _photoRepository.RemovePhoto(photo);
 
