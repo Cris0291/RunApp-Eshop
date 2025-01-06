@@ -64,7 +64,7 @@ namespace RunApp.Domain.CustomerProfileAggregate
 
             return ShippingAdress;
         }
-        public Card AddPaymentMethod(string holdersName, string cardNumber, string cvv, DateTime expiryDate)
+        public Card AddPaymentMethod(string holdersName, string cardNumber, string cvv, string expiryDate)
         {
             PaymentMethod = new Card
             {
@@ -76,7 +76,7 @@ namespace RunApp.Domain.CustomerProfileAggregate
 
             return PaymentMethod;
         }
-        public Card UpdatePaymentMethod(string holdersName, string cardNumber, string cvv, DateTime expiryDate)
+        public Card UpdatePaymentMethod(string holdersName, string cardNumber, string cvv, string expiryDate)
         {
             PaymentMethod!.CVV = cvv;
             PaymentMethod.HoldersName = holdersName;

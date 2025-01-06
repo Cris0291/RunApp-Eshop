@@ -14,7 +14,7 @@ namespace RunApp.Domain.ReviewAggregate
         public int Rating { get; internal set; }
         public DateTime Date { get; internal set; }
         public ReviewDescriptionEnums ReviewDescription { get; internal set; }
-        public Guid? ProductId { get; internal set; }
+        public Guid ProductId { get; internal set; }
         public Guid Id { get; internal set; }
         public static Review CreateReview(string comment, int rating, ReviewDescriptionEnums reviewDescription, Guid productId, Guid customerProfileId)
         {

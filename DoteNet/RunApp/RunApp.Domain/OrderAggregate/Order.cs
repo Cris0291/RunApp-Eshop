@@ -4,9 +4,6 @@ using RunApp.Domain.Common.ValueType;
 using RunApp.Domain.OrderAggregate.Events;
 using RunApp.Domain.OrderAggregate.LineItems;
 using RunApp.Domain.ProductAggregate.ProductErrors;
-using System.Diagnostics.Metrics;
-using System.IO;
-using System.Reflection.Emit;
 
 
 namespace RunApp.Domain.OrderAggregate
@@ -63,7 +60,10 @@ namespace RunApp.Domain.OrderAggregate
         }
         public LineItem DeleteItem(Guid productId)
         {
-            return LineItems.Single(x => x.ProductId == productId);
+            var item =  LineItems.Single(x => x.ProductId == productId);
+            TotalPrice -= item.TotalItemPrice;
+
+            return item;
         }
         public ErrorOr<Success> ChangeItemQuantity(int quantity, Guid productId)
         {
@@ -71,6 +71,10 @@ namespace RunApp.Domain.OrderAggregate
             if (item == null) return Error.NotFound(code: "ItemWasNotFound", description: "Requested item was not found in your order");
 
             item.Quantity = quantity;
+            TotalPrice -= item.TotalItemPrice;
+            item.TotalItemPrice = item.TotalItemPrice * quantity;
+            TotalPrice += item.TotalItemPrice;
+
             return Result.Success;
         }
         public void ModifyAddress(string zipCode, string street, string city, string country, string state)
@@ -95,7 +99,7 @@ namespace RunApp.Domain.OrderAggregate
                 Address.State = state;
             }
         }
-        public void ModifyPaymentMethod(string holdersName, string cardNumber, string cvv, DateTime expiryDate)
+        public void ModifyPaymentMethod(string holdersName, string cardNumber, string cvv, string expiryDate)
         {
             if (PaymentMethod == null)
             {
@@ -117,14 +121,15 @@ namespace RunApp.Domain.OrderAggregate
         }
         public void CommunicateToUserOrderCreation()
         {
+            var test = this;
             RaiseEvent(new CreateOrderEvent(Id, OrderId));
         }
         public ErrorOr<Success> PayOrder(Guid userId)
         {
-            IsPaid = true;
-
             var boughtProducts = LineItems.Select(x => x.ProductId);
             if (boughtProducts.Count() == 0) return Error.Validation(code: "CannotPayAnOrderThaHasNoItems", description: "Current order has no items. Please add some items to the cart");
+
+            IsPaid = true;
 
             RaiseEvent(new AddBoughtProductsEvent(userId, boughtProducts));
 

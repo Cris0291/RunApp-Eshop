@@ -13,7 +13,7 @@ namespace RunApp.Domain.ProductStatusAggregate
         public bool? Viewed { get; internal set; }
         public bool? Bought { get; internal set; }
         public Guid Id { get; internal set; }
-        public Guid? ProductId { get; internal set; }
+        public Guid ProductId { get; internal set; }
 
         public static ProductStatus CreateStatus(Guid productId, Guid customerId)
         {
@@ -31,7 +31,7 @@ namespace RunApp.Domain.ProductStatusAggregate
             Like = like;
             Dislike = null;
 
-            RaiseEvent(new AddOrRemoveProductLike(ProductId!.Value, like));
+            RaiseEvent(new AddOrRemoveProductLike(ProductId, like));
         }
         public void AddOrRemoveDislike(bool dislike)
         {
