@@ -14,8 +14,8 @@ namespace RunApp.Infrastructure.LineItems.Persistence
                 .WithMany()
                 .HasForeignKey(x => x.ProductId);
 
-            builder.HasOne<Order>()
-                .WithMany()
+            builder.HasOne(x => x.Order)
+                .WithMany(x => x.LineItems)
                 .HasForeignKey(x => x.OrderId);
 
             builder.HasKey(x => new {x.ProductId, x.OrderId});
@@ -32,6 +32,8 @@ namespace RunApp.Infrastructure.LineItems.Persistence
             builder.HasAlternateKey(x => x.LineItemID);
 
             builder.HasIndex(x => x.LineItemID);
+
+            builder.Property(x => x.LineItemID).HasDefaultValueSql("NEWID()");
         }
     }
 }

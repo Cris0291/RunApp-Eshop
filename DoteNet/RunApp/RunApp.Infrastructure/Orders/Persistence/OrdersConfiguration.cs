@@ -16,6 +16,8 @@ namespace RunApp.Infrastructure.Orders.Persistence
 
             builder.Property(x => x.DateOfPayment)
                 .HasDefaultValueSql("getutcdate()");
+
+            builder.HasKey(x => x.OrderId);
         }
     }
 }

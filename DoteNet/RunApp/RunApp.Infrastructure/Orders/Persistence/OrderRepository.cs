@@ -17,13 +17,19 @@ namespace RunApp.Infrastructure.Orders.Persistence
         {
             return await _appDbContext.Orders.Include(x => x.LineItems).SingleOrDefaultAsync(x => x.OrderId == orderId);
         }
-        public async Task<Order?> GetCurrentOrder(Guid orderId)
+        public async Task<Order?> GetCurrentOrder(List<Guid> orderIds)
         {
-            return await _appDbContext.Orders.Include(x => x.LineItems).Where(x => !x.IsPaid).SingleOrDefaultAsync(x => x.OrderId == orderId);
+            var orderSet = orderIds.ToHashSet();
+            return await _appDbContext.Orders.Include(x => x.LineItems).Where(x => !x.IsPaid).SingleOrDefaultAsync(x => orderIds.Contains(x.OrderId));
         }
         public async Task<Order?> GetOrderWithoutItems(Guid orderId)
         {
             return await _appDbContext.Orders.SingleOrDefaultAsync(x => x.OrderId == orderId);
+        }
+        public async Task<IEnumerable<Order>> GetUserOrders(List<Guid> orderIds)
+        {
+            var orderSet = orderIds.ToHashSet();
+            return await _appDbContext.Orders.Where(x => orderSet.Contains(x.OrderId)).ToListAsync();
         }
         public async Task DeleteItem(LineItem item)
         {

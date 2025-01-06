@@ -54,7 +54,7 @@ namespace RunApp.Infrastructure.Products.Persistence
         public IQueryable<Product> GetCreatedProducts(List<Guid> createdProdcucts)
         {
             var createdProductsSet = createdProdcucts.ToHashSet();
-            return _appDbContext.Products.Where(x => createdProductsSet.Contains(x.ProductId));
+            return _appDbContext.Products.Include(x => x.Categories).Where(x => createdProductsSet.Contains(x.ProductId));
         }
         public async Task<Product?> GetProductWithCategories(Guid productId, Guid categoryId)
         {
