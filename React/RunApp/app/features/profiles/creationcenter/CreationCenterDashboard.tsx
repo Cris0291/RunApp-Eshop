@@ -8,12 +8,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import {
-  BarChart,
   DollarSign,
   Home,
   LogOut,
   Package,
-  Settings,
   ShoppingCart,
   User,
 } from "lucide-react";
@@ -29,9 +27,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import CreationProductsWrapper from "./CreationProductsWrapper";
-import { ProductResponseDto } from "./contracts";
+import { ProductCreated, ProductResponseDto } from "./contracts";
+import { useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
+import { setSearch } from "../../store/products/productsQuerySlice";
+import { Button } from "@/components/ui/button";
+import { clearUser } from "../../registration/userSlice";
 
-const defaultEmptyProduct: ProductResponseDto = {
+const defaultEmptyProduct: ProductResponseDto | ProductCreated = {
   productId: "",
   name: "",
   description: "",
@@ -48,9 +51,12 @@ const defaultEmptyProduct: ProductResponseDto = {
 
 function CreationCenterDashboard() {
   const [activeLink, setActiveLink] = useState<string>("Dasboard");
-  const [productResponse, setProductResponse] = useState<ProductResponseDto>(defaultEmptyProduct)
+  const [productResponse, setProductResponse] = useState<ProductResponseDto | ProductCreated>(defaultEmptyProduct);
+  const [searchProduct, setSearchProduct] = useState("");
+  const dispatch = useDispatch();
+  const router = useRouter();
 
-  const onHandleCurrentProduct= (link: string, product: ProductResponseDto) => {
+  const onHandleCurrentProduct= (link: string, product: ProductCreated) => {
     setProductResponse(product)
     if(link !== activeLink) setActiveLink(link);
   }
@@ -63,12 +69,21 @@ function CreationCenterDashboard() {
     if(link !== activeLink) setActiveLink(link);
   }
 
+  const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      dispatch(setSearch({sortBy: "", search: searchProduct, categories: [], priceRange: [], starFilters: []}))
+      router.push("/products");
+    }
+
+    const logoutUser = () => {
+          dispatch(clearUser());
+          router.push("/login");
+        }
+
   const navItems = [
     { name: "Dashboard", icon: Home},
     { name: "Images", icon: DollarSign},
     { name: "Products", icon: Package},
-    { name: "Analytics", icon: BarChart},
-    { name: "Orders", icon: ShoppingCart},
   ];
 
   return (
@@ -109,14 +124,14 @@ function CreationCenterDashboard() {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Link
-                    href="#"
+                    href="/userprofile"
                     className="flex items-center justify-center hover:text-yellow-500"
                   >
-                    <Settings className="w-5 h-5" />
+                    <User className="w-5 h-5" />
                   </Link>
                 </TooltipTrigger>
                 <TooltipContent side="right">
-                  <p>Settings</p>
+                  <p>UserCenter</p>
                 </TooltipContent>
               </Tooltip>
             </div>
@@ -128,11 +143,15 @@ function CreationCenterDashboard() {
           <div className="flex justify-between items-center">
             <h1 className="text-3xl font-bold text-black">Creation Dashboard</h1>
             <div className="flex items-center space-x-4">
+              <form onSubmit={handleSubmit}>
               <Input
-                className="w-64 bg-white border-gray-300"
+                className="w-64 bg-white border-gray-300 text-black"
                 placeholder="Search..."
                 type="search"
+                value={searchProduct}
+                onChange={e => setSearchProduct(e.target.value)}
               />
+              </form>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Avatar className="cursor-pointer">
@@ -144,16 +163,8 @@ function CreationCenterDashboard() {
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
                     <LogOut className="mr-2 h-2 w-4" />
-                    <span>Log Out</span>
+                    <Button onClick={logoutUser}>Log Out</Button>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -163,7 +174,7 @@ function CreationCenterDashboard() {
         </div>
       </main>
     </div>
-  );
+  )
 }
 
 export default CreationCenterDashboard;

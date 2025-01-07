@@ -6,10 +6,10 @@ import { GetCreatedProducts } from "@/app/services/apiProduct";
 export default function useGetCreatedProducts(){
     const token = useAppSelector(getUserToken);
 
-    const {data: productCreated, isLoading} = useQuery({
+    const {data: productCreated, isLoading, error, isError} = useQuery({
         queryKey: ["CreatedProducts"],
         queryFn: () => GetCreatedProducts(token)
     })
 
-    return {productCreated, isLoading};
+    return {productCreated, isLoading, error, isError};
 }

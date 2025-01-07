@@ -15,10 +15,11 @@ import { motion } from "framer-motion"
 import {ProductCreationDto, ProductResponseDto } from "./contracts"
 import useCreateProductCommand from "./useCreateProductCommand";
 import StatusPopup from "@/app/ui/SatusPopup";
+import toast from "react-hot-toast";
+
 
 const CATEGORIES = [
-  "Electronics", "Clothing", "Books", "Home & Garden", "Toys & Games",
-  "Sports & Outdoors", "Beauty & Personal Care", "Automotive", "Health & Wellness"
+  "Equipment", "Apparel", "Nutrition", "Cardio", "Wellness", "Supplements", "Yoga", "HIIT", "Weight Loss", "Group Fitness"
 ]
 
 export default function CreationForm({onHandleAddAnImage, onHandleAddLink}: {onHandleAddAnImage: (product: ProductResponseDto) => void, onHandleAddLink : (link: string) => void}) {
@@ -47,8 +48,12 @@ const handleProductSubmit = (e: React.FormEvent) => {
   if(errors.length === 0){
     ProductsCraetionFunction(formData, {
       onSuccess: (data) => {
+        toast.success("review was updated")
         onHandleAddAnImage(data);
-      }
+      },
+      onError: (error) =>  {
+          toast.error(error.message);
+      },
     });
   }
 }

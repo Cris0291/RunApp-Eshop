@@ -9,15 +9,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Trash2, Upload, DollarSign, Tag,  AlertCircle } from 'lucide-react'
-import {newCategoryDto, newPromotionDto, ProductResponseDto } from "./contracts"
+import {newCategoryDto, newPromotionDto, ProductCreated} from "./contracts"
 import { SubmitHandler, useForm } from "react-hook-form"
 import useAddNewDiscount from "./useAddNewDiscount"
 import useAddNewCategory from "./useAddNewCategory"
 import useDeleteCreatedProduct from "./useDeleteCreatedProduct"
 import useGetCreatedProducts from "./useGetCreatedProducts"
+import useDeleteNewDiscount from "./useDeleteNewDiscount"
+import ProductLoadingCard from "@/app/ui/ProductLoadingCard"
+import NoProductsFound from "@/app/ui/NoProductsFound"
 
 interface Product {
-  id: string
+  productId: string
   name: string
   price: number
   discountedPrice: number | null
@@ -25,17 +28,17 @@ interface Product {
   category: string[]
 }
 
-const categories = ["Electronics", "Clothing", "Home & Garden", "Sports", "Books"]
+const categories = ["Equipment", "Apparel", "Nutrition", "Cardio", "Wellness", "Supplements", "Yoga", "HIIT", "Weight Loss", "Group Fitness"]
 
-export default function ProductManagementTable({onHandleCurrentProduct}: {onHandleCurrentProduct: (link: string, product: ProductResponseDto) => void}) {
-  const [products, setProducts] = useState<Product[]>([
-    { id: "1", name: "Wireless Earbuds", price: 129.99, discountedPrice: 99.99, image: "/placeholder.svg?height=100&width=100", category: ["Electronics"] },
-    { id: "2", name: "Smart Watch", price: 199.99, discountedPrice: null, image: null, category: ["Electronics"] },
-    { id: "3", name: "4K TV", price: 799.99, discountedPrice: 699.99, image: "/placeholder.svg?height=100&width=100", category: ["Electronics"] },
-    { id: "4", name: "Bluetooth Speaker", price: 79.99, discountedPrice: null, image: null, category: ["Electronics"] },
-    { id: "5", name: "Gaming Console", price: 399.99, discountedPrice: 349.99, image: "/placeholder.svg?height=100&width=100", category: ["Electronics"] },
+export default function ProductManagementTable({onHandleCurrentProduct}: {onHandleCurrentProduct: (link: string, product: ProductCreated) => void}) {
+  const [products, setProducts] = useState<Product[] | undefined>([
+    { productId: "1", name: "Wireless Earbuds", price: 129.99, discountedPrice: 99.99, image: "/placeholder.svg?height=100&width=100", category: ["Electronics"] },
+    { productId: "2", name: "Smart Watch", price: 199.99, discountedPrice: null, image: null, category: ["Electronics"] },
+    { productId: "3", name: "4K TV", price: 799.99, discountedPrice: 699.99, image: "/placeholder.svg?height=100&width=100", category: ["Electronics"] },
+    { productId: "4", name: "Bluetooth Speaker", price: 79.99, discountedPrice: null, image: null, category: ["Electronics"] },
+    { productId: "5", name: "Gaming Console", price: 399.99, discountedPrice: 349.99, image: "/placeholder.svg?height=100&width=100", category: ["Electronics"] },
   ])
-  const {productCreated, isLoading} = useGetCreatedProducts();
+  const {productCreated, isLoading, error, isError} = useGetCreatedProducts();
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [currentProductId, setCurrentProductId] = useState<string>("");
@@ -48,12 +51,17 @@ export default function ProductManagementTable({onHandleCurrentProduct}: {onHand
   const {addDiscount} = useAddNewDiscount();
   const {addCategory} = useAddNewCategory();
   const {deleteCreatedProduct} = useDeleteCreatedProduct();
+  const {deleteDiscount} = useDeleteNewDiscount()
 
   const handleDeleteProduct = (id: string) => {
     deleteCreatedProduct(id);
   }
 
-  const handleImageUpload = (product: any) => {
+  const handleDeleteDiscount = (id: string) => {
+    deleteDiscount(id);
+  }
+
+  const handleImageUpload = (product: ProductCreated) => {
     onHandleCurrentProduct("Images", product);
   }
 
@@ -101,7 +109,7 @@ export default function ProductManagementTable({onHandleCurrentProduct}: {onHand
     
     if(newCategory.trim().length === 0) newErrors.push("The new category cannot be empty");
 
-    const product = products.find(x => x.id === currentProductId);
+    const product = products?.find(x => x.productId === currentProductId);
     if(product === undefined) newErrors.push("Selected product was not found. Something unexpected happened");
 
     const isCategoryIncluded = product?.category.includes(newCategory);
@@ -112,13 +120,12 @@ export default function ProductManagementTable({onHandleCurrentProduct}: {onHand
     return newErrors;
   }
 
-
   return (
     <div className="container mx-auto p-4 bg-gray-50">
       <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">Product Management</h1>
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <Table>
+          {isLoading? <ProductLoadingCard/>: products !== undefined && !isError? <Table>
             <TableHeader>
               <TableRow className="bg-yellow-100">
                 <TableHead className="font-bold">Name</TableHead>
@@ -131,7 +138,7 @@ export default function ProductManagementTable({onHandleCurrentProduct}: {onHand
             </TableHeader>
             <TableBody>
               {products.map((product) => (
-                <TableRow key={product.id} className="hover:bg-gray-50">
+                <TableRow key={product.productId} className="hover:bg-gray-50">
                   <TableCell className="font-medium text-black">{product.name}</TableCell>
                   <TableCell className="text-black">${product.price.toFixed(2)}</TableCell>
                   <TableCell>
@@ -148,7 +155,7 @@ export default function ProductManagementTable({onHandleCurrentProduct}: {onHand
                   <TableCell>
                     <div className="flex space-x-2">
                       <Button 
-                        onClick={() => handleDeleteProduct(product.id)}
+                        onClick={() => handleDeleteProduct(product.productId)}
                         variant="destructive"
                         size="sm"
                         className="bg-red-500 hover:bg-red-600"
@@ -164,7 +171,7 @@ export default function ProductManagementTable({onHandleCurrentProduct}: {onHand
                         <Upload className="w-4 h-4" />
                       </Button>
                       <Button 
-                        onClick={() => handlePriceUpdate(product.id)}
+                        onClick={() => handlePriceUpdate(product.productId)}
                         variant="outline"
                         size="sm"
                         className="bg-yellow-500 text-white hover:bg-yellow-600"
@@ -172,7 +179,15 @@ export default function ProductManagementTable({onHandleCurrentProduct}: {onHand
                         <DollarSign className="w-4 h-4" />
                       </Button>
                       <Button 
-                        onClick={() => handleCategoryUpdate(product.id)}
+                        onClick={() => handleDeleteDiscount  (product.productId)}
+                        variant="destructive"
+                        size="sm"
+                        className="bg-red-500 hover:bg-red-600"
+                      >
+                        <DollarSign className="w-4 h-4" />
+                      </Button>
+                      <Button 
+                        onClick={() => handleCategoryUpdate(product.productId)}
                         variant="outline"
                         size="sm"
                         className="bg-yellow-500 text-white hover:bg-yellow-600"
@@ -184,7 +199,7 @@ export default function ProductManagementTable({onHandleCurrentProduct}: {onHand
                 </TableRow>
               ))}
             </TableBody>
-          </Table>
+          </Table>: <NoProductsFound/>}
         </div>
       </div>
 
@@ -234,7 +249,7 @@ export default function ProductManagementTable({onHandleCurrentProduct}: {onHand
               </AlertDescription>
              </Alert>
               )}
-          <div className="flex justify-end space-x-2">
+          <div className="flex justify-between space-x-2">
             <Button onClick={() => setIsPriceDialogOpen(false)} variant="outline" className="text-black">Cancel</Button>
             <Button type="submit" className="bg-yellow-500 text-white hover:bg-yellow-600">Update</Button>
           </div>

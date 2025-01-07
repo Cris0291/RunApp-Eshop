@@ -1,16 +1,15 @@
 import { useAppSelector } from "@/app/hooks/reduxHooks";
 import { getUserToken } from "../../registration/userSlice";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AddNewDiscount } from "@/app/services/apiProduct";
-import { newPromotionDto } from "./contracts";
+import { DeleteNewDiscount } from "@/app/services/apiProduct";
 import toast from "react-hot-toast";
 
-export default function useAddNewDiscount(){
+export default function useDeleteNewDiscount(){
     const token = useAppSelector(getUserToken);
     const queryClient = useQueryClient();
 
-    const {mutate: addDiscount} = useMutation({
-        mutationFn: ({newDiscount, productId}: {newDiscount: newPromotionDto, productId: string}) => AddNewDiscount({newDiscount, productId, token}),
+    const {mutate: deleteDiscount} = useMutation({
+        mutationFn: (productId : string) => DeleteNewDiscount({productId, token}),
         onSuccess: () => {
             toast.success("requested action was successful")
             queryClient.invalidateQueries({
@@ -20,7 +19,7 @@ export default function useAddNewDiscount(){
         onError: (error) =>  {
             toast.error(error.message);
         },
-    });
+    })
 
-    return {addDiscount}
+    return {deleteDiscount}
 }
