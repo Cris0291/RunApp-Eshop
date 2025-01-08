@@ -13,28 +13,26 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle} from "lucide-react";
 import useLoginUser from "./userLoginUser";
 import { useRouter } from 'next/navigation'
+import toast from "react-hot-toast";
+import RegisterLoadingCard from "@/app/ui/RegisterLoadingCard";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submittedErrors, setSubmittedErrors] = useState<(string | undefined)[]>([])
+  const router = useRouter();
 
   const {register, handleSubmit, formState: {errors}} = useForm<LoginFormValues>();
   const {loginUser, isPending} = useLoginUser()
 
-  const router = useRouter()
 
   const toogglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
   const onSubmit: SubmitHandler<LoginFormValues> = (data) => {
-    loginUser(data, {
-      onSuccess(){
-        router.push("/")
-      }
-    })
+    loginUser(data)
   } 
 
   const onError = () => {
@@ -61,7 +59,7 @@ function LoginPage() {
           />
         </svg>
       </div>
-      <div className="w-full max-w-md p-8 space-y-6 bg-white/90 backdrop-blur-sm rounded-lg shadow-2xl relative z-10">
+      {isPending ?  <RegisterLoadingCard/> : <div className="w-full max-w-md p-8 space-y-6 bg-white/90 backdrop-blur-sm rounded-lg shadow-2xl relative z-10">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
           <p className="text-gray-600">
@@ -70,7 +68,7 @@ function LoginPage() {
         </div>
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit, onError)}>
           <div className="sapce-y-2">
-            <Label htmlFor="email" className="text-sm font-medium">
+            <Label htmlFor="email" className="text-sm font-medium text-black">
               Email
             </Label>
             <Input
@@ -85,11 +83,11 @@ function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-white/50"
+              className="bg-white/50 text-black"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm font-medium">
+            <Label htmlFor="password" className="text-sm font-medium text-black">
               Password
             </Label>
             <div className="relative">
@@ -104,7 +102,7 @@ function LoginPage() {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="bg-white/50 pr-10"
+                className="bg-white/50 pr-10 text-black"
               />
               <button
                 type="button"
@@ -153,11 +151,11 @@ function LoginPage() {
         </form>
         <div className="text-center text-sm text-gray-600">
           Don't have an account?{" "}
-          <Link className="text-indigo-600 hover:underline" href="#">
+          <Link className="text-indigo-600 hover:underline" href="/register">
             Sign up
           </Link>
         </div>
-      </div>
+      </div>}
     </div>
   );
 }
