@@ -17,17 +17,18 @@ import useUpdatePasswordInfo from "./useUpdatePasswordInfo";
 import useUpdateOrCreateAddressInfo from "./useUpdateOrCreateAddressInfo";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAppDispatch, useAppSelector } from "@/app/hooks/reduxHooks";
-import { getUserToken, updateUser } from "@/app/features/registration/userSlice";
+import { updateUser } from "@/app/features/registration/userSlice";
 import useUpdateOrCreatePaymentInfo from "./useUpdateOrCreatePaymentInfo";
+import toast from "react-hot-toast";
+import ProductLoadingCard from "@/app/ui/ProductLoadingCard";
+import UserInfoErrorCard from "@/app/ui/UserInfoErrorCard";
 
 export default function UserSettingsPage() {
-  const token = useAppSelector(getUserToken)
-  const {userInfo, isLoading} = useGetUserAccountInfo(token);
-  const {updateUserAccountInfo, updatingUserAccount} = useUpdateAccountInfo(token);
-  const {updateOrCreateAddress, updatingOrCreatingAddress} = useUpdateOrCreateAddressInfo(token);
-  const {updateOrCreatePayment, updatingOrCreatingPayment} = useUpdateOrCreatePaymentInfo(token)
-  const {updatePassword, updatingPassword} = useUpdatePasswordInfo(token);
-  const [isSaved, setIsSaved] = useState(false)
+  const {userInfo, isLoading, error, isError} = useGetUserAccountInfo();
+  const {updateUserAccountInfo, updatingUserAccount} = useUpdateAccountInfo();
+  const {updateOrCreateAddress, updatingOrCreatingAddress} = useUpdateOrCreateAddressInfo();
+  const {updateOrCreatePayment, updatingOrCreatingPayment} = useUpdateOrCreatePaymentInfo()
+  const {updatePassword, updatingPassword} = useUpdatePasswordInfo();
   const [wasCreated, setWasCreated] = useState(false)
   const [activeTab, setActiveTab] = useState("account");
   const [showPassword, setShowPassword] = useState(false);
@@ -37,6 +38,8 @@ export default function UserSettingsPage() {
   const [submittedPaymentErrors, setSubmittedPaymentErrors] = useState<(string | undefined)[]>([])
   const [submittedPasswordErrors, setSubmittedPasswordErrors] = useState<(string | undefined)[]>([])
   const dispatch = useAppDispatch();
+
+  if(userInfo === undefined && isError) toast.error("Something unexpected hapenned. User was not found");
 
   const isUpdateOrCreate = (field: string) => {
     switch(field){
@@ -66,10 +69,10 @@ export default function UserSettingsPage() {
 
   const {register: accountRegister, getValues: getAccountValues, handleSubmit: handleAccountSubmit, formState: {errors: accountErrors}, reset: accountReset} = useForm<AccountSettingsForm>({
     defaultValues: {
-      email: "test@example.com",
-      confirmemail: "test@example.com",
-      username: "test",
-      name: "test",
+      email: userInfo?.email,
+      confirmemail: "",
+      username: userInfo?.username,
+      name: userInfo?.name,
     }
   });
   const {register: passwordRegister, getValues: getPasswordValues, handleSubmit: handlePasswordSubmit, formState: {errors: passwordErrors}, reset: passwordReset} = useForm<PasswordSettingsForm>({
@@ -80,19 +83,19 @@ export default function UserSettingsPage() {
   });
   const {register: addressRegister, handleSubmit: handleAddressSubmit, formState: {errors: addressErrors}, reset: addressReset} = useForm<AddressSettingsForm>({
     defaultValues: {
-      address: "test St",
-      city: "",
-      state: "NYC",
-      zipcode: "",
-      country: "",
+      address: userInfo?.address,
+      city: userInfo?.city,
+      state: userInfo?.state,
+      zipcode: userInfo?.zipcode,
+      country: userInfo?.country,
     }
   });
   const {register: paymentRegister, handleSubmit: handlePaymentSubmit, formState: {errors: paymentErrors}, reset: paymentReset} = useForm<PaymentSettingsForm>({
     defaultValues: {
-      cardnumber: "55555577777",
-      cardname: "",
-      expirydate: "04/12",
-      cvv: "",
+      cardnumber: userInfo?.cardnumber,
+      cardname: userInfo?.cardname,
+      expirydate: userInfo?.expirydate,
+      cvv: userInfo?.cvv,
     }
   });
 
@@ -100,37 +103,52 @@ export default function UserSettingsPage() {
   const onAccountSubmit: SubmitHandler<AccountSettingsForm> = (data) => {
     updateUserAccountInfo(data, {
       onSuccess: (data) => {
+        toast.success("User account info was updated")
         dispatch(updateUser({name: data.name, email: data.email, userName: data.username}))
-      }
+      },
+      onError: (error) =>  {
+        toast.error(error.message);
+    }
     })
   }
   const onPasswordSubmit: SubmitHandler<PasswordSettingsForm> = (data) => {
     const mail = getAccountValues("email")
     const newPassword = {password: data.password, email: mail}
     updatePassword(newPassword, {
-      onSuccess: () => passwordReset()
+      onSuccess: () => passwordReset(),
+      onError: (error) =>  {
+        toast.error(error.message);
+    }
     })
   }
 
   const onAddressSubmit: SubmitHandler<AddressSettingsForm> = (data) => {
     updateOrCreateAddress({addressInfo: data, wasCreated}, {
       onSuccess: () => {
+        toast.success("User address was updated")
         addressReset();
         queryClient.invalidateQueries({
           queryKey: ["userInfo"]
         })
-      }
+      },
+      onError: (error) =>  {
+        toast.error(error.message);
+    },
     })
   }
 
   const onPaymentSubmit: SubmitHandler<PaymentSettingsForm> = (data) => {
     updateOrCreatePayment({paymentInfo: data, wasCreated}, {
       onSuccess: () => {
+        toast.success("User payment info was updated")
         paymentReset();
         queryClient.invalidateQueries({
           queryKey: ["userInfo"]
         })
-      }
+      },
+      onError: (error) =>  {
+        toast.error(error.message);
+    }
     })
   }
 
@@ -186,7 +204,7 @@ export default function UserSettingsPage() {
   }
 
   return (
-    <>
+    isLoading? <ProductLoadingCard/>: userInfo !== undefined && !isError? <>
       <div className="container mx-auto max-w-4xl">
         <motion.h1 
           initial={{ opacity: 0, y: -20 }}
@@ -452,7 +470,7 @@ export default function UserSettingsPage() {
                                  {...addressRegister("zipcode", {
                                     required: "Zipcode is required",
                                     pattern: {
-                                      value: /^\d{5}(?:[-\s]\d{4})?$/i,
+                                      value: /^\d{5}(?:[-\s]\d{4})?$/,
                                       message: "Zipcode is invalid"
                                     }
                                  })} />
@@ -483,6 +501,21 @@ export default function UserSettingsPage() {
                         <CardDescription>Update your payment information.</CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                          <Label htmlFor="cardName">Card Number</Label>
+                          <div className="relative">
+                          <CreditCard
+                              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                              size={18}
+                              />
+                          <Input id="cardName"
+                                 type="text" 
+                                 className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
+                                 {...paymentRegister("cardname", {
+                                  required: "Card name is required"
+                                 })} />
+                          </div>
+                        </div>
                         <div className="space-y-2">
                           <Label htmlFor="cardNumber">Card Number</Label>
                           <div className="relative">
@@ -494,7 +527,11 @@ export default function UserSettingsPage() {
                                  type="number" 
                                  className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                                  {...paymentRegister("cardnumber", {
-                                  required: "Card number is required"
+                                  required: "Card number is required",
+                                  pattern:{
+                                    value: /^(?:\d[ -]*?){13,16}$/,
+                                    message: "Card number is invalid"
+                                  }
                                  })} />
                           </div>
                         </div>
@@ -526,7 +563,11 @@ export default function UserSettingsPage() {
                                    type="password" 
                                    className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                                    {...paymentRegister("cvv",{
-                                    required: "Cvv is required"
+                                    required: "Cvv is required",
+                                    pattern: {
+                                      value: /^[0-9]{3,4}$/,
+                                      message: "Cvv is inva;id"
+                                    }
                                    })} />
                             </div>
                           </div>
@@ -555,18 +596,6 @@ export default function UserSettingsPage() {
           </CardContent>
         </Card>
       </div>
-      <AnimatePresence>
-        {isSaved && (
-          <motion.div 
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded-md flex items-center shadow-lg"
-          >
-            <Check className="mr-2" /> Changes saved successfully!
-          </motion.div>
-        )}
-      </AnimatePresence>
-      </>
+      </>: <UserInfoErrorCard/>
   )
 }

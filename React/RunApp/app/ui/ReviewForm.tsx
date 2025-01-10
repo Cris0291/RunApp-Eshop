@@ -41,16 +41,16 @@ const sentimentOptions = [
   { value: "excellent", label: "Excellent", icon: ThumbsUp },
   { value: "good", label: "Good", icon: Smile },
   { value: "average", label: "Average", icon: Meh },
-  { value: "poor", label: "Poor", icon: Frown },
+  { value: "incomplete", label: "incomplete", icon: Frown },
   { value: "terrible", label: "Terrible", icon: ThumbsDown },
 ]
 
 export default function ReviewForm({ onSubmit, isSubmitting, size="sm", children, className = "bg-pink-500 text-white hover:bg-pink-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg" }: Props) {
-  const [sentiment, setSentiment] = useState("average")
-  const [content, setContent] = useState("")
-  const [rating, setRating] = useState(0)
-  const [hoverRating, setHoverRating] = useState(0)
-  const [isOpen, setIsOpen] = useState(false)
+  const [sentiment, setSentiment] = useState("average");
+  const [content, setContent] = useState("");
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
 
   
   const handleSubmit =  (e: React.FormEvent) => {

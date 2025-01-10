@@ -5,13 +5,9 @@ import { motion } from "framer-motion"
 import { 
     ShoppingCart, 
     Users, 
-    BarChart2, 
     Settings, 
     Bell, 
-    MessageCircle, 
-    HelpCircle, 
-    FileText, 
-    CreditCard,
+    MessageCircle,  
     ChevronRight,
     FileChartColumnIncreasing
   } from "lucide-react"

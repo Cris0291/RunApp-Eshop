@@ -1,7 +1,8 @@
 import { createListenerMiddleware, addListener, TypedStartListening, TypedAddListener,  ListenerEffectAPI } from "@reduxjs/toolkit";
 import { AppDispatch, RootState } from "./store";
 import { addChangeQuantityListener, addItemListener, deleteItemListener } from "../features/payment/shoppingcart/cartSlice";
-import { createOrderListener } from "../features/payment/checkout/orderSlice";
+import { createOrderListener, payOrderListener } from "../features/payment/checkout/orderSlice";
+import { getCurrentOrderListener } from "../features/login/loginSlice";
 
 
 export const listenerMiddleware = createListenerMiddleware();
@@ -18,3 +19,5 @@ addChangeQuantityListener(startAppListening);
 addItemListener(startAppListening);
 deleteItemListener(startAppListening);
 createOrderListener(startAppListening);
+payOrderListener(startAppListening);
+getCurrentOrderListener(startAppListening);

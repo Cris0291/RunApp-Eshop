@@ -8,20 +8,26 @@ export type ProductsQuery = {
 
 export type ProductForCard = {
     productId: string,
-    productName: string,
-    mainImage: string,
-    price: number,
+    name: string,
+    mainImage?: string,
+    actualPrice: number,
     priceWithDiscount: number | undefined,
-    numberOfLikes: number,
-    category: string[],
-    numberOfStars: number,
+    promotionalText: string | undefined,
+    discount: number,
+    numberOfLikes: number | undefined,
+    numberOfReviews: number | undefined,
+    averageRating: number,
+    userLike: boolean,
+    categoryNames: string[]
 }
 
 
-export type ProductForCardWithDiscountt = {
+export type ProductForCardWithDiscount = {
     productId: string,
     productName: string,
-    mainImage: string,
+    image?: string,
     price: number,
+    discount?: number,
     priceWithDiscount: number | undefined,
+    size: string,
 }

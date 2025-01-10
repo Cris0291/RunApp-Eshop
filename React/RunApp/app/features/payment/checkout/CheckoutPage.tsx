@@ -15,6 +15,9 @@ import usePayOrder from "./usePayOrder";
 import { addError, getCurrentOrderId, getOrderError, payCurrentOrder } from "./orderSlice";
 import EmptyCartCard from "./EmptyCartcard";
 import toast from "react-hot-toast";
+import HeaderProducts from "../../store/products/HeaderProducts";
+import { useRouter } from "next/navigation";
+import { setSearch } from "../../store/products/productsQuerySlice";
 
 export default function CheckoutPage(){
   const dispatch = useAppDispatch();
@@ -26,6 +29,8 @@ export default function CheckoutPage(){
   const [payErrors, SetPayErrors] = useState<(string | undefined)[]>([]);
   const orderError = useAppSelector(getOrderError);
   const {payOrder} = usePayOrder();
+  const [searchProduct, setSearchProduct] = useState("");
+  const router = useRouter();
 
   const onSubmitPayOrder = () => {
     const newErrors: (string | undefined)[] = [];
@@ -52,7 +57,20 @@ export default function CheckoutPage(){
       }
     }, [orderError])
 
+    const handleSearch = (search: string) => {
+          setSearchProduct(search);
+        }
+      
+        const handleSubmit = (e: React.FormEvent) => {
+            e.preventDefault();
+            dispatch(setSearch({sortBy: "", search: searchProduct, categories: [], priceRange: [], starFilters: []}))
+            router.push("/products");
+          }
+
 return (
+  <div>
+    <HeaderProducts handleSearch={handleSearch} search={searchProduct}  handleSubmit={handleSubmit}/>
+    <Separator/>
   <div className="min-h-screen bg-gray-100 text-gray-900 py-12">
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
       <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">
@@ -172,6 +190,7 @@ return (
         </div>
       </div>
     </div>
+  </div>
   </div>
 )
 }

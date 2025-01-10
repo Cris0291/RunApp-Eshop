@@ -6,6 +6,8 @@ import { ShoppingBag } from "lucide-react"
 import Link from "next/link";
 import { useAppDispatch } from "../hooks/reduxHooks";
 import { setSearch } from "../features/store/products/productsQuerySlice";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface AnimatedStoreButtonProps {
   size?: "sm" | "md" | "lg" | "xl"
@@ -14,9 +16,11 @@ interface AnimatedStoreButtonProps {
 export default function AnimatedStoreButton({ size = "lg" }: AnimatedStoreButtonProps) {
   const [isHovered, setIsHovered] = React.useState(false);
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const handleDispatch = () => {
-    dispatch(setSearch({sortBy: "", search: "all", categories: [], priceRange: [], starFilters: [],}))
+    dispatch(setSearch({sortBy: "", search: "all", categories: [], priceRange: [], starFilters: [],}));
+    router.push("/products");
 
   }
 
@@ -51,11 +55,10 @@ export default function AnimatedStoreButton({ size = "lg" }: AnimatedStoreButton
       variants={buttonVariants}
       transition={{ type: "spring", stiffness: 300, damping: 10 }}
     >
-      <Link
+      <Button
         className={`${sizes[size]} flex flex-col items-center justify-center p-2 rounded-none bg-gradient-to-br from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold shadow-lg`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        href="/products"
         onClick={handleDispatch}
       >
         <motion.div 
@@ -69,7 +72,7 @@ export default function AnimatedStoreButton({ size = "lg" }: AnimatedStoreButton
           
         </motion.div>
         <span className="text-center leading-tight">Go to Store</span>
-      </Link>
+      </Button>
     </motion.div>
   )
 }

@@ -9,19 +9,19 @@ export type Product = {
     discount: number | undefined,
     numberOfreviews: number | undefined,
     numberOflikes: number | undefined,
-    averageRating: number,
-    reviews: Review[],
+    averageRatings: number,
+    reviews: Review[] | undefined,
     mainImage?: string,
-    categories: string[],
+    categoryNames: string[],
 }
 
 export type Review = {
-    id: string,
-    userName: string
+    reviewId: string,
     comment: string,
     date: string,
     reviewDescription: string,
-    rating: number
+    rating: number,
+    userName: string
 }
 
 
@@ -35,4 +35,9 @@ export type ReviewDto = {
     comment: string,
     reviewDescription: string,
     rating: number
+}
+
+export type BoughtProducts = {
+    boughtProducts: string[],
+    boughtProductsWithReviews: string[]
 }

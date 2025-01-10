@@ -1,15 +1,12 @@
-import { useAppSelector } from "@/app/hooks/reduxHooks";
-import { getUserToken } from "../../registration/userSlice";
 import { useQuery } from "@tanstack/react-query";
 import { GetUserLikedProducts } from "@/app/services/apiUserProfle";
 
 export default function useGetUserProfileLikes(){
-    const token = useAppSelector(getUserToken);
-
-    const {data: userLikes, isLoading: loadingLikes} = useQuery({
+   
+    const {data: userLikes, isLoading: loadingLikes, error: errorLikes, isError: isErrorLike} = useQuery({
         queryKey: ["userLikes"],
-        queryFn: () => GetUserLikedProducts(token)
+        queryFn: () => GetUserLikedProducts()
     })
 
-    return {userLikes, loadingLikes}
+    return {userLikes, loadingLikes, errorLikes, isErrorLike}
 }

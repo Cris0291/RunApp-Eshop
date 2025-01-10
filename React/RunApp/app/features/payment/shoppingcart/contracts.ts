@@ -5,17 +5,26 @@ export type ProductForCart = {
     price: number,
     priceWithDiscount: number | undefined,
     totalPrice: number,
-    image: string
+    image?: string
+}
+
+export type ProductForLineItem = {
+    id: string,
+    name: string,
+    quantity: number | null,
+    price: number,
+    priceWithDiscount: number | undefined,
+    totalPrice: number,
 }
 
 export type CartProductsResponse = {
-    id: string,
+    productId: string,
+    lineItemId: string,
     name: string,
     quantity: number,
     price: number,
     priceWithDiscount: number | undefined,
     totalPrice: number,
-    image: string
 }
 
 export type DeleteItemDto ={
