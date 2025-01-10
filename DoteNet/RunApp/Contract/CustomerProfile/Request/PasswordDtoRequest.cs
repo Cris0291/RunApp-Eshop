@@ -1,4 +1,4 @@
 ﻿namespace Contracts.CustomerProfile.Request
 {
-    public record PasswordDtoRequest(string Password, string Email);
+    public record PasswordDtoRequest(string OldPassword, string NewPassword, string Email);
 }
