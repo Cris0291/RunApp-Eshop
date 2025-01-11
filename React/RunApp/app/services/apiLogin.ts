@@ -1,10 +1,11 @@
+import { AxiosError } from "axios";
 import { LoginFormValues } from "../features/login/contracts";
 import { UserDto } from "../features/registration/contracts";
 import { axiosInstance } from "./axiosInstance";
 
 
-export default function loginRequest(login : LoginFormValues) : Promise<UserDto>{
-    return axiosInstance.post("api/accounts/login", login).then(response => response.data)
+export default function loginRequest(login : LoginFormValues){
+    return axiosInstance.post<UserDto>("api/accounts/login", login).then(response => response.data).catch<AxiosError>(error => error);
 }
 
 export async function refreshAccessToken(token: string, refreshToken: string){
