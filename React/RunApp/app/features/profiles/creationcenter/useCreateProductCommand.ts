@@ -1,11 +1,8 @@
-import { useAppSelector } from "@/app/hooks/reduxHooks";
-import { getUserToken } from "../../registration/userSlice";
 import { useMutation } from "@tanstack/react-query";
 import { CreateProduct } from "@/app/services/apiProduct";
-import { ProductCreationDto, ProductRequestDto } from "./contracts";
+import { ProductCreationDto} from "./contracts";
 
 export default function useCreateProductCommand(){
-    const token = useAppSelector(getUserToken)
 
     const {mutate: ProductsCraetionFunction, isPending: isCreating, isError, isSuccess, isIdle} = useMutation({
         mutationFn: (creteProductDto: ProductCreationDto) => {
@@ -25,7 +22,7 @@ export default function useCreateProductCommand(){
                 }
             }
 
-            return CreateProduct({product, token})
+            return CreateProduct({product})
         }
     })
 

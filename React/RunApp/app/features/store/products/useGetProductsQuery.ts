@@ -3,11 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { ProductsQuery } from "./contracts";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { useAppSelector } from "@/app/hooks/reduxHooks";
-import { getUserToken } from "../../registration/userSlice";
 
 export default function useGetProductsQuery({sortBy ,search ,categories, priceRange, starFilters} : ProductsQuery){
-    const token = useAppSelector(getUserToken)
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const {replace} = useRouter();
@@ -52,11 +49,11 @@ export default function useGetProductsQuery({sortBy ,search ,categories, priceRa
       console.log(`${queryParams}`)
       replace(`${pathname}?${params.toString()}`)
 
-    const {isLoading, data: products, refetch, error} = useQuery({
-        queryFn: () => getProducts(queryParams, token),
+    const {isLoading, data: products, refetch, error, isError} = useQuery({
+        queryFn: () => getProducts(queryParams),
         queryKey: ["products", sortBy, search, categories, priceRange],
-        enabled: false
+        enabled: false,
     })
 
-    return {isLoading, products, refetch, error}
+    return {isLoading, products, refetch, error, isError}
 }

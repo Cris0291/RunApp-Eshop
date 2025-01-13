@@ -46,9 +46,9 @@ export default function SearchBar({ onSearch, placeholder = "Search..." }: Searc
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            className="w-full pl-12 pr-24 py-3 text-lg focus:ring-pink-500 focus:border-pink-500 transition-all duration-300 bg-white hover:bg-gray-50 rounded-none shadow-md"
+            className="w-full pl-12 pr-24 py-3 text-lg focus:ring-pink-500 focus:border-pink-500 transition-all duration-300 bg-white hover:bg-gray-50 rounded-none shadow-md text-black"
           />
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-6 text-gray-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-6 text-black" />
         </div>
         <Button
           type="submit"

@@ -2,10 +2,10 @@ import React from "react";
 import CreationForm from "./CreationForm";
 import ProductImageUpload from "./ProductImageUpload";
 import ProductManagementTable from "./ProductManagementTable";
-import { ProductResponseDto } from "./contracts";
+import { ProductCreated, ProductResponseDto } from "./contracts";
 
 
-export default function CreationProductsWrapper({item, onHandleCurrentProduct, product, onHandleAddAnImage, onHandleAddLink}: {item: string, onHandleCurrentProduct: (link: string, product: ProductResponseDto) => void, product: ProductResponseDto, onHandleAddAnImage : (product: ProductResponseDto) => void, onHandleAddLink : (link: string) => void}){
+export default function CreationProductsWrapper({item, onHandleCurrentProduct, product, onHandleAddAnImage, onHandleAddLink}: {item: string, onHandleCurrentProduct: (link: string, product: ProductCreated) => void, product: ProductResponseDto | ProductCreated, onHandleAddAnImage : (product: ProductResponseDto) => void, onHandleAddLink : (link: string) => void}){
     
     switch(item){
         case "Dashboard":

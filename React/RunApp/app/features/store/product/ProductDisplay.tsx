@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -9,30 +9,36 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Star, Truck, RefreshCcw, ChevronRight, ThumbsUp, ThumbsDown, Watch, Droplet, Shield, Clock, Pencil, Check } from "lucide-react"
-import { usePathname } from "next/navigation"
+import { Star, Truck, RefreshCcw, ChevronRight, ThumbsUp, ThumbsDown, Watch, Droplet, Shield, Clock, Pencil, MessageSquare} from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
 import useGetProductQuery from "./useGetProductQuery"
 import { useAppDispatch, useAppSelector } from "@/app/hooks/reduxHooks"
-import { addItem, deleteItem } from "../../payment/shoppingcart/cartSlice"
 import ReviewForm from "../../../ui/ReviewForm"
 import useCreateReviewCommand from "./useCreateReviewCommand"
 import LoadingModal from "@/app/ui/LoadingModal"
-import { getUserAddress, getUserId, getUserPaymentMethod } from "../../registration/userSlice"
+import { getUserAddress, getUserPaymentMethod } from "../../registration/userSlice"
 import useAddRatingCommand from "./useAddRatingCommand"
 import LikeButton from "@/app/ui/LikeButton"
 import useAddOrRemoveLikeHook from "@/app/hooks/useAddOrRemoveLikeHook"
 import useCreateOrderOrAddItem from "@/app/utils/useCreateOrderOrAddItem"
 import { useDispatch } from "react-redux"
-import { getIsCurrentOrder } from "../../payment/checkout/orderSlice"
+import { addError, getIsCurrentOrder, getOrderError } from "../../payment/checkout/orderSlice"
 import StatusPopup from "@/app/ui/SatusPopup"
 import { Product, Review } from "./contracts"
 import ProductNotFound from "@/app/ui/ProductNotFound"
 import NoImagePlaceholder from "@/app/ui/NoImagePlaceholder"
 import { iconsForCategories } from "@/app/utils/categories"
+import { getIsProductBought, getIsProductBoughtAndHasReview } from "./productSlice"
+import useUpdateUserReview from "../../profiles/userprofile/useUpdateUserReview"
+import ProductLoadingCard from "@/app/ui/ProductLoadingCard"
+import toast from "react-hot-toast"
+import { addCartError, getCartError } from "../../payment/shoppingcart/cartSlice"
+import { setSearch } from "../products/productsQuerySlice"
+import HeaderProducts from "../products/HeaderProducts"
 
-const reviews: Review[] = [
+const reviews: Review[] | undefined  = [
   {
-    id: "0",
+    reviewId: "0",
     userName: "test",
     rating: 0,
     date: "",
@@ -40,7 +46,7 @@ const reviews: Review[] = [
     reviewDescription: "Good",
   },
   {
-    id: "1",
+    reviewId: "1",
     userName: "A",
     rating: 5,
     date: "2023-05-15",
@@ -48,7 +54,7 @@ const reviews: Review[] = [
     reviewDescription: "Good quality",
   },
   {
-    id: "2",
+    reviewId: "2",
     userName: "B",
     rating: 4,
     date: "2023-05-10",
@@ -56,7 +62,7 @@ const reviews: Review[] = [
     reviewDescription: "Bad",
   },
   {
-    id: "3",
+    reviewId: "3",
     userName: "C",
     rating: 5,
     date: "2023-05-05",
@@ -64,7 +70,7 @@ const reviews: Review[] = [
     reviewDescription: "neutral",
   },
   {
-    id: "4",
+    reviewId: "4",
     userName: "D",
     rating: 0,
     date: "",
@@ -73,14 +79,14 @@ const reviews: Review[] = [
   },
 ]
 
-const productTest: Product = {
+const productTest: Product | undefined = {
   productId: "1",
   name: "Elegant Timepiece",
   actualPrice: 299.99,
   priceWithDiscount: 100,
   promotionalText: "Good test discounts",
   discount: 60,
-  averageRating: 4.5,
+  averageRatings: 4.5,
   numberOfreviews: 128,
   numberOflikes: 50,
   description: "A sophisticated watch that combines classic design with modern functionality. Perfect for both casual and formal occasions.",
@@ -91,20 +97,13 @@ const productTest: Product = {
     "Genuine leather strap",
     "1-year warranty"
   ],
-  categories: [
+  categoryNames: [
     "Yoga",
     "HIIT",
   ],
   mainImage: "/placeholder.svg?height=400&width=400",
   reviews: reviews,
 }
-
-const categories1 = [
-  { name: "Analog", icon: Watch },
-  { name: "Water Resistant", icon: Droplet },
-  { name: "Durable", icon: Shield },
-  { name: "Precise", icon: Clock },
-]
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -124,36 +123,57 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 export default function ProductDisplay() {
-  const pathname = usePathname();
-  const userId = useAppSelector(getUserId);
-  const {isLoading, product, error} = useGetProductQuery(pathname);
+  const pathName = usePathname();
+  const productIdArray = pathName.split("/");
+  const productId = productIdArray[productIdArray.length -1]
+  const {isLoading, product, error, isGetProductError} = useGetProductQuery(productId);
   const {AddOrRemoveLikeMutation} = useAddOrRemoveLikeHook();
   const {isPending, AddReview} = useCreateReviewCommand();
   const [quantity, setQuantity] = useState(1)
   const [isAddedTocart, setIsAddedToCart] = useState(false);
-  const [isError, setIsError] = useState(false)
-  const [mainImage, setMainImage] = useState(productTest.mainImage)
+  const [isError, setIsError] = useState(false);
   const createOrderOrAddItem = useCreateOrderOrAddItem();
   const dispatch = useDispatch();
-  const {addRating} = useAddRatingCommand();
   const [currentReviewsPage, setCurrentReviewsPage] = useState(1);
   const existOrder = useAppSelector(getIsCurrentOrder);
   const userAddress = useAppSelector(getUserAddress);
   const userPaymentMethod = useAppSelector(getUserPaymentMethod);
+  const isBoughtProduct = useAppSelector(getIsProductBought(productId));
+  const isBoughtProductHasReview = useAppSelector(getIsProductBoughtAndHasReview(productId));
+   const {updateReviewsMutation, updatingReviews} = useUpdateUserReview();
+   const cartError = useAppSelector(getCartError);
+   const orderError = useAppSelector(getOrderError);
+   const [searchProduct, setSearchProduct] = useState("");
+   const router = useRouter();
   const reviewsPerPage = 5;
+
+  useEffect(() => {
+    if(cartError !== undefined){
+      const tempCartError = cartError;
+      dispatch(addCartError(undefined));
+      throw new Error(tempCartError);
+    }
+    if(orderError !== undefined){
+      const tempOrderError = orderError;
+      dispatch(addError(undefined));
+      throw new Error(tempOrderError);
+    }
+  }, [cartError, orderError])
+
+  if(isGetProductError) toast.error(`${error?.message}: Product could not be downloaded from server`)
 
   const lastIndex = currentReviewsPage * reviewsPerPage;
   const initialIndex = 0
 
-  const currentReviews = reviews.slice(initialIndex, lastIndex)
+  const currentReviews =  productTest !== undefined  && productTest.reviews !== undefined ?  productTest.reviews.slice(initialIndex, lastIndex) : []
 
-  const isRendered = lastIndex < reviews.length
+  const isRendered = productTest !== undefined  && productTest.reviews !== undefined ? lastIndex < productTest.reviews.length : 0
 
   const handleAddToCartState = () => {
     
     if(productTest !== undefined){
       const productForCart = {name: productTest.name, id: productTest.productId, quantity: quantity, price: productTest.actualPrice, priceWithDiscount: productTest.priceWithDiscount, 
-        totalPrice: productTest.actualPrice * quantity, image: productTest.mainImage}
+        totalPrice: productTest.actualPrice * quantity}
     
                             
     if(!isNaN(quantity) && quantity !== 0){
@@ -171,23 +191,37 @@ export default function ProductDisplay() {
   }
 
   const onSubmit = ({sentiment, content, rating}: {sentiment: string, content: string, rating: number}) => {
-    //Todo: check whether the product has been bought
-    //Todo: check if i already have a review on this product
-    //Todo: handle errors like the ones mention above or could not submitt review
-
     if(productTest !== undefined){
       const reviewDto = {comment: content, reviewDescription: sentiment, rating: rating}
       AddReview({reviewDto, productId: productTest.productId})
     }
   }
 
+  const handleReviewUpdate = ({sentiment, reviewId, content, rating}: {sentiment: string, reviewId: string, content: string, rating: number}) => {
+    if(productTest !== undefined){
+      const reviewDto = {comment: content, reviewDescription: sentiment, rating}
+      updateReviewsMutation({reviewDto, reviewId});
+    }
+  }
+
+  const handleSearch = (search: string) => {
+    setSearchProduct(search);
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      dispatch(setSearch({sortBy: "", search: searchProduct, categories: [], priceRange: [], starFilters: []}))
+      router.push("/products");
+    }
+
   return (
-    productTest == undefined ? 
-    <ProductNotFound/> : 
-    <div className="min-h-screen bg-gradient-to-br from-white to-pink-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    isLoading  ? 
+    <ProductLoadingCard/> : productTest !== undefined && !isGetProductError?
+    <div className="min-h-screen bg-gradient-to-br from-white to-pink-50">
+      <div>
+      <HeaderProducts handleSearch={handleSearch} search={searchProduct}  handleSubmit={handleSubmit}/>
         <Card className="overflow-hidden bg-white shadow-xl hover:shadow-2xl transition-shadow duration-300">
-          {isLoading? <LoadingModal/> : <CardContent className="p-6 sm:p-10">
+          <CardContent className="p-6 sm:p-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
               {/* Product Images */}
               <div className="space-y-4">
@@ -208,7 +242,7 @@ export default function ProductDisplay() {
               <div className="space-y-6">
                 <h1 className="text-3xl font-bold text-gray-900 hover:text-pink-600 transition-colors duration-300">{productTest.name}</h1>
                 <div className="flex items-center space-x-2">
-                  <StarRating rating={productTest.averageRating} />
+                  <StarRating rating={productTest.averageRatings} />
                   <span className="text-sm text-gray-500 hover:text-pink-500 transition-colors duration-300">({productTest.numberOfreviews} reviews)</span>
                 </div>
                 <p className="text-3xl font-bold text-gray-900 hover:text-pink-600 transition-colors duration-300">${productTest.actualPrice.toFixed(2)}</p>
@@ -218,7 +252,7 @@ export default function ProductDisplay() {
                 <div>
                   <h3 className="text-sm font-medium text-gray-900 mb-3">Product Categories</h3>
                   <div className="flex flex-wrap gap-4">
-                    {productTest.categories.map((category) => (
+                    {productTest.categoryNames.map((category) => (
                       <div key={category} className="flex flex-col items-center group">
                         <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center group-hover:bg-pink-200 transition-colors duration-300">
                           {iconsForCategories.map((categoryIcon) => (
@@ -280,9 +314,8 @@ export default function ProductDisplay() {
 
             {/* Product Tabs */}
             <Tabs defaultValue="features" className="mt-10">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="features" className="hover:bg-pink-50 transition-colors duration-300">Features</TabsTrigger>
-                <TabsTrigger value="specs" className="hover:bg-pink-50 transition-colors duration-300">Specifications</TabsTrigger>
                 <TabsTrigger value="reviews" className="hover:bg-pink-50 transition-colors duration-300">Reviews</TabsTrigger>
               </TabsList>
               <TabsContent value="features" className="mt-6">
@@ -292,11 +325,6 @@ export default function ProductDisplay() {
                   ))}
                 </ul>
               </TabsContent>
-              <TabsContent value="specs" className="mt-6">
-                <p className="text-gray-600 hover:text-pink-600 transition-colors duration-300">
-                  Detailed specifications for the {productTest.name} would be listed here.
-                </p>
-              </TabsContent>
               <TabsContent value="reviews" className="mt-6">
                 <div className="space-y-8">
                   {/* Review Summary */}
@@ -304,30 +332,38 @@ export default function ProductDisplay() {
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 hover:text-pink-600 transition-colors duration-300">Customer Reviews</h3>
                       <div className="flex items-center mt-1">
-                        <StarRating rating={productTest.averageRating} />
-                        <span className="ml-2 text-sm text-gray-500 hover:text-pink-500 transition-colors duration-300">{productTest.averageRating} out of 5</span>
+                        <StarRating rating={productTest.averageRatings} />
+                        <span className="ml-2 text-sm text-gray-500 hover:text-pink-500 transition-colors duration-300">{productTest.averageRatings} out of 5</span>
                       </div>
                     </div>
+                    {isBoughtProduct && ! isBoughtProductHasReview ? 
                     <ReviewForm onSubmit={onSubmit} isSubmitting={isPending}>
-                      <Pencil className="mr-2 h-4 w-4" /> Add Review
-                    </ReviewForm>
-                  </div>
-
-                  {/* Rating Distribution */}
-                  <div className="space-y-2">
-                    {[5, 4, 3, 2, 1].map((star) => (
-                      <div key={star} className="flex items-center group">
-                        <span className="text-sm text-gray-600 w-8 group-hover:text-pink-600 transition-colors duration-300">{star} star</span>
-                        <Progress value={star * 20} className="h-2 w-full mx-4 group-hover:bg-pink-100 transition-colors duration-300" />
-                        <span className="text-sm text-gray-600 w-12 group-hover:text-pink-600 transition-colors duration-300">{star * 20}%</span>
-                      </div>
-                    ))}
+                       <Pencil className="mr-2 h-4 w-4" /> Add Review
+                    </ReviewForm>:
+                    isBoughtProduct &&  isBoughtProductHasReview? 
+                    <ReviewForm size="sm" className="border-green-600 text-green-600 hover:bg-pink-50" onSubmit={({sentiment, content, rating}: {sentiment: string, content: string, rating: number}) => handleReviewUpdate({sentiment, reviewId: productTest.productId, content, rating})} isSubmitting={updatingReviews}>
+                        <Star className="mr-2 h-4 w-4" /> Edit Review
+                    </ReviewForm>:
+                    <Button className=" bg-red-500 text-white hover:bg-red-600 transition-colors duration-300 transform hover:scale-105">
+                      Only Bought Products can be reviewd
+                    </Button>
+                    }
                   </div>
 
                   {/* Individual Reviews */}
                   <div className="space-y-6">
-                    {productTest.reviews.map((review) => (
-                      <div key={review.id} className="border-t border-gray-200 pt-6 group">
+                    {productTest.reviews === undefined ? 
+                    <Card className="w-full max-w-md mx-auto">
+                      <CardContent className="flex flex-col items-center justify-center p-6">
+                        <MessageSquare className="w-12 h-12 text-gray-400 mb-4" />
+                          <h3 className="text-xl font-semibold text-gray-800 mb-2">No Reviews Yet</h3>
+                          <p className="text-gray-600 text-center">
+                            Be the first to share your thoughts on this product!
+                          </p>
+                      </CardContent>
+                    </Card> :
+                    productTest.reviews.map((review) => (
+                      <div key={review.reviewId} className="border-t border-gray-200 pt-6 group">
                         <div className="flex items-center mb-4">
                           <Avatar className="h-10 w-10 group-hover:ring-2 group-hover:ring-pink-500 transition-all duration-300">
                             <AvatarFallback>{review.userName}</AvatarFallback>
@@ -341,16 +377,6 @@ export default function ProductDisplay() {
                           </div>
                         </div>
                         <p className="text-gray-600 mb-4 group-hover:text-gray-800 transition-colors duration-300">{review.comment}</p>
-                        <div className="flex items-center space-x-4">
-                          <Button variant="outline" size="sm" className="text-gray-500 hover:bg-pink-50 hover:text-pink-600 transition-colors duration-300 transform hover:scale-105">
-                            <ThumbsUp className="h-4 w-4 mr-2" />
-                            Helpful 
-                          </Button>
-                          <Button variant="outline" size="sm" className="text-gray-500 hover:bg-pink-50 hover:text-pink-600 transition-colors duration-300 transform hover:scale-105">
-                            <ThumbsDown className="h-4 w-4 mr-2" />
-                              Not Helpful 
-                          </Button>
-                        </div>
                       </div>
                     ))}
                   </div>
@@ -366,10 +392,11 @@ export default function ProductDisplay() {
                 </div>
               </TabsContent>
             </Tabs>
-          </CardContent>}
+          </CardContent>
         </Card>
       </div>
-    </div>
+    </div>:
+    <ProductNotFound/>
   )
     
 }

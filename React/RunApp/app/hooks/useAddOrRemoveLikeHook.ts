@@ -1,12 +1,15 @@
 import { useMutation } from "@tanstack/react-query";
 import AddOrRemoveLike from "../services/apiAddOrRemoveLike";
 import { useAppSelector } from "./reduxHooks";
-import { getUserToken } from "../features/registration/userSlice";
+import toast from "react-hot-toast";
 
 export default function useAddOrRemoveLikeHook(){
-    const token = useAppSelector(getUserToken)
     const {mutate: AddOrRemoveLikeMutation} = useMutation({
-        mutationFn: ({liked, productId}: {liked: boolean, productId: string}) => AddOrRemoveLike({productId, liked, token})
+        mutationFn: ({liked, productId}: {liked: boolean, productId: string}) => AddOrRemoveLike({productId, liked}),
+        onSuccess: () => toast.success("requested action was successful"),
+        onError: (error) =>  {
+            toast.error(error.message);
+        },
     })
 
     return {AddOrRemoveLikeMutation}

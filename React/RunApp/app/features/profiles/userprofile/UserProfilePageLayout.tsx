@@ -20,13 +20,15 @@ import {
     MapPin,
     Settings,
     ShoppingBag,
-    Star,
     User,
     CircleDollarSign
   } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import UserProfileLayoutWrapper from "./UserProfileLayoutWrapper";
+import { useAppDispatch } from "@/app/hooks/reduxHooks";
+import { useRouter } from "next/navigation";
+import { clearUser } from "../../registration/userSlice";
 
 
 const navItems = [
@@ -38,10 +40,17 @@ const navItems = [
 
 export default function UserProfilePageLayout(){
     const [activeLink, setActiveLink] = useState("Dashboard");
+    const dispatch = useAppDispatch();
+    const router = useRouter();
     
 
     const handleActiveLink = (newLink: string) => {
       setActiveLink(newLink);
+    }
+
+    const logoutUser = () => {
+      dispatch(clearUser());
+      router.push("/login");
     }
 
 
@@ -59,16 +68,8 @@ export default function UserProfilePageLayout(){
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
+                    <Button onClick={logoutUser}>Log out</Button>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -76,7 +77,7 @@ export default function UserProfilePageLayout(){
                 <nav className="flex-1 overflow-y-auto">
                   <ul className="p-1 space-y-2">
                     {navItems.map((item) => (
-                      <li key={item.name}>
+                      item.name !== "Settings"? <li key={item.name}>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
@@ -94,7 +95,7 @@ export default function UserProfilePageLayout(){
                             <p>{item.name}</p>
                           </TooltipContent>
                         </Tooltip>
-                      </li>
+                      </li>: ""
                     ))}
                   </ul>
                 </nav>
@@ -102,7 +103,11 @@ export default function UserProfilePageLayout(){
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
-                        className=" flex items-center justify-center text-gray-400 hover:text-white transition-colors duration-200"
+                        className={`flex items-center justify-center rounded-lg transition-colors duration-200 ${
+                          activeLink === "Settings"
+                            ? "bg-pink-600 text-white"
+                            : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                        }`}
                         onClick={() => setActiveLink("Settings")}
                       >
                         <Settings className="w-5 h-5" />

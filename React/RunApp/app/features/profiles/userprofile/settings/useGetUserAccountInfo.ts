@@ -1,12 +1,12 @@
 import { GetuserInfo } from "@/app/services/apiSettings";
 import { useQuery } from "@tanstack/react-query";
 
-export default function useGetUserAccountInfo(token: string){
+export default function useGetUserAccountInfo(){
 
-    const {data: userInfo, isLoading} = useQuery({
+    const {data: userInfo, isLoading, error, isError} = useQuery({
         queryKey: ["userInfo"],
-        queryFn: () => GetuserInfo(token)
+        queryFn: () => GetuserInfo()
     })
 
-    return {userInfo, isLoading};
+    return {userInfo, isLoading, error, isError};
 }

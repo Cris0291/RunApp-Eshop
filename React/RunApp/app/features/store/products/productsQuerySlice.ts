@@ -9,7 +9,7 @@ const initialState : ProductsQuery = {
     search: "",
     categories: [],
     priceRange: [],
-    starFilters: []
+    starFilters: [],
 }
 
 export const productsQuerySlice = createSlice({

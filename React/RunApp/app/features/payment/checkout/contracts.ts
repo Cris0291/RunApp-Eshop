@@ -1,4 +1,4 @@
-import { ProductForCart } from "../shoppingcart/contracts"
+import { CartProductsResponse, ProductForCart } from "../shoppingcart/contracts"
 
 export type AddressSettingsForm = {
     address: string,
@@ -39,4 +39,15 @@ export type AddressSettingsForm = {
     cardname: string,
     expirydate: string,
     cvv: string,
+  }
+
+  export type OrderWithItems = {
+    OrderId: string,
+    CardRequest?: PaymentSettingsForm,
+    AddressRequest?: AddressSettingsForm,
+    Items: CartProductsResponse[],
+  }
+
+  export type CurrentOrderWrapper = {
+    order?: OrderWithItems
   }

@@ -4,13 +4,17 @@ import productsQueryReducer from "../features/store/products/productsQuerySlice"
 import cartReducer from "../features/payment/shoppingcart/cartSlice";
 import { listenerMiddleware } from "./listenerMiddleware";
 import orderReducer from "../features/payment/checkout/orderSlice";
+import productReducer from "../features/store/product/productSlice";
+import loginReducer from "../features/login/loginSlice";
 
 export const store = configureStore({
     reducer: {
         user: userReducer,
         productsQuery: productsQueryReducer,
+        product: productReducer,
         cart: cartReducer,
         order: orderReducer,
+        login: loginReducer
 
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().prepend(listenerMiddleware.middleware),

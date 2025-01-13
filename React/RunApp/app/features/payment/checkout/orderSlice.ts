@@ -55,10 +55,9 @@ export const createOrderListener = (startAppListening: AppStartListening) => {
         actionCreator: createOrder,
         effect: async (action, listenerApi) => {
             const state = listenerApi.getState();
-            const token = state.user.token;
 
             try {
-              const orderResponse = await CreateOrderRequest({orderDto: state.order.currentOrder, token});
+              const orderResponse = await CreateOrderRequest({orderDto: state.order.currentOrder});
               listenerApi.dispatch(addOrder(orderResponse));
 
               if(state.cart.pendingProductIfOrderDoesNotExist === undefined) throw new Error("Something unexpected happened. the item you are trying to add to the cart was not found");
@@ -76,10 +75,9 @@ export const payOrderListener = (startAppListening: AppStartListening) => {
         actionCreator: payCurrentOrder,
         effect: async (action, listenerApi) => {
             const state = listenerApi.getState();
-            const token = state.user.token;
 
             try {
-              const boughtProducts = await GetBoughtProducts(token);
+              const boughtProducts = await GetBoughtProducts();
               listenerApi.dispatch(setBoughtproducts(boughtProducts));
 
               listenerApi.dispatch(clearCart());

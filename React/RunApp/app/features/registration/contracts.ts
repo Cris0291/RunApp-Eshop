@@ -13,7 +13,8 @@ export type FormValues = {
     email: string,
     userName: string
     token: string,
-    id: string,
+    refreshToken: string,
+    refreshTokenExpirationDate: string,
   }
 
   export type UpdateUserDto = {
@@ -25,17 +26,27 @@ export type FormValues = {
   export interface User {
     name: string,
     email: string,
-    userName: string
-    token: string
+    userName: string,
+    token: string,
     id: string,
   }
 
   export type UserWithSettingsDto = {
     name: string,
     email: string,
-    userName: string
-    token: string,
-    id: string,
+    userName: string,
     address?: AddressSettingsForm,
     card?: PaymentSettingsForm,
+  }
+
+  export type TokenModel = {
+    token: string,
+    refreshToken: string,
+    refreshTokenExpirationDate: string,
+  }
+
+  export type UserSession = {
+    name: string,
+    email: string,
+    userName: string
   }

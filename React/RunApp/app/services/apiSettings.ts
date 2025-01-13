@@ -2,66 +2,38 @@ import { AccountSettingsForm, UserInfoQuery, AccountInfoResponse, PasswordUpdate
 import { axiosInstance } from "./axiosInstance";
 
 
-export async function GetuserInfo(token: string){
-    return axiosInstance.get<UserInfoQuery>("api/user/account", {
-        headers: {
-            "Authorization": `Bearer ${token}`
-        }
-    }).then(response => response.data);
+export async function GetuserInfo(){
+    return axiosInstance.get<UserInfoQuery>("api/user/account").then(response => response.data);
 
 }
 
-export async function UpdateAccountInfo({accountInfo, token} : {accountInfo: AccountSettingsForm, token: string}){
+export async function UpdateAccountInfo({accountInfo} : {accountInfo: AccountSettingsForm}){
     const accountSettings = {Name: accountInfo.name, Email: accountInfo.email, NickName: accountInfo.username};
 
-    return axiosInstance.put<AccountInfoResponse>("api/user/account-info", accountSettings, {
-        headers: {
-            "Authorization": `Bearer ${token}`
-        }
-    }).then(response => response.data);
+    return axiosInstance.put<AccountInfoResponse>("api/user/account-info", accountSettings).then(response => response.data);
 }
 
-export async function UpdatePasswordInfo({passwordInfo, token}: {passwordInfo: PasswordUpdatedSettings, token: string}){
+export async function UpdatePasswordInfo({passwordInfo}: {passwordInfo: PasswordUpdatedSettings}){
 
-    return axiosInstance.put<number>("api/user/password", passwordInfo, {
-        headers: {
-            "Authorization": `Bearer ${token}`
-        }
-    }).then(response => response.status);
+    return axiosInstance.put<number>("api/user/password", passwordInfo).then(response => response.status);
 
 }
 
-export async function CreateAddressInfo({addressInfo, token}: {addressInfo: AddressSettingsForm, token: string}){
-    return axiosInstance.post<AddressResponse>("api/user/address", addressInfo, {
-        headers:{
-            "Authorization": `Bearer ${token}`
-        }
-    }).then(response => response.data)
+export async function CreateAddressInfo({addressInfo}: {addressInfo: AddressSettingsForm}){
+    return axiosInstance.post<AddressResponse>("api/user/address", addressInfo).then(response => response.data)
 
 }
 
-export async function UpdateAddressInfo({addressInfo, token}: {addressInfo: AddressSettingsForm, token: string}){
-    return axiosInstance.put<AddressResponse>("api/user/address", addressInfo, {
-        headers:{
-            "Authorization": `Bearer ${token}`
-        }
-    }).then(response => response.data)
+export async function UpdateAddressInfo({addressInfo}: {addressInfo: AddressSettingsForm}){
+    return axiosInstance.put<AddressResponse>("api/user/address", addressInfo).then(response => response.data)
 }
 
-export async function CreatePaymentMethod({paymentInfo, token}: {paymentInfo: PaymentSettingsForm, token: string}){
-    return axiosInstance.post<number>("api/user/payment", paymentInfo, {
-        headers: {
-            "Authorization": `Bearer ${token}`
-        }
-    }).then(response => response.status);
+export async function CreatePaymentMethod({paymentInfo}: {paymentInfo: PaymentSettingsForm}){
+    return axiosInstance.post<number>("api/user/payment", paymentInfo).then(response => response.status);
 
 }
 
-export async function UpdatePaymentMethod({paymentInfo, token}: {paymentInfo: PaymentSettingsForm, token: string}){
-    return axiosInstance.put<number>("api/user/payment", paymentInfo, {
-        headers: {
-            "Authorization": `Bearer ${token}`
-        }
-    }).then(response => response.status);
+export async function UpdatePaymentMethod({paymentInfo}: {paymentInfo: PaymentSettingsForm}){
+    return axiosInstance.put<number>("api/user/payment", paymentInfo).then(response => response.status);
 
 }

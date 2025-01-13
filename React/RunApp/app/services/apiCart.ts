@@ -2,29 +2,18 @@ import { CartProductsResponse, ChangeItemQuantityRequestDto, DeleteItemDto, Prod
 import { axiosInstance } from "./axiosInstance";
 
 
-export async function updateItemQuantity({orderId, productId, quantity, token}: {orderId: string, productId: string, quantity: number, token: string}){
+export async function updateItemQuantity({orderId, productId, quantity}: {orderId: string, productId: string, quantity: number}){
     const changeQuantityDto: ChangeItemQuantityRequestDto = {productId, quantity};
     
-    return axiosInstance.put<number>(`api/orders/${orderId}/lineitems`, changeQuantityDto, {
-        headers:{
-            "Authorization": `Bearer ${token}`
-        }
-    }).then(response => response.status);
+    return axiosInstance.put<number>(`api/orders/${orderId}/lineitems`, changeQuantityDto).then(response => response.status);
 }
 
-export async function addItemToCart({productForCart, orderId, token}: {productForCart: ProductForLineItem, orderId: string, token: string}){
-    return axiosInstance.post<CartProductsResponse>(`api/orders/${orderId}/lineitems`, productForCart, {
-        headers:{
-            "Authorization": `Bearer ${token}`
-        }
-    }).then(response => response.data);
+export async function addItemToCart({productForCart, orderId}: {productForCart: ProductForLineItem, orderId: string}){
+    return axiosInstance.post<CartProductsResponse>(`api/orders/${orderId}/lineitems`, productForCart).then(response => response.data);
 }
 
-export async function deleteItemToCart({token, orderId, DeleteItemDto}: {token: string, orderId: string, DeleteItemDto: DeleteItemDto}){
+export async function deleteItemToCart({orderId, DeleteItemDto}: {orderId: string, DeleteItemDto: DeleteItemDto}){
     return axiosInstance.delete<number>(`api/orders/${orderId}/lineitems`, {
-        headers: {
-            "Authorization": `Bearer ${token}`
-        },
         data: {
             DeleteItemDto: DeleteItemDto
         }

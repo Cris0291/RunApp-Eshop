@@ -1,14 +1,12 @@
-import { useAppSelector } from "@/app/hooks/reduxHooks";
 import { GetUserBoughtProducts } from "@/app/services/apiUserProfle";
 import { useQuery } from "@tanstack/react-query";
-import { getUserToken } from "../../registration/userSlice";
+
 
 export default function useGetuserBoughtProducts(){
-    const token = useAppSelector(getUserToken)
-
-    const {data: userBoughtProducts, isLoading: loadingProducts} = useQuery({
+   
+    const {data: userBoughtProducts, isLoading: loadingProducts, error: errorBoughtProducts, isError: isErrorBoughtProduct} = useQuery({
         queryKey: ["userBoughtProducts"],
-        queryFn: () => GetUserBoughtProducts(token)
+        queryFn: () => GetUserBoughtProducts()
     })
-    return {userBoughtProducts, loadingProducts}
+    return {userBoughtProducts, loadingProducts, errorBoughtProducts, isErrorBoughtProduct}
 }

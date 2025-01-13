@@ -1,26 +1,38 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react"
 import { useAppDispatch, useAppSelector } from "@/app/hooks/reduxHooks"
-import { changeItemQuantity, decreaseItemQuantity, deleteItem, getCartItems, getTotalItems, getTotalPrice, increaseItemQuantity } from "./cartSlice"
-import { useRouter } from "next/navigation"
+import { addCartError, changeItemQuantity, decreaseItemQuantity, deleteItem, getCartError, getCartItems, getTotalItems, getTotalPrice, increaseItemQuantity } from "./cartSlice"
 import Spinner from "@/app/ui/Spinner"
+import { useRouter } from "next/navigation"
+import { setSearch } from "../../store/products/productsQuerySlice"
+import HeaderProducts from "../../store/products/HeaderProducts"
 
 
 function ShoppingCartPage() {
   const [isRedirected, setIsRedirected] = useState(false);
-
+  const [searchProduct, setSearchProduct] = useState("");
   const router = useRouter();
 
   const dispatch = useAppDispatch();
   const cartItems = useAppSelector(getCartItems);
   const total = useAppSelector(getTotalPrice);
   const itemCount = useAppSelector(getTotalItems);
+  const cartError = useAppSelector(getCartError)
+
+
+  useEffect(() => {
+    if(cartError !== undefined){
+      const tempCartError = cartError;
+      dispatch(addCartError(undefined));
+      throw new Error(tempCartError);
+    }
+  }, [cartError])
 
   const handleCheckout = () => {
     if(cartItems.length > 0){
@@ -37,8 +49,21 @@ function ShoppingCartPage() {
     setIsRedirected(true);
   }
 
+  const handleSearch = (search: string) => {
+      setSearchProduct(search);
+    }
+  
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        dispatch(setSearch({sortBy: "", search: searchProduct, categories: [], priceRange: [], starFilters: []}))
+        router.push("/products");
+      }
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-white text-black">
+    <div>
+    <HeaderProducts handleSearch={handleSearch} search={searchProduct}  handleSubmit={handleSubmit}/>
+    <Separator/>
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100 text-black">
       <h1 className="text-3xl font-bold mb-8 flex items-center text-black">
         <ShoppingCart className="mr-2" /> Your Shopping Cart
       </h1>
@@ -53,14 +78,16 @@ function ShoppingCartPage() {
           <div className="space-y-6">
             {cartItems.map(item => (
               <div key={item.id} className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-4 pb-6 border-b border-yellow-200 last:border-b-0 transition-all duration-300 ease-in-out hover:bg-yellow-50 hover:shadow-md rounded-lg p-4">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full sm:w-40 h-40 object-cover rounded-md transition-transform duration-300 ease-in-out hover:scale-105"
-                />
                 <div className="flex-grow space-y-2">
                   <h2 className="text-xl font-semibold text-black">{item.name}</h2>
-                  <p className="text-2xl font-bold text-yellow-500">${item.price.toFixed(2)}</p>
+                  <div className="flex justify-start items-center gap-2">
+                  {item.priceWithDiscount === undefined ? 
+                   <p className="font-semibold text-lg text-yellow-500">${(item.price * (item.quantity === null ? 0 : item.quantity)).toFixed(2)}</p> :
+                   <>
+                   <p className="text-yellow-500 text-lg line-through">${(item.price * (item.quantity === null ? 0 : item.quantity)).toFixed(2)}</p>
+                   <p className="font-semibold text-red-500 text-lg">${(item.priceWithDiscount * (item.quantity === null ? 0 : item.quantity)).toFixed(2)}</p>
+                   </> }
+                   </div>
                   <div className="flex items-center space-x-2">
                     <Button
                       variant="outline"
@@ -134,6 +161,7 @@ function ShoppingCartPage() {
           </div>
         </div>
       )}
+    </div>
     </div>
   )
 }

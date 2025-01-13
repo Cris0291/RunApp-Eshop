@@ -1,15 +1,14 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation} from "@tanstack/react-query";
 import { AddressSettingsForm } from "./contracts";
 import { CreateAddressInfo, UpdateAddressInfo } from "@/app/services/apiSettings";
 
-export default function useUpdateOrCreateAddressInfo(token: string){
+export default function useUpdateOrCreateAddressInfo(){
 
     const {mutate: updateOrCreateAddress, isPending: updatingOrCreatingAddress} = useMutation({
         mutationFn: ({addressInfo, wasCreated}: {addressInfo: AddressSettingsForm, wasCreated: boolean}) => {
             const result = wasCreated ? UpdateAddressInfo : CreateAddressInfo;
-            return result({addressInfo, token});
-
-        }
+            return result({addressInfo});
+        },
     })
 
     return {updateOrCreateAddress, updatingOrCreatingAddress}

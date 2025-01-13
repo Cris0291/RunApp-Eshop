@@ -58,3 +58,12 @@ export type CategoryResponse = {
     catergoryId: string,
     category: string
 }
+
+export type ProductCreated = {
+    productId: string
+    name: string
+    price: number
+    discountedPrice: number | null
+    image: string | null
+    category: string[]
+  }

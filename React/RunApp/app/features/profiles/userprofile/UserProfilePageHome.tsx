@@ -29,37 +29,42 @@ import SearchBar from "@/app/ui/SearchBar";
 import AnimatedButton from "@/app/ui/AnimatedButton";
 import { useAppDispatch } from "@/app/hooks/reduxHooks";
 import { setSearch } from "../../store/products/productsQuerySlice";
-import { useRouter } from "next/navigation";
 import { UserBoughtProducts, UserLikes, UserReviews } from "./contracts";
+import NoImagePlaceholder from "@/app/ui/NoImagePlaceholder";
+import FailureSpan from "@/app/ui/FailureSpan";
+import NoProductsFound from "@/app/ui/NoProductsFound";
+import { useRouter } from "next/navigation";
 
 function UserProfilePageHome() {
   const [unliked, setUnliked] = useState(false);
   const [key, setKey] = useState<string>();
-  const {userReviews, loadingReviews} = useGetUserProfileReviews()
-  const {userBoughtProducts, loadingProducts} = useGetuserBoughtProducts()
-  const {userLikes, loadingLikes} = useGetUserProfileLikes()
+  const {userReviews, loadingReviews, errorReviews, isErrorReview} = useGetUserProfileReviews()
+  const {userBoughtProducts, loadingProducts, errorBoughtProducts, isErrorBoughtProduct} = useGetuserBoughtProducts()
+  const {userLikes, loadingLikes, errorLikes, isErrorLike} = useGetUserProfileLikes()
   const {updateReviewsMutation, updatingReviews} = useUpdateUserReview()
   const {AddOrRemoveLikeMutation} = useAddOrRemoveLikeHook()
   const dispatch = useAppDispatch();
-  const router = useRouter()
+  const router = useRouter();
 
 
-  const handleReviewUpdate = ({sentiment, reviewId, content, rating}: {sentiment: string, reviewId: string, content: string, rating: number}) => {
+  const handleReviewUpdate = ({sentiment, reviewId, content, rating}: {sentiment: string, reviewId?: string, content: string, rating: number}) => {
+    if(reviewId === undefined) throw new Error("Product id was undefined. Something unexpected happened");
     const reviewDto = {comment: content, reviewDescription: sentiment, rating}
     updateReviewsMutation({reviewDto, reviewId});
   }
 
-  const handleLike = ({productId, like}: {productId: string, like: boolean}) => {
+  const handleLike = ({productId, like}: {productId?: string, like: boolean}) => {
+    if(productId === undefined) throw new Error("Product id was undefined. Something unexpected happened");
     AddOrRemoveLikeMutation({liked: like, productId: productId})
   }
 
   const handleSearch = (searchTerm: string) => {
-    dispatch(setSearch({sortBy: "", search: searchTerm, categories: [], priceRange: [], starFilters: [],}))
-    router.push("/products")
+    dispatch(setSearch({sortBy: "", search: searchTerm, categories: [], priceRange: [], starFilters: []}))
+    router.push("/products");
   }
 
 
-  const userReviews1: UserReviews[] = [
+  const userReviews1: UserReviews[] | undefined = [
     {
       productId: "1",
       productName: "Wireless Earbuds",
@@ -71,9 +76,9 @@ function UserProfilePageHome() {
       reviewId: "1"
     },
     {
-      productId: "2",
-      productName: "Smart Watch",
-      productImage: "/placeholder.svg?height=50&width=50",
+      productId: undefined,
+      productName: undefined,
+      productImage: undefined,
       rating: 5,
       reviewDate: "14/07/2027",
       reviewDescription: "another test",
@@ -82,7 +87,7 @@ function UserProfilePageHome() {
     },
   ];
 
-  const userBoughtProducts1: UserBoughtProducts[] = [
+  const userBoughtProducts1: UserBoughtProducts[] | undefined = [
     {
       productId: "1",
       name: "Wireless Earbuds",
@@ -94,12 +99,12 @@ function UserProfilePageHome() {
       productId: "2",
       name: "Smart Watch",
       productPrice: 199.99,
-      productImage: "/placeholder.svg?height=50&width=50",
+      productImage: undefined,
       category: "swimming"
     },
   ];
 
-  const userLikes1: UserLikes[] = [
+  const userLikes1: UserLikes[] | undefined = [
     {
       productId: "1",
       productName: "Wireless Earbuds",
@@ -109,10 +114,10 @@ function UserProfilePageHome() {
       like: true,
     },
     {
-      productId: "2",
-      productName: "Smart Watch",
-      productPrice: 199.99,
-      productImage: "/placeholder.svg?height=50&width=50",
+      productId: undefined,
+      productName: undefined,
+      productPrice: undefined,
+      productImage: undefined,
       likeId: "5",
       like: false,
     },
@@ -150,7 +155,7 @@ function UserProfilePageHome() {
               value="liked"
               className="bg-white p-6 rounded-lg shadow-md"
             >
-              {loadingLikes ? <SpinnerCard/> : <Table>
+              {loadingLikes ? <SpinnerCard/> : userLikes1 !== undefined && !isErrorLike? <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[100px]">Image</TableHead>
@@ -161,69 +166,79 @@ function UserProfilePageHome() {
                 </TableHeader>
                 <TableBody>
                   {userLikes1.map((product) => (
-                    <TableRow key={product.id}>
+                    <TableRow key={product.productId === undefined ? "NOKEY" : product.productId}>
                       <TableCell>
+                        {product.productImage === undefined ? 
+                        <NoImagePlaceholder/> :
                         <img
-                          src={product.image}
-                          alt={product.name}
+                          src={product.productImage}
+                          alt={product.productName}
                           className="w-12 h-12  object-cover rounded-md"
-                        />
+                        />}
                       </TableCell>
                       <TableCell className="font-medium text-black">
-                        {product.name}
+                        {product.productName === undefined ? <FailureSpan/> : product.productName}
                       </TableCell>
                       <TableCell className="font-medium text-black">
-                        {product.price}
+                        {product.productPrice === undefined ? <FailureSpan/> : product.productPrice}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button
+                        {product.productId === undefined ?
+                         <FailureSpan/> :
+                         <Button
                           variant="outline"
                           size="sm"
-                          className={`bg-pink-500 text-white hover:bg-pink-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${unliked && product.id === key ? "border-pink-600 bg-white text-pink-600 hover:bg-pink-50" : ""}`}
+                          className={`bg-pink-500 text-white hover:bg-pink-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${unliked && product.productId === key ? "border-pink-600 bg-white text-pink-600 hover:bg-pink-50" : ""}`}
                           onClick={() => {
-                            setKey(product.id)
-                            handleLike({productId: product.id, like: unliked})
+                            setKey(product.productId)
+                            handleLike({productId: product.productId, like: unliked})
                             setUnliked(prev =>  !prev)
                           }}
                         >
                           <Heart className="mr-2 h-4 w-4" />
                           Unlike
-                        </Button>
+                        </Button>}
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>}
+              </Table>: <NoProductsFound/>}
             </TabsContent>
             <TabsContent
               value="reviewed"
               className="bg-white p-6 rounded-lg shadow-md"
             >
-              {loadingReviews ? <SpinnerCard/> : <Table>
+              {loadingReviews ? <SpinnerCard/> : userReviews1 !== undefined && !isErrorReview? <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[100px]">Image</TableHead>
                     <TableHead>Name</TableHead>
-                    <TableHead>Price</TableHead>
+                    <TableHead>Review Date</TableHead>
+                    <TableHead>Review Description</TableHead>
                     <TableHead>Rating</TableHead>
                     <TableHead className="text-right">Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {userReviews1.map((product) => (
-                    <TableRow key={product.id}>
+                    <TableRow key={product.productId === undefined ? "NOKEY" : product.productId}>
                       <TableCell>
+                      {product.productImage === undefined ? 
+                        <NoImagePlaceholder/> :
                         <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-12 h-12 object-cover rounded-md"
-                        />
+                          src={product.productImage}
+                          alt={product.productName}
+                          className="w-12 h-12  object-cover rounded-md"
+                        />}
                       </TableCell>
                       <TableCell className="font-medium text-black">
-                        {product.name}
+                      {product.productName === undefined ? <FailureSpan/> : product.productName}
                       </TableCell>
                       <TableCell className="font-medium text-black">
-                        {product.price}
+                        {product.reviewDate}
+                      </TableCell>
+                      <TableCell className="font-medium text-black">
+                        {product.reviewDescription}
                       </TableCell>
                       <TableCell>
                         <div className="flex">
@@ -240,20 +255,22 @@ function UserProfilePageHome() {
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        <ReviewForm size="sm" className="border-pink-600 text-pink-600 hover:bg-pink-50" onSubmit={({sentiment, content, rating}: {sentiment: string, content: string, rating: number}) => handleReviewUpdate({sentiment, reviewId: product.id, content, rating})} isSubmitting={updatingReviews}>
+                        {product.productId === undefined ?
+                        <FailureSpan/> : 
+                        <ReviewForm size="sm" className="border-pink-600 text-pink-600 hover:bg-pink-50" onSubmit={({sentiment, content, rating}: {sentiment: string, content: string, rating: number}) => handleReviewUpdate({sentiment, reviewId: product.productId, content, rating})} isSubmitting={updatingReviews}>
                           <Star className="mr-2 h-4 w-4" /> Edit Review
-                        </ReviewForm>
+                        </ReviewForm>}
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>}
+              </Table>: <NoProductsFound/>}
             </TabsContent>
             <TabsContent
               value="bought"
               className="bg-white p-6 rounded-lg shadow-md"
             >
-              {loadingProducts ? <SpinnerCard/> : <Table>
+              {loadingProducts ? <SpinnerCard/> : userBoughtProducts1 !== undefined && !isErrorBoughtProduct? <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[100px]">Image</TableHead>
@@ -265,27 +282,32 @@ function UserProfilePageHome() {
                 </TableHeader>
                 <TableBody>
                   {userBoughtProducts1.map((product) => (
-                    <TableRow key={product.id}>
+                    <TableRow key={product.productId === undefined ? "NOKEY" : product.productId}>
                       <TableCell>
+                      {product.productImage === undefined ? 
+                        <NoImagePlaceholder/> :
                         <img
-                          src={product.image}
-                          className="w-12 h-12 object-cover rounded-md"
-                        />
+                          src={product.productImage}
+                          alt={product.name}
+                          className="w-12 h-12  object-cover rounded-md"
+                        />}
                       </TableCell>
                       <TableCell className="font-medium text-black">
                         {product.name}
                       </TableCell>
                       <TableCell className="font-medium text-black">
-                        {product.price}
+                         {product.productPrice === undefined ? <FailureSpan/> : product.productPrice}
                       </TableCell>
                       <TableCell>
+                        {product.productId === undefined ? 
+                        <FailureSpan/> :
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                            MapCategories(product.categories[0])
+                            MapCategories(product.category)
                           }`}
                         >
-                          {product.categories[0]}
-                        </span>
+                          {product.category}
+                        </span>}
                       </TableCell>
                       <TableCell className="text-right">
                         <Button
@@ -294,16 +316,18 @@ function UserProfilePageHome() {
                           className="bg-green-600 hover:bg-green-700 text-white"
                           asChild
                         >
-                          <Link href={`/products/${product.id}`}>
+                          {product.productId === undefined ? 
+                          <FailureSpan/> : 
+                          <Link href={`/products/${product.productId}`}>
                              Buy Again
                            <ShoppingCart className="ml-2 h-4 w-4" />
-                          </Link>
+                          </Link>}
                         </Button>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>}
+              </Table>: <NoProductsFound/>}
             </TabsContent>
           </Tabs>
         </div>

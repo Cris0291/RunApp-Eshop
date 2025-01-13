@@ -25,3 +25,8 @@ export type UserBoughtProducts = {
     name: string,
     category: string
 }
+
+export type SimpleBoughtProducts = {
+    boughtProducts: string[],
+    boughtProductsWithReview: string[],
+}

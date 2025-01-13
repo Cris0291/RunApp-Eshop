@@ -7,6 +7,7 @@ import { useState } from "react";
 import useGetProductsQuery from "./useGetProductsQuery";
 import { getSearchQueryProduct } from "./productsQuerySlice";
 import { useAppSelector } from '@/app/hooks/reduxHooks'
+import toast from "react-hot-toast";
 
 function Products() {
   const searchTerm = useAppSelector(getSearchQueryProduct)
@@ -16,7 +17,6 @@ function Products() {
   const [sortBy, setSortBy] = useState("default");
   const [starFilters, setStarFilters] = useState<number[]>([])
   const [search, setSearch] = useState(() => {
-    console.log("just a test")
     setFirstRefetch(true)
     return searchTerm.length == 0 ? "all" : searchTerm 
   });
@@ -24,9 +24,11 @@ function Products() {
 
   let queryValues : ProductsQuery = {sortBy, search, priceRange, categories: selectedCategories, starFilters}
 
-  const {isLoading, products, refetch, error} = useGetProductsQuery(queryValues);
+  const {isLoading, products, refetch, error, isError} = useGetProductsQuery(queryValues);
+
+  if(isError && error !== null)toast.error(error.message)
+
   if(firstRefetch){
-    console.log("executed once")
     setFirstRefetch(false)
     refetch()
   }
@@ -64,7 +66,7 @@ function Products() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <HeaderProducts handleSearch={handleSearch} search={search}  handleSubmit={handleSubmit}/>
-      <MainPageProductsServerSide handleSelectedCategories={handleSelectedCategories} handlePriceRange={handlePriceRange} handleSortBy={handleSortBy} priceRange={priceRange} sortBy={sortBy} selectedCategories={selectedCategories} handleSubmit={handleSubmit} handleStarFilterChange={handleStarFilterChange} starFilters={starFilters}/>
+      <MainPageProductsServerSide handleSelectedCategories={handleSelectedCategories} handlePriceRange={handlePriceRange} handleSortBy={handleSortBy} priceRange={priceRange} sortBy={sortBy} selectedCategories={selectedCategories} handleSubmit={handleSubmit} handleStarFilterChange={handleStarFilterChange} starFilters={starFilters} products1={[]} error={error} isError={isError} isLoading={isLoading}/>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import AuthorizationAttribute from "@/app/utils/AuthorizationAttribute";
 
 function CreationCenter() {
   return <AuthorizationAttribute>
-    <CreationCenterDashboard />;
+    <CreationCenterDashboard />
     </AuthorizationAttribute>
 }
 

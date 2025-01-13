@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -10,14 +10,18 @@ import useGetProductsWithDiscountQuery from "./useGetProductsWithDiscountQuery"
 import LikeButton from "@/app/ui/LikeButton"
 import useAddOrRemoveLikeHook from "@/app/hooks/useAddOrRemoveLikeHook"
 import useCreateOrderOrAddItem from "@/app/utils/useCreateOrderOrAddItem"
-import { getIsCurrentOrder } from "../../payment/checkout/orderSlice"
+import { addError, getIsCurrentOrder, getOrderError } from "../../payment/checkout/orderSlice"
 import { useAppSelector } from "@/app/hooks/reduxHooks"
 import { getUserAddress, getUserPaymentMethod } from "../../registration/userSlice"
 import { ProductForCardWithDiscount } from "../../store/products/contracts"
+import ProductLoadingCard from "@/app/ui/ProductLoadingCard"
+import NoProductsFound from "@/app/ui/NoProductsFound"
+import { addCartError, getCartError } from "../../payment/shoppingcart/cartSlice"
+import { useDispatch } from "react-redux"
 
 
 
-const products: ProductForCardWithDiscount[] = [
+const products: ProductForCardWithDiscount[] | undefined  = [
   { productId: "1", productName: "Wireless Earbuds", price: 129.99, priceWithDiscount: 20, discount: 20, image: "https://images.unsplash.com/photo-1594534475808-b18fc33b045e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", size: "medium" },
   { productId: "2", productName: "Smart Watch", price: 199.99, priceWithDiscount: 20, discount: 15, image: "https://images.unsplash.com/photo-1594534475808-b18fc33b045e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", size: "small" },
   { productId: "3", productName: "4K TV", price: 799.99, priceWithDiscount: 20, discount: 30, image: "https://images.unsplash.com/photo-1594534475808-b18fc33b045e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", size: "large" },
@@ -26,18 +30,35 @@ const products: ProductForCardWithDiscount[] = [
 ]
 
 export default function UserProfileDiscount() {
+  const dispatch = useDispatch()
   const [isAddedTocart, setIsAddedToCart] = useState<string[]>([]);
-  const {productsWithDiscount, loadingProductsWithDiscount} = useGetProductsWithDiscountQuery();
+  const {productsWithDiscount, loadingProductsWithDiscount, error, isError} = useGetProductsWithDiscountQuery();
   const {AddOrRemoveLikeMutation} = useAddOrRemoveLikeHook();
   const createOrderOrAddItem = useCreateOrderOrAddItem();
   const existOrder = useAppSelector(getIsCurrentOrder);
   const userAddress = useAppSelector(getUserAddress);
   const userPaymentMethod = useAppSelector(getUserPaymentMethod);
+  const cartError = useAppSelector(getCartError);
+  const orderError = useAppSelector(getOrderError);
+
+
+  useEffect(() => {
+      if(cartError !== undefined){
+        const tempCartError = cartError;
+        dispatch(addCartError(undefined));
+        throw new Error(tempCartError);
+      }
+      if(orderError !== undefined){
+        const tempOrderError = orderError;
+        dispatch(addError(undefined));
+        throw new Error(tempOrderError);
+      }
+    }, [cartError, orderError])
 
 
   const handleAddToCartState = (product: ProductForCardWithDiscount) => {
     const productForCart = {name: product.productName, id: product.productId, quantity: 1, price: product.price, priceWithDiscount: product.priceWithDiscount, 
-      totalPrice: product.price * 1, image: product.image}
+      totalPrice: product.price * 1}
 
     createOrderOrAddItem(productForCart, existOrder,userAddress, userPaymentMethod);
     setIsAddedToCart(prev => {
@@ -53,8 +74,8 @@ export default function UserProfileDiscount() {
   return (
     <>
       <h1 className="text-4xl font-bold text-center mb-8 text-pink-600">Special Offers</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {products.map((product) => (
+      <div className={products !== undefined && !isError && !loadingProductsWithDiscount? "grid grid-cols-1 md:grid-cols-3 gap-6": ""}>
+        {loadingProductsWithDiscount? <ProductLoadingCard/>: products !== undefined && !isError? products.map((product) => (
           <motion.div
             key={product.productId}
             className={`${
@@ -106,7 +127,7 @@ export default function UserProfileDiscount() {
               </CardFooter>
             </Card>
           </motion.div>
-        ))}
+        )): <NoProductsFound/>}
       </div>
     </>
   )

@@ -18,14 +18,12 @@ import { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import useRegisterUser from "./useRegisterUser";
 import { FormValues } from "./contracts";
-import { useRouter } from 'next/navigation'
-import Spinner from "@/app/ui/Spinner";
+import RegisterLoadingCard from "@/app/ui/RegisterLoadingCard";
 
 
 function Register() {
   const {register, getValues, handleSubmit, formState: {errors}} = useForm<FormValues>();
-  const {mutate, isPending, isSuccess} = useRegisterUser()
-  const router = useRouter();
+  const {mutate, isPending} = useRegisterUser()
 
   const [name, setName] = useState("");
   const [userName, setUserName] = useState("");
@@ -36,12 +34,7 @@ function Register() {
   const [submittedErrors, setSubmittedErrors] = useState<(string | undefined)[]>([])
 
   const onSubmit: SubmitHandler<FormValues> = (data) => {  
-    mutate(data, {
-      onSuccess(){
-        router.push("/")
-      }
-    })
-    
+    mutate(data)
   };
 
   const onError = () => {
@@ -54,6 +47,7 @@ function Register() {
 
     setSubmittedErrors(newErrors);
   }
+
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
@@ -72,7 +66,7 @@ function Register() {
           </h1>
         </div>
       </div>
-      {isPending ? <Spinner/> : <div className="md:w-1/2 flex items-center justify-center p-8">
+      {isPending ? <RegisterLoadingCard/> : <div className="md:w-1/2 flex items-center justify-center p-8">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="text-2xl font-bold">

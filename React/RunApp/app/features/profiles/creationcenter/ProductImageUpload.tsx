@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Upload, X, Check, ShoppingBag } from 'lucide-react'
 import fileToDataString from "@/app/utils/fileToDataString"
-import {ProductResponseDto } from "./contracts"
+import {ProductCreated, ProductResponseDto } from "./contracts"
 import useUploadProductImage from "./useUploadProductImage"
+import toast from "react-hot-toast"
 
 const product1 = {
   id: '',
@@ -18,7 +19,7 @@ const product1 = {
   price: 0
 }
 
-export default function ProductImageUpload({product}: {product: ProductResponseDto}) {
+export default function ProductImageUpload({product}: {product: ProductResponseDto | ProductCreated}) {
   const [previewImgUrl, setPreviewimgUrl] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<File>();
   const [isDragging, setIsDragging] = useState(false)
@@ -42,7 +43,7 @@ export default function ProductImageUpload({product}: {product: ProductResponseD
       setPreviewimgUrl(imgUrl);
     }
     catch (error){
-      console.log(error);
+      toast.error("Something unexpected happened. Image could not be uploaded");
     }
   }
 
@@ -73,7 +74,7 @@ export default function ProductImageUpload({product}: {product: ProductResponseD
       setPreviewimgUrl(imgUrl);
     }
     catch (error){
-      console.log(error);
+      toast.error("Something unexpected happened. Image could not be uploaded");
     }
   }
 
