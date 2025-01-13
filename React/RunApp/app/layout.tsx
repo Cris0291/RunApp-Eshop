@@ -4,6 +4,7 @@ import StoreProvider from "./utils/StoreProvider";
 import { Toaster } from 'react-hot-toast';
 import {ErrorBoundary} from "react-error-boundary"
 import ErrorFallback from "./ui/ErrorFallback";
+import { GlobalProvider } from "./ui/GlobalContext";
 
 export default function RootLayout({
   children,
@@ -16,7 +17,9 @@ export default function RootLayout({
         <ErrorBoundary FallbackComponent={ErrorFallback}>
         <StoreProvider>
         <ReactQueryProvider>
+        <GlobalProvider>
         {children}
+        </GlobalProvider>
         <Toaster position="top-center" gutter={12}
          containerStyle={{margin: "8px"}}
          toastOptions={{

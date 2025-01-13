@@ -1,11 +1,11 @@
-
-import Header from "@/app/ui/Header";
 import { ShoppingCart, Truck, Award } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { HeaderBody } from "./ui/HeaderBody";
+import Auth from "./services/apiAuth";
 
-export default function Page() {
+export default async function Page() {
+  const user = await Auth()
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -15,7 +15,7 @@ export default function Page() {
           <ShoppingCart className="h-6 w-6 text-green-600" />
           <span className="ml-2 text-xl font-bold text-gray-800">FitStore</span>
         </Link>
-        <HeaderBody isRegisterd = {true}/>
+        <HeaderBody isRegisterd = {user !== undefined}/>
       </div>
     </header>
       <main className="flex-1">
@@ -43,9 +43,9 @@ export default function Page() {
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Link
                     className="inline-flex h-10 items-center justify-center rounded-md bg-white px-8 text-sm font-medium text-black shadow transition-colors hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50"
-                    href={true ? "/products" : "/register"}
+                    href={user !== undefined ? "/products" : "/register"}
                   >
-                    {true? "Shop Now" : "Register"}
+                    {user !== undefined? "Shop Now" : "Register"}
                   </Link>
                 </div>
               </div>

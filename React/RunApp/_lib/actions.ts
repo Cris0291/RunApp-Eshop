@@ -1,15 +1,14 @@
 "use server"
 
 import { FormValues } from "@/app/features/registration/contracts";
-import { ProductForCard } from "@/app/features/store/products/contracts";
 import registerRequest from "@/app/services/apiRegister";
 import { AxiosError } from "axios";
-import { redirect } from 'next/navigation'
 import { z } from "zod";
 import { cookies } from 'next/headers'
 import loginRequest from "@/app/services/apiLogin";
 import { LoginFormValues } from "@/app/features/login/contracts";
 import { getProducts } from "@/app/services/apiProducts";
+import AddOrRemoveLike from "@/app/services/apiAddOrRemoveLike";
 
 const RegisterSchema = z.object({
     name: z.string().trim().min(1, {message: "Name field is required"}),
@@ -31,15 +30,6 @@ const LoginSchema = z.object({
     email: z.string().email({message: "Invalid email address"}),
     password: z.string().min(8, {message: "Password must be at least 8 characters"}).trim(),
 })
-
-export async function GetProductsAction(formData: FormData){
-    const search = formData.get("search") as string;
-    const searchQuery = search.trim().length === 0 ? "search=all" : `search=${search}`;
-
-    history.pushState(null, "", `?${searchQuery}`);
-    redirect(`/products?${searchQuery}`);
-
-}
 
 export async function GetProductsServerAction(prevState:  any,  formData: FormData){
     const query = formData.get("query") as string;
@@ -92,4 +82,8 @@ export async function LoginUser(prevState: any, formData: FormData){
     }
 
     (await cookies()).set("session", JSON.stringify(user))
+}
+
+export async function LikeAction(productId: string, liked: boolean, formData: FormData){
+    const response = await AddOrRemoveLike({productId, liked});
 }
