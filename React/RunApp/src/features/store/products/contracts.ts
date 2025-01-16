@@ -11,13 +11,13 @@ export type ProductForCard = {
   name: string;
   mainImage?: string;
   actualPrice: number;
-  priceWithDiscount: number | undefined;
-  promotionalText: string | undefined;
-  discount: number | undefined;
-  numberOfLikes: number | undefined;
-  numberOfReviews: number | undefined;
+  priceWithDiscount: number | null;
+  promotionalText: string | null;
+  discount: number | null;
+  numberOfLikes: number | null;
+  numberOfReviews: number | null;
   averageRating: number;
-  userLike: boolean;
+  userLike: boolean | null;
   categoryNames: string[];
 };
 

@@ -61,7 +61,7 @@ function MainPageProductsServerSide({
   const [currentPage, setCurrentPage] = useState(1);
   const { AddOrRemoveLikeMutation } = useAddOrRemoveLikeHook();
   const productsPerPage = 6;
-
+  console.log(products);
   const handleLike = (liked: boolean, productId: string) => {
     AddOrRemoveLikeMutation({ liked, productId });
   };
@@ -216,7 +216,6 @@ function MainPageProductsServerSide({
                     <SelectItem value="AverageRatingDescendingOrder">
                       Rating: High to Low
                     </SelectItem>
-                    <SelectItem value="rating">Top Rated</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -245,11 +244,13 @@ function MainPageProductsServerSide({
                   <div className="p-4">
                     <div className="flex justify-between items-center">
                       <h3 className="text-lg font-semibold mb-1 text-gray-500">
-                        {product.name}
+                        {product.name.slice(0, 20)}
                       </h3>
                       <LikeButton
                         size="sm"
-                        initialLiked={product.userLike}
+                        initialLiked={
+                          product.userLike !== null ? product.userLike : false
+                        }
                         onLikeChange={(like) =>
                           handleLike(like, product.productId)
                         }
@@ -267,7 +268,7 @@ function MainPageProductsServerSide({
                       </div>
                     </div>
                     <div className="flex items-center justify-between mb-4">
-                      {product.priceWithDiscount === undefined ? (
+                      {product.priceWithDiscount === null ? (
                         <span className="text-xl font-bold text-green-600">
                           ${product.actualPrice.toFixed(2)}
                         </span>
@@ -277,14 +278,14 @@ function MainPageProductsServerSide({
                             ${product.actualPrice.toFixed(2)}
                           </span>
                           <span className="font-semibold text-red-500 text-lg">
-                            ${product.priceWithDiscount.toFixed(2)}
+                            ${product.priceWithDiscount}
                           </span>
                         </div>
                       )}
                       <div className="flex items-center">
                         <Star className="w-5 h-5 fill-current text-yellow-500" />
                         <span className="ml-1 text-sm text-gray-600">
-                          {product.averageRating.toFixed()}
+                          {product.averageRating}
                         </span>
                       </div>
                     </div>
@@ -292,7 +293,7 @@ function MainPageProductsServerSide({
                       className="w-full bg-green-600 hover:bg-green-700 text-white"
                       asChild
                     >
-                      <Link to={`products/${product.productId}`}>
+                      <Link to={`${product.productId}`}>
                         Buy
                         <ShoppingCart className="ml-2 h-4 w-4" />
                       </Link>

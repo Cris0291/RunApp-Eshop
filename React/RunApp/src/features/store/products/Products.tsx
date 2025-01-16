@@ -11,7 +11,7 @@ function Products() {
   const [firstRefetch, setFirstRefetch] = useState<boolean>();
   const [priceRange, setPriceRange] = useState<number[]>([0, 300]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState("default");
+  const [sortBy, setSortBy] = useState("SimpleOrder");
   const [starFilters, setStarFilters] = useState<number[]>([]);
   const [search, setSearch] = useState(() => {
     setFirstRefetch(true);
