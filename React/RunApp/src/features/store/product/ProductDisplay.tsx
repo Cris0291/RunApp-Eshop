@@ -49,78 +49,6 @@ import { setSearch } from "../products/productsQuerySlice";
 import HeaderProducts from "../products/HeaderProducts";
 import { useLocation, useNavigate } from "react-router";
 
-const reviews: Review[] | undefined = [
-  {
-    reviewId: "0",
-    userName: "test",
-    rating: 0,
-    date: "",
-    comment:
-      "This watch exceeded my expectations. The craftsmanship is impeccable, and it looks even better in person. Highly recommended!",
-    reviewDescription: "Good",
-  },
-  {
-    reviewId: "1",
-    userName: "A",
-    rating: 5,
-    date: "2023-05-15",
-    comment:
-      "This watch exceeded my expectations. The craftsmanship is impeccable, and it looks even better in person. Highly recommended!",
-    reviewDescription: "Good quality",
-  },
-  {
-    reviewId: "2",
-    userName: "B",
-    rating: 4,
-    date: "2023-05-10",
-    comment:
-      "Great watch for the price. The only reason I'm not giving it 5 stars is because the strap took a while to break in. Otherwise, it's perfect.",
-    reviewDescription: "Bad",
-  },
-  {
-    reviewId: "3",
-    userName: "C",
-    rating: 5,
-    date: "2023-05-05",
-    comment:
-      "I've been wearing this watch daily for a month now, and it's holding up beautifully. The timekeeping is precise, and I love the classic design.",
-    reviewDescription: "neutral",
-  },
-  {
-    reviewId: "4",
-    userName: "D",
-    rating: 0,
-    date: "",
-    comment:
-      "This watch exceeded my expectations. The craftsmanship is impeccable, and it looks even better in person. Highly recommended!",
-    reviewDescription: "normal",
-  },
-];
-
-const productTest: Product | undefined = {
-  productId: "1",
-  name: "Elegant Timepiece",
-  actualPrice: 299.99,
-  priceWithDiscount: 100,
-  promotionalText: "Good test discounts",
-  discount: 60,
-  averageRatings: 4.5,
-  numberOfreviews: 128,
-  numberOflikes: 50,
-  description:
-    "A sophisticated watch that combines classic design with modern functionality. Perfect for both casual and formal occasions.",
-  bulletPoints: [
-    "Swiss movement",
-    "Sapphire crystal glass",
-    "Water-resistant up to 50 meters",
-    "Genuine leather strap",
-    "1-year warranty",
-  ],
-  categoryNames: ["Yoga", "HIIT"],
-  mainImage: "/placeholder.svg?height=400&width=400",
-  reviews: reviews,
-};
-
 function StarRating({ rating }: { rating: number }) {
   return (
     <div className="flex">
@@ -186,24 +114,24 @@ export default function ProductDisplay() {
   const initialIndex = 0;
 
   const currentReviews =
-    productTest !== undefined && productTest.reviews !== undefined
-      ? productTest.reviews.slice(initialIndex, lastIndex)
+    product !== undefined && product.reviews !== undefined
+      ? product.reviews.slice(initialIndex, lastIndex)
       : [];
 
   const isRendered =
-    productTest !== undefined && productTest.reviews !== undefined
-      ? lastIndex < productTest.reviews.length
+    product !== undefined && product.reviews !== undefined
+      ? lastIndex < product.reviews.length
       : 0;
 
   const handleAddToCartState = () => {
-    if (productTest !== undefined) {
+    if (product !== undefined) {
       const productForCart = {
-        name: productTest.name,
-        id: productTest.productId,
+        name: product.name,
+        id: product.productId,
         quantity: quantity,
-        price: productTest.actualPrice,
-        priceWithDiscount: productTest.priceWithDiscount,
-        totalPrice: productTest.actualPrice * quantity,
+        price: product.actualPrice,
+        priceWithDiscount: product.priceWithDiscount,
+        totalPrice: product.actualPrice * quantity,
       };
 
       if (!isNaN(quantity) && quantity !== 0) {
@@ -221,8 +149,8 @@ export default function ProductDisplay() {
   };
 
   const handleLike = (liked: boolean) => {
-    if (productTest !== undefined)
-      AddOrRemoveLikeMutation({ liked, productId: productTest.productId });
+    if (product !== undefined)
+      AddOrRemoveLikeMutation({ liked, productId: product.productId });
   };
 
   const onSubmit = ({
@@ -234,13 +162,13 @@ export default function ProductDisplay() {
     content: string;
     rating: number;
   }) => {
-    if (productTest !== undefined) {
+    if (product !== undefined) {
       const reviewDto = {
         comment: content,
         reviewDescription: sentiment,
         rating: rating,
       };
-      AddReview({ reviewDto, productId: productTest.productId });
+      AddReview({ reviewDto, productId: product.productId });
     }
   };
 
@@ -255,7 +183,7 @@ export default function ProductDisplay() {
     content: string;
     rating: number;
   }) => {
-    if (productTest !== undefined) {
+    if (product !== undefined) {
       const reviewDto = {
         comment: content,
         reviewDescription: sentiment,
@@ -285,7 +213,7 @@ export default function ProductDisplay() {
 
   return isLoading ? (
     <ProductLoadingCard />
-  ) : productTest !== undefined && !isGetProductError ? (
+  ) : product !== undefined && !isGetProductError ? (
     <div className="min-h-screen bg-gradient-to-br from-white to-pink-50">
       <div>
         <HeaderProducts
@@ -299,12 +227,12 @@ export default function ProductDisplay() {
               {/* Product Images */}
               <div className="space-y-4">
                 <div className="aspect-square relative overflow-hidden rounded-lg bg-gray-100 group">
-                  {productTest.mainImage === undefined ? (
+                  {product.mainImage === undefined ? (
                     <NoImagePlaceholder />
                   ) : (
                     <img
-                      src={productTest.mainImage}
-                      alt={productTest.name}
+                      src={product.mainImage}
+                      alt={product.name}
                       className="group-hover:scale-105 transition-transform duration-300"
                     />
                   )}
@@ -315,19 +243,19 @@ export default function ProductDisplay() {
               {/* Product Details */}
               <div className="space-y-6">
                 <h1 className="text-3xl font-bold text-gray-900 hover:text-pink-600 transition-colors duration-300">
-                  {productTest.name}
+                  {product.name}
                 </h1>
                 <div className="flex items-center space-x-2">
-                  <StarRating rating={productTest.averageRatings} />
+                  <StarRating rating={product.averageRatings} />
                   <span className="text-sm text-gray-500 hover:text-pink-500 transition-colors duration-300">
-                    ({productTest.numberOfreviews} reviews)
+                    ({product.numberOfreviews} reviews)
                   </span>
                 </div>
                 <p className="text-3xl font-bold text-gray-900 hover:text-pink-600 transition-colors duration-300">
-                  ${productTest.actualPrice.toFixed(2)}
+                  ${product.actualPrice.toFixed(2)}
                 </p>
                 <p className="text-gray-600 hover:text-gray-800 transition-colors duration-300">
-                  {productTest.description}
+                  {product.description}
                 </p>
 
                 {/* Category Icons */}
@@ -336,7 +264,7 @@ export default function ProductDisplay() {
                     Product Categories
                   </h3>
                   <div className="flex flex-wrap gap-4">
-                    {productTest.categoryNames.map((category) => (
+                    {product.categoryNames.map((category) => (
                       <div
                         key={category}
                         className="flex flex-col items-center group"
@@ -439,7 +367,7 @@ export default function ProductDisplay() {
               </TabsList>
               <TabsContent value="features" className="mt-6">
                 <ul className="list-disc pl-5 space-y-2 text-gray-600">
-                  {productTest.bulletPoints.map((feature, index) => (
+                  {product.bulletPoints.map((feature, index) => (
                     <li
                       key={index}
                       className="hover:text-pink-600 transition-colors duration-300"
@@ -458,9 +386,9 @@ export default function ProductDisplay() {
                         Customer Reviews
                       </h3>
                       <div className="flex items-center mt-1">
-                        <StarRating rating={productTest.averageRatings} />
+                        <StarRating rating={product.averageRatings} />
                         <span className="ml-2 text-sm text-gray-500 hover:text-pink-500 transition-colors duration-300">
-                          {productTest.averageRatings} out of 5
+                          {product.averageRatings} out of 5
                         </span>
                       </div>
                     </div>
@@ -483,7 +411,7 @@ export default function ProductDisplay() {
                         }) =>
                           handleReviewUpdate({
                             sentiment,
-                            reviewId: productTest.productId,
+                            reviewId: product.productId,
                             content,
                             rating,
                           })
@@ -501,7 +429,7 @@ export default function ProductDisplay() {
 
                   {/* Individual Reviews */}
                   <div className="space-y-6">
-                    {productTest.reviews === undefined ? (
+                    {product.reviews === undefined ? (
                       <Card className="w-full max-w-md mx-auto">
                         <CardContent className="flex flex-col items-center justify-center p-6">
                           <MessageSquare className="w-12 h-12 text-gray-400 mb-4" />
@@ -514,7 +442,7 @@ export default function ProductDisplay() {
                         </CardContent>
                       </Card>
                     ) : (
-                      productTest.reviews.map((review) => (
+                      product.reviews.map((review) => (
                         <div
                           key={review.reviewId}
                           className="border-t border-gray-200 pt-6 group"
