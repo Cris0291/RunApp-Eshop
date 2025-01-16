@@ -1,16 +1,10 @@
-import { UserDto } from "@/features/registration/contracts";
 import { HeaderBody } from "@/ui/HeaderBody";
 import { useAuth } from "@/utils/AuhtProvider";
-import Cookies from "js-cookie";
 import { ShoppingCart, Truck, Award } from "lucide-react";
 import { Link } from "react-router";
 
 export default function HomePage() {
   const { authStatus } = useAuth();
-  console.log(authStatus);
-  const test = Cookies.get("Session");
-  const test2: UserDto = test === undefined ? undefined : JSON.parse(test);
-  console.log(test2);
 
   return (
     <div className="flex flex-col min-h-screen">

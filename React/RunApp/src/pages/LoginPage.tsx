@@ -8,7 +8,6 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { Link } from "react-router";
-import RegisterLoadingCard from "@/ui/RegisterLoadingCard";
 import useLoginUser from "@/features/login/useLoginUser";
 import { LoginFormValues } from "@/features/login/contracts";
 import Spinner from "@/ui/Spinner";
