@@ -27,10 +27,14 @@ let isRefreshing = false;
 
 axiosInstance.interceptors.request.use(
   function (config) {
+    console.log("intercepted 1");
+
     if (tokenModel !== undefined) {
       config.headers.Authorization = `Bearer ${tokenModel.token}`;
+      console.log("intercepted 3");
+      console.log(tokenModel.token);
     }
-    console.log(config);
+    console.log("intercepted 2");
     return config;
   },
   function (error) {
@@ -44,7 +48,7 @@ axiosInstance.interceptors.response.use(
   },
   async function (error) {
     const originalRequest: AxiosRequestConfig = error.config;
-
+    console.log("response 1");
     if (
       error.response &&
       error.response.status === 401 &&
@@ -52,12 +56,14 @@ axiosInstance.interceptors.response.use(
     ) {
       if (!isRefreshing) {
         isRefreshing = true;
+        console.log("refresh 1");
         try {
+          console.log("problem 1");
           const data = await refreshAccessToken(
             tokenModel.token,
             tokenModel.refreshToken
           );
-
+          console.log("problem 2");
           const userSession: UserDto = {
             token: data.token,
             refreshToken: data.refreshToken,
@@ -66,35 +72,27 @@ axiosInstance.interceptors.response.use(
             userName: data.userName,
             email: data.email,
           };
-          Cookies.remove("Session");
-          Cookies.set("Session", JSON.stringify(userSession));
 
+          Cookies.set("Session", JSON.stringify(userSession));
+          console.log("refresh 2");
           error.config.headers["Authorization"] = `Bearer ${data.token}`;
 
-          refreshAndRetryQueue.forEach(({ resolve, reject, config }) => {
-            axiosInstance
-              .request(config)
-              .then((response) => resolve(response))
-              .catch((err) => reject(err));
-          });
-
           refreshAndRetryQueue.length = 0;
-          console.log("refresh");
+          console.log("refresh 3");
           return axiosInstance(originalRequest);
         } catch {
+          console.log("refresh 4");
           Cookies.remove("Session");
           store.dispatch(clearUser());
-          window.location.href = "/";
+          console.log("refresh 5");
+          //window.location.href = "/";
+          console.log("refresh 6");
         } finally {
           isRefreshing = false;
         }
       }
-
-      return new Promise<void>((resolve, reject) => {
-        refreshAndRetryQueue.push({ config: originalRequest, resolve, reject });
-      });
     }
-
+    console.log("response 2");
     return Promise.reject(error);
   }
 );
