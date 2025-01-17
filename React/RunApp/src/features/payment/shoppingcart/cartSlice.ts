@@ -9,6 +9,9 @@ import {
   updateItemQuantity,
 } from "@/services/apiCart";
 import { ExistProduct } from "@/services/apiProduct";
+import { addOrderId } from "../checkout/orderSlice";
+import { GetCurrentOrder } from "@/services/apiOrders";
+import { AxiosError } from "axios";
 
 type cartState = {
   products: ProductForLineItem[];
@@ -237,7 +240,6 @@ export const addItemListener = (startAppListening: AppStartListening) => {
         const state = listenerApi.getState();
 
         const cartState = state.cart;
-        const orderState = state.order;
 
         const product = cartState.products.find(
           (x) => x.id === cartState.currentProducId
@@ -247,18 +249,24 @@ export const addItemListener = (startAppListening: AppStartListening) => {
         const result = await ExistProduct({
           productId: cartState.currentProducId,
         });
+
         if (result !== 200)
           throw new Error(
             "Testing. Requested item was not find in the database"
           );
 
-        if (orderState.currentOrderId.trim().length === 0)
-          throw new Error("Something unexpected happened, order was not added");
+        const order = await GetCurrentOrder();
+        if (order instanceof AxiosError)
+          throw new Error("Current order could not be fetched");
+
+        if (order.order === undefined)
+          throw new Error("Current order was not found");
 
         await addItemToCart({
           productForCart: product,
-          orderId: orderState.currentOrderId,
+          orderId: order.order.OrderId,
         });
+        listenerApi.dispatch(addOrderId(order.order.OrderId));
       } catch (error) {
         listenerApi.dispatch(
           addCartError(
