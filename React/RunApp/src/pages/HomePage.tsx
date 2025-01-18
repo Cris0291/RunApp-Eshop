@@ -1,10 +1,15 @@
 import { HeaderBody } from "@/ui/HeaderBody";
 import { useAuth } from "@/utils/AuhtProvider";
+import { useGlobal } from "@/utils/GlobalProvider";
 import { ShoppingCart, Truck, Award } from "lucide-react";
+
 import { Link } from "react-router";
 
 export default function HomePage() {
   const { authStatus } = useAuth();
+  const { orderId } = useGlobal();
+
+  console.log(`testing id ${orderId}`);
 
   return (
     <div className="flex flex-col min-h-screen">
