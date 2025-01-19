@@ -9,6 +9,10 @@ export function HeaderBody({ isRegisterd }: { isRegisterd: boolean }) {
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     navigate("/products");
   };
   if (!isRegisterd) {
@@ -36,7 +40,7 @@ export function HeaderBody({ isRegisterd }: { isRegisterd: boolean }) {
     <>
       <div className="flex-1 max-w-xl mx-4">
         <div className="relative">
-          <form>
+          <form onSubmit={handleSubmit}>
             <Input
               className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent text-black"
               placeholder="Search for products..."

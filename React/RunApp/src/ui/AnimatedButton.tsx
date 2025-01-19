@@ -1,12 +1,9 @@
-"use client";
-
 import * as React from "react";
 import { motion } from "framer-motion";
 import { ShoppingBag } from "lucide-react";
-import { useAppDispatch } from "../hooks/reduxHooks";
-import { setSearch } from "../features/store/products/productsQuerySlice";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router";
+import { useGlobal } from "@/utils/GlobalProvider";
 
 interface AnimatedStoreButtonProps {
   size?: "sm" | "md" | "lg" | "xl";
@@ -16,19 +13,11 @@ export default function AnimatedStoreButton({
   size = "lg",
 }: AnimatedStoreButtonProps) {
   const [isHovered, setIsHovered] = React.useState(false);
-  const dispatch = useAppDispatch();
+  const { setSearchQuery } = useGlobal();
   let navigate = useNavigate();
 
   const handleDispatch = () => {
-    dispatch(
-      setSearch({
-        sortBy: "",
-        search: "all",
-        categories: [],
-        priceRange: [],
-        starFilters: [],
-      })
-    );
+    setSearchQuery("all");
     navigate("/products");
   };
 
