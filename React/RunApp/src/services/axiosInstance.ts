@@ -1,9 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import {
-  TokenModel,
-  UserDto,
-  UserSession,
-} from "../features/registration/contracts";
+import { TokenModel, UserDto } from "../features/registration/contracts";
 import { refreshAccessToken } from "./apiLogin";
 import { store } from "../utils/store";
 import { clearUser } from "../features/registration/userSlice";
@@ -28,7 +24,9 @@ let isRefreshing = false;
 axiosInstance.interceptors.request.use(
   function (config) {
     console.log("intercepted 1");
-
+    const tokenModelJson = Cookies.get("Session");
+    const tokenModel: TokenModel =
+      tokenModelJson !== undefined ? JSON.parse(tokenModelJson) : undefined;
     if (tokenModel !== undefined) {
       config.headers.Authorization = `Bearer ${tokenModel.token}`;
       console.log("intercepted 3");

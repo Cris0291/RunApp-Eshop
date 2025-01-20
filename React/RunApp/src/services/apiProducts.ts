@@ -1,4 +1,3 @@
-import { AxiosError } from "axios";
 import {
   ProductForCard,
   ProductForCardWithDiscount,
@@ -13,6 +12,6 @@ export default async function GetProducts(queryValues: string) {
 
 export async function getProductsWithDiscount() {
   return axiosInstance
-    .get<ProductForCardWithDiscount>("api/products/product-discount")
+    .get<ProductForCardWithDiscount[]>("api/products/product-discount")
     .then((response) => response.data);
 }
