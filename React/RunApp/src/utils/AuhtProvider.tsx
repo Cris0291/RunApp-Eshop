@@ -1,6 +1,7 @@
 import { UserDto } from "@/features/registration/contracts";
 import Cookies from "js-cookie";
 import { createContext, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 
 const AuthContext = createContext<any>(null);
 
@@ -14,6 +15,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     Cookies.remove("Session");
+    window.location.replace("/");
   };
 
   useEffect(() => {
