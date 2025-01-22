@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router";
 import HomePage from "./pages/HomePage";
 import StoreProvider from "./utils/StoreProvider";
 import ReactQueryProvider from "./utils/ReactQueryProvider";
@@ -9,6 +9,11 @@ import ProductsPage from "./pages/ProductsPage";
 import { AuthProvider } from "./utils/AuhtProvider";
 import PrivateRoute from "./utils/PrivateRoute";
 import { GlobalProvider } from "./utils/GlobalProvider";
+import ProductPage from "./pages/ProductPage";
+import CartPage from "./pages/CartPage";
+import OrderPage from "./pages/OrderPage";
+import UserProfilePage from "./pages/UserProfilePage";
+import CreationCenterPage from "./pages/CreationCenterPage";
 
 let router = createBrowserRouter([
   {
@@ -25,19 +30,57 @@ let router = createBrowserRouter([
   },
   {
     path: "/products",
+    element: <Outlet />,
+    children: [
+      {
+        index: true,
+        element: (
+          <PrivateRoute>
+            <ProductsPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: ":productId",
+        element: (
+          <PrivateRoute>
+            <ProductPage />
+          </PrivateRoute>
+        ),
+      },
+    ],
+  },
+  {
+    path: "/orders/cart",
     element: (
       <PrivateRoute>
-        <ProductsPage />
+        <CartPage />
       </PrivateRoute>
     ),
+  },
+  {
+    path: "/orders/checkout",
+    element: (
+      <PrivateRoute>
+        <OrderPage />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/userprofile",
+    element: <UserProfilePage />,
+  },
+  {
+    path: "/userprofile/creationcenter",
+    element: <CreationCenterPage />,
   },
 ]);
 
 function App() {
   return (
-    <AuthProvider>
-      <GlobalProvider>
-        <StoreProvider>
+    <StoreProvider>
+      <AuthProvider>
+        <GlobalProvider>
           <ReactQueryProvider>
             <RouterProvider router={router} />
             <Toaster
@@ -61,9 +104,9 @@ function App() {
               }}
             />
           </ReactQueryProvider>
-        </StoreProvider>
-      </GlobalProvider>
-    </AuthProvider>
+        </GlobalProvider>
+      </AuthProvider>
+    </StoreProvider>
   );
 }
 
