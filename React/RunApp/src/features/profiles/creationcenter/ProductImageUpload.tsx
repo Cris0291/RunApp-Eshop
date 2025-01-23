@@ -16,13 +16,6 @@ import { ProductCreated, ProductResponseDto } from "./contracts";
 import useUploadProductImage from "./useUploadProductImage";
 import toast from "react-hot-toast";
 
-const product1 = {
-  id: "",
-  name: "No product selected",
-  description: "Please select a product to upload an image.",
-  price: 0,
-};
-
 export default function ProductImageUpload({
   product,
 }: {
@@ -97,18 +90,24 @@ export default function ProductImageUpload({
     const formData = new FormData();
     formData.append("file", selectedImage as Blob);
 
-    uploadImage({ formData, productId: product.productId });
-
-    if (!uploadingImage) {
-      setUploadSuccess(true);
-      setTimeout(() => {
-        setUploadSuccess(false);
-        setPreviewimgUrl(null);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
-      }, 3000);
-    }
+    uploadImage(
+      { formData, productId: product.productId },
+      {
+        onSuccess: () => {
+          toast.success("Image was upload correctly");
+          setUploadSuccess(true);
+          setTimeout(() => {
+            setUploadSuccess(false);
+            setPreviewimgUrl(null);
+            if (fileInputRef.current) {
+              fileInputRef.current.value = "";
+            }
+          }, 3000);
+        },
+        onError: (error) =>
+          toast.error(`${error.message}: image was not upload`),
+      }
+    );
   };
 
   return (
@@ -126,12 +125,9 @@ export default function ProductImageUpload({
               For
             </h3>
             <div className="space-y-2">
-              <p className="text-2xl font-bold text-gray-800">
-                {product1?.name}
-              </p>
-              <p className="text-gray-600">{product1?.description}</p>
+              <p className="text-2xl font-bold text-gray-800">{product.name}</p>
               <p className="text-xl font-semibold text-yellow-600">
-                ${product1?.price.toFixed(2)}
+                ${product?.price.toFixed(2)}
               </p>
             </div>
           </div>

@@ -44,7 +44,6 @@ export default function CreationForm({
   const { ProductsCraetionFunction, isCreating, isError, isSuccess, isIdle } =
     useCreateProductCommand();
   const [hasPromotion, setHasPromotion] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [submittedErrors, setSubmittedErrors] = useState<string[]>([]);
   const [formData, setFormData] = useState<ProductCreationDto>({
     name: "",
