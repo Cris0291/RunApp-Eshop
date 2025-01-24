@@ -1,4 +1,4 @@
-import { UpdatePasswordInfo } from "@/app/services/apiSettings";
+import { UpdatePasswordInfo } from "@/services/apiSettings";
 import { useMutation } from "@tanstack/react-query";
 import { PasswordUpdatedSettings } from "./contracts";
 
