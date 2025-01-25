@@ -101,6 +101,10 @@ export default function PaymentInfoForm() {
                 className="border-yellow-500 focus:ring-yellow-500 focus:border-yellow-500 text-black"
                 {...register("cardnumber", {
                   required: "Card number is required",
+                  pattern: {
+                    value: /^(?:\d[ -]*?){13,16}$/,
+                    message: "Card number is invalid",
+                  },
                 })}
               />
             </div>
@@ -125,6 +129,10 @@ export default function PaymentInfoForm() {
                   className="border-yellow-500 focus:ring-yellow-500 focus:border-yellow-500 text-black"
                   {...register("cvv", {
                     required: "Cvv is required",
+                    pattern: {
+                      value: /^[0-9]{3,4}$/,
+                      message: "Cvv is inva;id",
+                    },
                   })}
                 />
               </div>

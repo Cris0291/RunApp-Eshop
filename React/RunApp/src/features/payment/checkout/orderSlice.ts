@@ -1,18 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {
-  AddressSettingsForm,
-  OrderDto,
-  OrderResponse,
-  PaymentSettingsForm,
-} from "./contracts";
+import { OrderDto, OrderResponse } from "./contracts";
 import { RootState } from "@/utils/store";
 import { AppStartListening } from "@//utils/listenerMiddleware";
-import { CreateOrderRequest } from "@/services/apiOrders";
-import { clearCart, deletePendingProduct } from "../shoppingcart/cartSlice";
+import { CreateOrderRequest, GetCurrentOrder } from "@/services/apiOrders";
+import { addCurrentItems, clearCart } from "../shoppingcart/cartSlice";
 import { GetBoughtProducts } from "@/services/apiUserProfle";
 import { setBoughtproducts } from "../../store/product/productSlice";
-import { ExistProduct } from "@/services/apiProduct";
-import { addItemToCart } from "@/services/apiCart";
+import { ProductForLineItem } from "../shoppingcart/contracts";
 
 type OrderState = {
   currentOrder: OrderDto;
@@ -22,7 +16,7 @@ type OrderState = {
 };
 
 const initialState: OrderState = {
-  currentOrder: {},
+  currentOrder: { cardRequest: null, addressRequest: null },
   currentOrderId: "",
   order_error: undefined,
   IsOrder: false,
@@ -32,48 +26,34 @@ export const orderSlice = createSlice({
   name: "order",
   initialState,
   reducers: {
-    createOrder: (
-      state,
-      action: PayloadAction<{
-        address?: AddressSettingsForm;
-        card?: PaymentSettingsForm;
-      }>
-    ) => {
-      state.currentOrder.AddressRequest = action.payload.address;
-      state.currentOrder.CardRequest = action.payload.card;
-    },
-    addOrderId: (state, action: PayloadAction<string>) => {
-      state.currentOrderId = action.payload;
+    createOrder: (state) => {
+      state.IsOrder = true;
     },
     payCurrentOrder: (state) => {
-      state.currentOrder = {};
+      state.currentOrder = { cardRequest: null, addressRequest: null };
       state.currentOrderId = "";
     },
     addError: (state, action: PayloadAction<string | undefined>) => {
       state.order_error = action.payload;
     },
-    CheckOrderExistence: (state, action: PayloadAction<boolean>) => {
-      state.IsOrder = action.payload;
-    },
     addOrder: (state, action: PayloadAction<OrderResponse>) => {
-      state.currentOrder.AddressRequest = action.payload.AddressRequest;
-      state.currentOrder.CardRequest = action.payload.CardRequest;
+      state.currentOrder.addressRequest = action.payload.addressRequest;
+      state.currentOrder.cardRequest = action.payload.cardRequest;
+      state.currentOrderId = action.payload.orderId;
+    },
+    addOrderId: (state, action: PayloadAction<string>) => {
+      state.currentOrderId = action.payload;
     },
   },
 });
 
-export const {
-  createOrder,
-  addOrderId,
-  payCurrentOrder,
-  addError,
-  CheckOrderExistence,
-  addOrder,
-} = orderSlice.actions;
+export const { createOrder, payCurrentOrder, addError, addOrder, addOrderId } =
+  orderSlice.actions;
 
 export default orderSlice.reducer;
 
-export const getIsCurrentOrder = (state: RootState) => state.order.IsOrder;
+export const getIsCurrentOrder = (state: RootState) =>
+  state.order.currentOrderId.trim().length > 0;
 export const getCurrentOrderId = (state: RootState) =>
   state.order.currentOrderId;
 export const getOrderError = (state: RootState) => state.order.order_error;
@@ -85,34 +65,37 @@ export const createOrderListener = (startAppListening: AppStartListening) => {
       const state = listenerApi.getState();
 
       try {
-        if (state.cart.pendingProductIfOrderDoesNotExist === undefined)
-          throw new Error(
-            "Something unexpected happened. the item you are trying to add to the cart was not found"
+        const orderWrapper = await GetCurrentOrder();
+
+        if (orderWrapper.order !== null) {
+          listenerApi.dispatch(
+            addOrder({
+              orderId: orderWrapper.order.orderId,
+              addressRequest: orderWrapper.order.addressRequest,
+              cardRequest: orderWrapper.order.cardRequest,
+            })
           );
+          const productItems: ProductForLineItem[] =
+            orderWrapper.order.items.length > 0
+              ? orderWrapper.order.items.map((item) => ({
+                  id: item.productId,
+                  name: item.name,
+                  price: item.price,
+                  quantity: item.quantity,
+                  totalPrice: item.totalPrice,
+                  priceWithDiscount: item.priceWithDiscount,
+                }))
+              : [];
 
-        const orderResponse = await CreateOrderRequest({
-          orderDto: state.order.currentOrder,
-        });
-
-        if (orderResponse) listenerApi.dispatch(CheckOrderExistence(true));
-
-        const result = await ExistProduct({
-          productId: state.cart.pendingProductIfOrderDoesNotExist.id,
-        });
-
-        if (result !== 200)
-          throw new Error(
-            "Testing. Requested item was not find in the database"
-          );
-
-        await addItemToCart({
-          productForCart: state.cart.pendingProductIfOrderDoesNotExist,
-          orderId: orderResponse.OrderId,
-        });
-
-        listenerApi.dispatch(deletePendingProduct());
+          listenerApi.dispatch(addCurrentItems(productItems));
+        } else {
+          const orderResponse = await CreateOrderRequest({
+            cardRequest: null,
+            addressRequest: null,
+          });
+          listenerApi.dispatch(addOrder(orderResponse));
+        }
       } catch (error) {
-        listenerApi.dispatch(CheckOrderExistence(false));
         listenerApi.dispatch(
           addError("There was a problem with the current order")
         );

@@ -1,53 +1,53 @@
-import { CartProductsResponse, ProductForCart } from "../shoppingcart/contracts"
+import { CartProductsResponse } from "../shoppingcart/contracts";
 
 export type AddressSettingsForm = {
-    address: string,
-    city: string,
-    state: string,
-    zipcode: string,
-    country: string,
-  }
+  address: string;
+  city: string;
+  state: string;
+  zipcode: string;
+  country: string;
+};
 
-  export type PaymentSettingsForm = {
-    cardnumber: string,
-    cardname: string,
-    expirydate: string,
-    cvv: string,
-  }
+export type PaymentSettingsForm = {
+  cardnumber: string;
+  cardname: string;
+  expirydate: string;
+  cvv: string;
+};
 
-  export type OrderDto = {
-    CardRequest?: PaymentSettingsForm,
-    AddressRequest?: AddressSettingsForm,
-  }
+export type OrderDto = {
+  cardRequest: PaymentSettingsForm | null;
+  addressRequest: AddressSettingsForm | null;
+};
 
-  export type OrderResponse = {
-    OrderId: string,
-    CardRequest?: PaymentSettingsForm,
-    AddressRequest?: AddressSettingsForm,
-  }
+export type OrderResponse = {
+  orderId: string;
+  cardRequest: PaymentSettingsForm | null;
+  addressRequest: AddressSettingsForm | null;
+};
 
-  export type AddressResponse = {
-    address: string,
-    city: string,
-    state: string,
-    zipcode: string,
-    country: string,
-  }
+export type AddressResponse = {
+  address: string;
+  city: string;
+  state: string;
+  zipcode: string;
+  country: string;
+};
 
-  export type PaymentResponse = {
-    cardnumber: string,
-    cardname: string,
-    expirydate: string,
-    cvv: string,
-  }
+export type PaymentResponse = {
+  cardnumber: string;
+  cardname: string;
+  expirydate: string;
+  cvv: string;
+};
 
-  export type OrderWithItems = {
-    OrderId: string,
-    CardRequest?: PaymentSettingsForm,
-    AddressRequest?: AddressSettingsForm,
-    Items: CartProductsResponse[],
-  }
+export type OrderWithItems = {
+  orderId: string;
+  cardRequest: PaymentSettingsForm | null;
+  addressRequest: AddressSettingsForm | null;
+  items: CartProductsResponse[];
+};
 
-  export type CurrentOrderWrapper = {
-    order?: OrderWithItems
-  }
+export type CurrentOrderWrapper = {
+  order: OrderWithItems | null;
+};

@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import {
   Card,
@@ -20,8 +18,10 @@ import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { getCurrentOrderId } from "./orderSlice";
 import { addUserAddress } from "../../registration/userSlice";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router";
 
 export default function ShippingInfoForm() {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const orderId = useAppSelector(getCurrentOrderId);
   const [submittedErrors, setSubmittedErrors] = useState<
@@ -47,7 +47,7 @@ export default function ShippingInfoForm() {
       toast.error(
         "No order was created. Please add your personal info inthe settings page"
       );
-      window.location.href = "/userprofile/settings";
+      navigate("/userprofile/settings");
     }
     updateOrderAddress(
       { orderId, addressInfo: data },
@@ -125,6 +125,10 @@ export default function ShippingInfoForm() {
               id="zipcode"
               {...register("zipcode", {
                 required: "Zipcode is required",
+                pattern: {
+                  value: /^\d{5}(?:[-\s]\d{4})?$/,
+                  message: "Zipcode is invalid",
+                },
               })}
               className="border-yellow-500 focus:ring-yellow-500 focus:border-yellow-500 text-black"
             />
