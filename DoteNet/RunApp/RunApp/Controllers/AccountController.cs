@@ -12,9 +12,11 @@ using RunApp.Api.Services;
 using RunApp.Domain.Common;
 using RunApp.Domain.UserAggregate;
 using RunApp.Domain.UserAggregate.Events;
+using RunnApp.Application.CustomerProfiles.Queries.GetUserAccountInfo;
 using RunnApp.Application.StoreOwnerProfiles.Commands.LoginStoreOwnerProfile;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using RunApp.Api.Mappers.CustomerProfiles;
 
 namespace RunApp.Api.Controllers
 {
@@ -86,8 +88,9 @@ namespace RunApp.Api.Controllers
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpirationDate = refreshTokenExiprationDate;
             await _userManager.UpdateAsync(user);
-            UserDto userDto = new UserDto(user.UserName!, user.NickName, token, user.Email!, refreshToken, refreshTokenExiprationDate);
-            return Ok(userDto);
+
+            var result = await _mediator.Send(new GetUserAccountInfoQuery(user.Id));
+            return result.MatchFirst(value => Ok(value.FromCustomerToUserDtoWithToken(token, refreshToken, refreshTokenExiprationDate)), Problem);
         }
 
         [HttpPost(ApiEndpoints.Account.LoginSalesProfile)]
