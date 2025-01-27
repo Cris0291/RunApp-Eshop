@@ -1,4 +1,7 @@
-import { CartProductsResponse } from "../shoppingcart/contracts";
+import {
+  CartProductsResponse,
+  ProductForLineItem,
+} from "../shoppingcart/contracts";
 
 export type AddressSettingsForm = {
   address: string;
@@ -46,6 +49,13 @@ export type OrderWithItems = {
   cardRequest: PaymentSettingsForm | null;
   addressRequest: AddressSettingsForm | null;
   items: CartProductsResponse[];
+};
+
+export type OrderItems = {
+  orderId: string;
+  cardRequest: PaymentSettingsForm | null;
+  addressRequest: AddressSettingsForm | null;
+  items: ProductForLineItem[];
 };
 
 export type CurrentOrderWrapper = {

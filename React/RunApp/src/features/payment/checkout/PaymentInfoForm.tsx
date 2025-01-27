@@ -21,7 +21,11 @@ import { addUserCard } from "../../registration/userSlice";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 
-export default function PaymentInfoForm() {
+export default function PaymentInfoForm({
+  handlePayment,
+}: {
+  handlePayment: (change: boolean) => void;
+}) {
   const dispatch = useAppDispatch();
   const orderId = useAppSelector(getCurrentOrderId);
   const { updateOrderPamentMethod } = useModifyOrderPaymentMethod();
@@ -53,7 +57,7 @@ export default function PaymentInfoForm() {
       { orderId, paymentInfo: data },
       {
         onSuccess: (data) => {
-          dispatch(addUserCard(data));
+          handlePayment(true);
         },
       }
     );

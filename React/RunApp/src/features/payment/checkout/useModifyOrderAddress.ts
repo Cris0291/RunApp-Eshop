@@ -4,7 +4,7 @@ import { AddressSettingsForm } from "./contracts";
 import toast from "react-hot-toast";
 
 export default function useModifyOrderAddress() {
-  const { mutate: updateOrderAddress } = useMutation({
+  const { mutate: updateOrderAddress, isPending } = useMutation({
     mutationFn: ({
       orderId,
       addressInfo,
@@ -21,5 +21,5 @@ export default function useModifyOrderAddress() {
       ),
   });
 
-  return { updateOrderAddress };
+  return { updateOrderAddress, isPending };
 }

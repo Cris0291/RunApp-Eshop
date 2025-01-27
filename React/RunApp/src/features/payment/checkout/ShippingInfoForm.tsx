@@ -20,7 +20,11 @@ import { addUserAddress } from "../../registration/userSlice";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 
-export default function ShippingInfoForm() {
+export default function ShippingInfoForm({
+  handleAddress,
+}: {
+  handleAddress: (change: boolean) => void;
+}) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const orderId = useAppSelector(getCurrentOrderId);
@@ -45,7 +49,7 @@ export default function ShippingInfoForm() {
   const onAddressInfoSubmit: SubmitHandler<AddressSettingsForm> = (data) => {
     if (orderId.trim().length === 0) {
       toast.error(
-        "No order was created. Please add your personal info inthe settings page"
+        "No order was created. Please add your personal info in the settings page"
       );
       navigate("/userprofile/settings");
     }
@@ -53,7 +57,7 @@ export default function ShippingInfoForm() {
       { orderId, addressInfo: data },
       {
         onSuccess: (data) => {
-          dispatch(addUserAddress(data));
+          handleAddress(true);
         },
       }
     );

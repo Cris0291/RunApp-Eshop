@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { OrderDto, OrderResponse } from "./contracts";
+import { OrderDto, OrderItems, OrderResponse } from "./contracts";
 import { RootState } from "@/utils/store";
 import { AppStartListening } from "@//utils/listenerMiddleware";
 import { CreateOrderRequest, GetCurrentOrder } from "@/services/apiOrders";
@@ -7,6 +7,12 @@ import { addCurrentItems, clearCart } from "../shoppingcart/cartSlice";
 import { GetBoughtProducts } from "@/services/apiUserProfle";
 import { setBoughtproducts } from "../../store/product/productSlice";
 import { ProductForLineItem } from "../shoppingcart/contracts";
+import Cookies from "js-cookie";
+
+const currentOrderText = Cookies.get("Order");
+const orderCookie: OrderItems | undefined = currentOrderText
+  ? JSON.parse(currentOrderText)
+  : undefined;
 
 type OrderState = {
   currentOrder: OrderDto;
@@ -16,8 +22,11 @@ type OrderState = {
 };
 
 const initialState: OrderState = {
-  currentOrder: { cardRequest: null, addressRequest: null },
-  currentOrderId: "",
+  currentOrder: {
+    cardRequest: orderCookie ? orderCookie.cardRequest : null,
+    addressRequest: orderCookie ? orderCookie.addressRequest : null,
+  },
+  currentOrderId: orderCookie ? orderCookie.orderId : "",
   order_error: undefined,
   IsOrder: false,
 };
@@ -30,7 +39,6 @@ export const orderSlice = createSlice({
       state.IsOrder = true;
     },
     payCurrentOrder: (state) => {
-      state.currentOrder = { cardRequest: null, addressRequest: null };
       state.currentOrderId = "";
     },
     addError: (state, action: PayloadAction<string | undefined>) => {
@@ -87,12 +95,26 @@ export const createOrderListener = (startAppListening: AppStartListening) => {
                 }))
               : [];
 
+          const storedOrder: OrderItems = {
+            orderId: orderWrapper.order.orderId,
+            addressRequest: orderWrapper.order.addressRequest,
+            cardRequest: orderWrapper.order.cardRequest,
+            items: productItems,
+          };
+          Cookies.set("Order", JSON.stringify(storedOrder));
           listenerApi.dispatch(addCurrentItems(productItems));
         } else {
           const orderResponse = await CreateOrderRequest({
             cardRequest: null,
             addressRequest: null,
           });
+          const storedOrder: OrderItems = {
+            orderId: orderResponse.orderId,
+            addressRequest: null,
+            cardRequest: null,
+            items: [],
+          };
+          Cookies.set("Order", JSON.stringify(storedOrder));
           listenerApi.dispatch(addOrder(orderResponse));
         }
       } catch (error) {
@@ -115,6 +137,20 @@ export const payOrderListener = (startAppListening: AppStartListening) => {
         listenerApi.dispatch(setBoughtproducts(boughtProducts));
 
         listenerApi.dispatch(clearCart());
+
+        const orderResponse = await CreateOrderRequest({
+          cardRequest: null,
+          addressRequest: null,
+        });
+        const nextOrder: OrderItems = {
+          orderId: orderResponse.orderId,
+          addressRequest: orderResponse.addressRequest,
+          cardRequest: orderResponse.cardRequest,
+          items: [],
+        };
+
+        Cookies.set("Order", JSON.stringify(nextOrder));
+        listenerApi.dispatch(addOrderId(orderResponse.orderId));
       } catch (error) {
         listenerApi.dispatch(
           addError(

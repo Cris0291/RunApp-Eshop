@@ -19,6 +19,8 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { getCartItems, getTotalPrice } from "../shoppingcart/cartSlice";
 import {
+  addUserAddress,
+  addUserCard,
   getUserAddress,
   getUserPaymentMethod,
 } from "../../registration/userSlice";
@@ -35,8 +37,14 @@ import EmptyCartCard from "./EmptyCartcard";
 import toast from "react-hot-toast";
 import HeaderProducts from "../../store/products/HeaderProducts";
 import { useNavigate } from "react-router";
+import useModifyOrderAddress from "./useModifyOrderAddress";
+import Spinner from "@/ui/Spinner";
+import useModifyOrderPaymentMethod from "./useModifyOrderPaymentMethod";
 
 export default function CheckoutPage() {
+  const { updateOrderAddress, isPending } = useModifyOrderAddress();
+  const { updateOrderPamentMethod, pendingPayment } =
+    useModifyOrderPaymentMethod();
   const dispatch = useAppDispatch();
   const cartItems = useAppSelector(getCartItems);
   const totalPrice = useAppSelector(getTotalPrice);
@@ -44,6 +52,10 @@ export default function CheckoutPage() {
   const userPaymentMethod = useAppSelector(getUserPaymentMethod);
   const orderId = useAppSelector(getCurrentOrderId);
   const [payErrors, SetPayErrors] = useState<(string | undefined)[]>([]);
+  const [changeAddress, setChangeAddress] = useState(userAddress !== undefined);
+  const [changePayment, setChangePayment] = useState(
+    userPaymentMethod !== undefined
+  );
   const orderError = useAppSelector(getOrderError);
   const { payOrder } = usePayOrder();
   const navigate = useNavigate();
@@ -83,6 +95,54 @@ export default function CheckoutPage() {
       throw new Error(tempOrderError);
     }
   }, [orderError]);
+
+  const handleAddressSubmit = () => {
+    if (orderId.trim().length === 0) {
+      toast.error(
+        "No order was created. Please add your personal info in the settings page"
+      );
+      navigate("/userprofile/settings");
+    }
+    if (userAddress === undefined) {
+      toast.error(
+        "No order was created. Please add your personal info in the settings page"
+      );
+      navigate("/userprofile/settings");
+    }
+    if (userAddress !== undefined) {
+      updateOrderAddress(
+        { orderId, addressInfo: userAddress },
+        {
+          onSuccess: (data) => {},
+        }
+      );
+    }
+  };
+
+  const handlePaymentSubmit = () => {
+    if (orderId.trim().length === 0) {
+      toast.error(
+        "No order was created. Please add your personal info inthe settings page"
+      );
+      navigate("/userprofile/settings");
+    }
+
+    if (userPaymentMethod === undefined) {
+      toast.error(
+        "No order was created. Please add your personal info in the settings page"
+      );
+      navigate("/userprofile/settings");
+    }
+
+    if (userPaymentMethod !== undefined) {
+      updateOrderPamentMethod(
+        { orderId, paymentInfo: userPaymentMethod },
+        {
+          onSuccess: (data) => {},
+        }
+      );
+    }
+  };
 
   return (
     <div>
@@ -148,13 +208,7 @@ export default function CheckoutPage() {
                 </CardContent>
               </Card>
 
-              {userAddress === undefined &&
-              cartItems.length !== 0 &&
-              orderId.trim().length !== 0 ? (
-                <ShippingInfoForm />
-              ) : userAddress !== undefined &&
-                cartItems.length !== 0 &&
-                orderId.trim().length !== 0 ? (
+              {changeAddress ? (
                 <Card className="bg-white shadow-lg rounded-lg overflow-hidden">
                   <CardHeader className="bg-gray-50 border-b border-gray-200">
                     <CardTitle className="text-xl text-gray-800 flex items-center">
@@ -167,42 +221,50 @@ export default function CheckoutPage() {
                       <p className="flex items-center">
                         <CheckCircle className="mr-2 text-green-500" />{" "}
                         <strong>Address: </strong>
-                        {userAddress.address}
+                        {userAddress?.address}
                       </p>
                       <p className="flex items-center">
                         <CheckCircle className="mr-2 text-green-500" />{" "}
                         <strong>City: </strong>
-                        {userAddress.city}
+                        {userAddress?.city}
                       </p>
                       <p className="flex items-center">
                         <CheckCircle className="mr-2 text-green-500" />{" "}
                         <strong>State: </strong>
-                        {userAddress.state}
+                        {userAddress?.state}
                       </p>
                       <p className="flex items-center">
                         <CheckCircle className="mr-2 text-green-500" />{" "}
                         <strong>Zipcode: </strong>
-                        {userAddress.zipcode}
+                        {userAddress?.zipcode}
                       </p>
                       <p className="flex items-center">
                         <CheckCircle className="mr-2 text-green-500" />{" "}
                         <strong>Country: </strong>
-                        {userAddress.country}
+                        {userAddress?.country}
                       </p>
+                    </div>
+                    <div className="flex gap-4">
+                      <Button
+                        className="w-full bg-indigo-600 hover:bg-indigo-700"
+                        onClick={() => setChangeAddress((prev) => !prev)}
+                      >
+                        Change Address
+                      </Button>
+                      <Button
+                        className="w-full bg-green-600 hover:bg-green-700"
+                        onClick={() => handleAddressSubmit()}
+                      >
+                        {!isPending ? "Confirm Address" : <Spinner />}
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
               ) : (
-                ""
+                <ShippingInfoForm handleAddress={setChangeAddress} />
               )}
 
-              {userPaymentMethod === undefined &&
-              cartItems.length !== 0 &&
-              orderId.trim().length !== 0 ? (
-                <PaymentInfoForm />
-              ) : userPaymentMethod !== undefined &&
-                cartItems.length !== 0 &&
-                orderId.trim().length !== 0 ? (
+              {changePayment ? (
                 <Card className="bg-white shadow-lg rounded-lg overflow-hidden">
                   <CardHeader className="bg-gray-50 border-b border-gray-200">
                     <CardTitle className="text-xl text-gray-800 flex items-center">
@@ -215,28 +277,42 @@ export default function CheckoutPage() {
                       <p className="flex items-center">
                         <CheckCircle className="mr-2 text-green-500" />{" "}
                         <strong>Card Number: </strong>
-                        {userPaymentMethod.cardnumber}
+                        {userPaymentMethod?.cardnumber}
                       </p>
                       <p className="flex items-center">
                         <CheckCircle className="mr-2 text-green-500" />{" "}
                         <strong>Card Name: </strong>
-                        {userPaymentMethod.cardname}
+                        {userPaymentMethod?.cardname}
                       </p>
                       <p className="flex items-center">
                         <CheckCircle className="mr-2 text-green-500" />{" "}
                         <strong>Expiry Date: </strong>
-                        {userPaymentMethod.expirydate}
+                        {userPaymentMethod?.expirydate}
                       </p>
                       <p className="flex items-center">
                         <CheckCircle className="mr-2 text-green-500" />{" "}
                         <strong>Cvv: </strong>
-                        {userPaymentMethod.cvv}
+                        {userPaymentMethod?.cvv}
                       </p>
+                    </div>
+                    <div className="flex gap-4">
+                      <Button
+                        className="w-full bg-indigo-600 hover:bg-indigo-700"
+                        onClick={() => setChangePayment(true)}
+                      >
+                        Change Payment
+                      </Button>
+                      <Button
+                        className="w-full bg-green-600 hover:bg-green-700"
+                        onClick={() => handlePaymentSubmit()}
+                      >
+                        {!pendingPayment ? "Confirm Payment" : <Spinner />}
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
               ) : (
-                ""
+                <PaymentInfoForm handlePayment={setChangePayment} />
               )}
             </div>
 
@@ -286,7 +362,12 @@ export default function CheckoutPage() {
                       className="w-full bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition-colors duration-300 text-lg font-semibold py-6 mt-3"
                       size="lg"
                       onClick={onSubmitPayOrder}
-                      disabled={cartItems.length === 0}
+                      disabled={
+                        cartItems.length === 0 ||
+                        userAddress === undefined ||
+                        userPaymentMethod === undefined ||
+                        orderId.trim().length === 0
+                      }
                     >
                       <DollarSign className="mr-2 h-5 w-5" /> Pay $
                       {totalPrice.toFixed(2)}
