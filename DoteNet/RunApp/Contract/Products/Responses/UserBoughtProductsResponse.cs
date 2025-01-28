@@ -1,4 +1,4 @@
 ﻿namespace Contracts.Products.Responses
 {
-    public record UserBoughtProductsResponse(Guid ProductId, string? ProductImage, decimal ProductPrice, string Name, string Category);
+    public record UserBoughtProductsResponse(Guid ProductId, decimal ProductPrice, string Name, string Category);
 }
