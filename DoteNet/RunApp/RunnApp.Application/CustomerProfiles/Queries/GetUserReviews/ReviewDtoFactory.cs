@@ -1,14 +1,13 @@
 ﻿using RunApp.Domain.ReviewAggregate;
-using RunnApp.Application.CustomerProfiles.Common;
-using RunnApp.Application.Products.Queries.GetProducts;
+using RunApp.Domain.Products;
 
 namespace RunnApp.Application.CustomerProfiles.Queries.GetUserReviews
 {
     public static class ReviewDtoFactory
     {
-        public static IQueryable<ProductImageDto> FromProductsToProductsWithImage(this IQueryable<ProductWithMainImage> products)
+        public static IQueryable<ProductImageDto> FromProductsToProductsDto(this IQueryable<Product> products)
         {
-            return products.Select(x => new ProductImageDto(x.Product.ProductId, x.Product.Name, x.MainImage == null ? null : x.MainImage.Url));
+            return products.Select(x => new ProductImageDto(x.ProductId, x.Name));
         }
         public static List<ReviewWithProductImage> CreateReviewsWithProduct(this List<Review> reviews, List<ProductImageDto> products)
         {

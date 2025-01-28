@@ -20,10 +20,8 @@ namespace RunnApp.Application.CustomerProfiles.Queries.GetUserReviews
 
             var products = _productsRepository.GetBoughtProducts(customer.BoughtProducts);
 
-            var productsWithMainImage = _leftJoinRepository.GetProductsWithImage(products);
-
-            var productsImageDto = productsWithMainImage.FromProductsToProductsWithImage();
-            var productsImage = await _leftJoinRepository.ExecuteQuery(productsImageDto);
+            var productsDto = products.FromProductsToProductsDto();
+            var productsImage = await _leftJoinRepository.ExecuteQuery(productsDto);
 
             var userReviews = await _reviewsRepository.GetUserReviews(customer.Reviews);
 
