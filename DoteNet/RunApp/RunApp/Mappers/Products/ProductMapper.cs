@@ -46,13 +46,13 @@ namespace RunApp.Api.Mappers.Products
                 updateProduct.Price, updateProduct.Bulletpoints,updateProduct.Characteristics.Brand,
                 updateProduct.Characteristics.Type, updateProduct.Characteristics.Color, updateProduct.Characteristics.Weight, productId);
         }
-        public static IEnumerable<UserBoughtProductsResponse> ProductsWithImageToProductsResponse(this IEnumerable<ProductWithMainImage> productWithMainImages)
+        public static IEnumerable<UserBoughtProductsResponse> ProductsWithImageToProductsResponse(this IEnumerable<Product> productWithMainImages)
         {
             return productWithMainImages.Select(x => x.ProductWithImageToProductResponse()).ToList();
         }
-        public static UserBoughtProductsResponse ProductWithImageToProductResponse(this ProductWithMainImage productWithMainImage)
+        public static UserBoughtProductsResponse ProductWithImageToProductResponse(this Product productWithMainImage)
         {
-            return new UserBoughtProductsResponse(productWithMainImage.Product.ProductId, productWithMainImage.MainImage?.Url, productWithMainImage.Product.ActualPrice, productWithMainImage.Product.Name, (productWithMainImage.Product.Categories.Select(x => x.CategoryName).ToArray())[0]);
+            return new UserBoughtProductsResponse(productWithMainImage.ProductId, productWithMainImage.ActualPrice, productWithMainImage.Name, (productWithMainImage.Categories.Select(x => x.CategoryName).ToArray())[0]);
         }
         public static IEnumerable<CreatedProductResponseDto> ProductsWithImageToCreatedProductsResponse(this IEnumerable<ProductWithMainImage> productWithMainImages)
         {
@@ -84,7 +84,7 @@ namespace RunApp.Api.Mappers.Products
         }
         public static LikesWithProductResponse LikeDtoToLikeResponse(this ProductUserLikesDto product)
         {
-            return new LikesWithProductResponse(product.Product?.Product.ProductId, product.Product?.Product.Name, product.Product?.MainImage?.Url, product.Product?.Product.ActualPrice, product.ProductStatus.ProductStatusId, product.ProductStatus.Like);
+            return new LikesWithProductResponse(product.Product?.ProductId, product.Product?.Name, product.Product?.ActualPrice, product.ProductStatus.ProductStatusId, product.ProductStatus.Like);
         }
         public static int[] FromQueryStarValuesToRequestQuery(this string filterByStars)
         {
