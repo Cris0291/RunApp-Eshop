@@ -7,10 +7,12 @@ export default function useGetUserProfileLikes() {
     isLoading: loadingLikes,
     error: errorLikes,
     isError: isErrorLike,
+    refetch: likesFetch,
   } = useQuery({
     queryKey: ["userLikes"],
     queryFn: () => GetUserLikedProducts(),
+    enabled: false,
   });
 
-  return { userLikes, loadingLikes, errorLikes, isErrorLike };
+  return { userLikes, loadingLikes, errorLikes, isErrorLike, likesFetch };
 }

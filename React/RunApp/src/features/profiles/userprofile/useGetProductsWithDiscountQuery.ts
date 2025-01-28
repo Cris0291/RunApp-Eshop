@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export default function useGetProductsWithDiscountQuery() {
   const {
-    data: productsWithDiscount,
+    data: products,
     isLoading: loadingProductsWithDiscount,
     error,
     isError,
@@ -12,5 +12,5 @@ export default function useGetProductsWithDiscountQuery() {
     queryFn: () => getProductsWithDiscount(),
   });
 
-  return { productsWithDiscount, loadingProductsWithDiscount, error, isError };
+  return { products, loadingProductsWithDiscount, error, isError };
 }

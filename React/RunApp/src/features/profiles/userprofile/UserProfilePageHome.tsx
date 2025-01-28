@@ -1,5 +1,3 @@
-"use client";
-
 import { Heart, ShoppingCart, Star } from "lucide-react";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,32 +19,31 @@ import useGetuserBoughtProducts from "./useGetUserBoughtProducts";
 import useAddOrRemoveLikeHook from "@/hooks/useAddOrRemoveLikeHook";
 import MapCategories from "@/services/categoryMapper";
 import SearchBar from "@/ui/SearchBar";
-import AnimatedButton from "@/ui/AnimatedButton";
-import { useAppDispatch } from "@/hooks/reduxHooks";
-import { setSearch } from "../../store/products/productsQuerySlice";
-import { UserBoughtProducts, UserLikes, UserReviews } from "./contracts";
-import NoImagePlaceholder from "@/ui/NoImagePlaceholder";
-import FailureSpan from "@/ui/FailureSpan";
 import NoProductsFound from "@/ui/NoProductsFound";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 
 function UserProfilePageHome() {
+  const [activeTab, setActiveTab] = useState("liked");
   const [unliked, setUnliked] = useState(false);
   const [key, setKey] = useState<string>();
-  const { userReviews, loadingReviews, errorReviews, isErrorReview } =
-    useGetUserProfileReviews();
+  const {
+    userReviews,
+    loadingReviews,
+    errorReviews,
+    isErrorReview,
+    reviewsFetch,
+  } = useGetUserProfileReviews();
   const {
     userBoughtProducts,
+    boughtFetch,
     loadingProducts,
     errorBoughtProducts,
     isErrorBoughtProduct,
   } = useGetuserBoughtProducts();
-  const { userLikes, loadingLikes, errorLikes, isErrorLike } =
+  const { userLikes, loadingLikes, errorLikes, isErrorLike, likesFetch } =
     useGetUserProfileLikes();
   const { updateReviewsMutation, updatingReviews } = useUpdateUserReview();
   const { AddOrRemoveLikeMutation } = useAddOrRemoveLikeHook();
-  const dispatch = useAppDispatch();
-  let navigate = useNavigate();
 
   const handleReviewUpdate = ({
     sentiment,
@@ -55,14 +52,10 @@ function UserProfilePageHome() {
     rating,
   }: {
     sentiment: string;
-    reviewId?: string;
+    reviewId: string;
     content: string;
     rating: number;
   }) => {
-    if (reviewId === undefined)
-      throw new Error(
-        "Product id was undefined. Something unexpected happened"
-      );
     const reviewDto = {
       comment: content,
       reviewDescription: sentiment,
@@ -75,96 +68,36 @@ function UserProfilePageHome() {
     productId,
     like,
   }: {
-    productId?: string;
+    productId: string;
     like: boolean;
   }) => {
-    if (productId === undefined)
-      throw new Error(
-        "Product id was undefined. Something unexpected happened"
-      );
     AddOrRemoveLikeMutation({ liked: like, productId: productId });
   };
 
-  const handleSearch = (searchTerm: string) => {
-    dispatch(
-      setSearch({
-        sortBy: "",
-        search: searchTerm,
-        categories: [],
-        priceRange: [],
-        starFilters: [],
-      })
-    );
-    navigate("/products");
-  };
-
-  const userReviews1: UserReviews[] | undefined = [
-    {
-      productId: "1",
-      productName: "Wireless Earbuds",
-      productImage: "/placeholder.svg?height=50&width=50",
-      comment: "test",
-      rating: 4,
-      reviewDate: "14/07/2027",
-      reviewDescription: "another test",
-      reviewId: "1",
-    },
-    {
-      productId: undefined,
-      productName: undefined,
-      productImage: undefined,
-      rating: 5,
-      reviewDate: "14/07/2027",
-      reviewDescription: "another test",
-      reviewId: "1",
-      comment: "test",
-    },
-  ];
-
-  const userBoughtProducts1: UserBoughtProducts[] | undefined = [
-    {
-      productId: "1",
-      name: "Wireless Earbuds",
-      productPrice: 79.99,
-      productImage: "/placeholder.svg?height=50&width=50",
-      category: "Yoga",
-    },
-    {
-      productId: "2",
-      name: "Smart Watch",
-      productPrice: 199.99,
-      productImage: undefined,
-      category: "swimming",
-    },
-  ];
-
-  const userLikes1: UserLikes[] | undefined = [
-    {
-      productId: "1",
-      productName: "Wireless Earbuds",
-      productPrice: 79.99,
-      productImage: "/placeholder.svg?height=50&width=50",
-      likeId: "4",
-      like: true,
-    },
-    {
-      productId: undefined,
-      productName: undefined,
-      productPrice: undefined,
-      productImage: undefined,
-      likeId: "5",
-      like: false,
-    },
-  ];
+  switch (activeTab) {
+    case "liked":
+      likesFetch();
+      break;
+    case "reviewed":
+      reviewsFetch();
+      break;
+    case "bought":
+      boughtFetch();
+      break;
+  }
 
   return (
     <div className="container mx-auto space-y-6">
       <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-md">
-        <SearchBar onSearch={(search: string) => handleSearch(search)} />
-        <AnimatedButton size="md" />
+        <SearchBar />
       </div>
 
-      <Tabs defaultValue="liked" className="space-y*4">
+      <Tabs
+        defaultValue="liked"
+        className="space-y*4"
+        value={activeTab}
+        onValueChange={setActiveTab}
+      >
         <TabsList className="bg-black p-1 rounded-lg shadow-md sm:w-full md:w-1/2">
           <TabsTrigger
             value="liked"
@@ -191,54 +124,26 @@ function UserProfilePageHome() {
         >
           {loadingLikes ? (
             <SpinnerCard />
-          ) : userLikes1 !== undefined && !isErrorLike ? (
+          ) : userLikes !== undefined && !isErrorLike ? (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px]">Image</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead className="text-right">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {userLikes1.map((product) => (
-                  <TableRow
-                    key={
-                      product.productId === undefined
-                        ? "NOKEY"
-                        : product.productId
-                    }
-                  >
-                    <TableCell>
-                      {product.productImage === undefined ? (
-                        <NoImagePlaceholder />
-                      ) : (
-                        <img
-                          src={product.productImage}
-                          alt={product.productName}
-                          className="w-12 h-12  object-cover rounded-md"
-                        />
-                      )}
+                {userLikes.map((product) => (
+                  <TableRow key={product.productId}>
+                    <TableCell className="font-medium text-black">
+                      {product.productName}
                     </TableCell>
                     <TableCell className="font-medium text-black">
-                      {product.productName === undefined ? (
-                        <FailureSpan />
-                      ) : (
-                        product.productName
-                      )}
-                    </TableCell>
-                    <TableCell className="font-medium text-black">
-                      {product.productPrice === undefined ? (
-                        <FailureSpan />
-                      ) : (
-                        product.productPrice
-                      )}
+                      {product.productPrice}
                     </TableCell>
                     <TableCell className="text-right">
-                      {product.productId === undefined ? (
-                        <FailureSpan />
-                      ) : (
+                      {
                         <Button
                           variant="outline"
                           size="sm"
@@ -259,7 +164,7 @@ function UserProfilePageHome() {
                           <Heart className="mr-2 h-4 w-4" />
                           Unlike
                         </Button>
-                      )}
+                      }
                     </TableCell>
                   </TableRow>
                 ))}
@@ -275,11 +180,10 @@ function UserProfilePageHome() {
         >
           {loadingReviews ? (
             <SpinnerCard />
-          ) : userReviews1 !== undefined && !isErrorReview ? (
+          ) : userReviews !== undefined && !isErrorReview ? (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px]">Image</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Review Date</TableHead>
                   <TableHead>Review Description</TableHead>
@@ -288,31 +192,10 @@ function UserProfilePageHome() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {userReviews1.map((product) => (
-                  <TableRow
-                    key={
-                      product.productId === undefined
-                        ? "NOKEY"
-                        : product.productId
-                    }
-                  >
-                    <TableCell>
-                      {product.productImage === undefined ? (
-                        <NoImagePlaceholder />
-                      ) : (
-                        <img
-                          src={product.productImage}
-                          alt={product.productName}
-                          className="w-12 h-12  object-cover rounded-md"
-                        />
-                      )}
-                    </TableCell>
+                {userReviews.map((product) => (
+                  <TableRow key={product.productId}>
                     <TableCell className="font-medium text-black">
-                      {product.productName === undefined ? (
-                        <FailureSpan />
-                      ) : (
-                        product.productName
-                      )}
+                      {product.productName}
                     </TableCell>
                     <TableCell className="font-medium text-black">
                       {product.reviewDate}
@@ -335,9 +218,7 @@ function UserProfilePageHome() {
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      {product.productId === undefined ? (
-                        <FailureSpan />
-                      ) : (
+                      {
                         <ReviewForm
                           size="sm"
                           className="border-pink-600 text-pink-600 hover:bg-pink-50"
@@ -361,7 +242,7 @@ function UserProfilePageHome() {
                         >
                           <Star className="mr-2 h-4 w-4" /> Edit Review
                         </ReviewForm>
-                      )}
+                      }
                     </TableCell>
                   </TableRow>
                 ))}
@@ -377,11 +258,10 @@ function UserProfilePageHome() {
         >
           {loadingProducts ? (
             <SpinnerCard />
-          ) : userBoughtProducts1 !== undefined && !isErrorBoughtProduct ? (
+          ) : userBoughtProducts !== undefined && !isErrorBoughtProduct ? (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px]">Image</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>Category</TableHead>
@@ -389,39 +269,16 @@ function UserProfilePageHome() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {userBoughtProducts1.map((product) => (
-                  <TableRow
-                    key={
-                      product.productId === undefined
-                        ? "NOKEY"
-                        : product.productId
-                    }
-                  >
-                    <TableCell>
-                      {product.productImage === undefined ? (
-                        <NoImagePlaceholder />
-                      ) : (
-                        <img
-                          src={product.productImage}
-                          alt={product.name}
-                          className="w-12 h-12  object-cover rounded-md"
-                        />
-                      )}
-                    </TableCell>
+                {userBoughtProducts.map((product) => (
+                  <TableRow key={product.productId}>
                     <TableCell className="font-medium text-black">
                       {product.name}
                     </TableCell>
                     <TableCell className="font-medium text-black">
-                      {product.productPrice === undefined ? (
-                        <FailureSpan />
-                      ) : (
-                        product.productPrice
-                      )}
+                      {product.productPrice}
                     </TableCell>
                     <TableCell>
-                      {product.productId === undefined ? (
-                        <FailureSpan />
-                      ) : (
+                      {
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-semibold ${MapCategories(
                             product.category
@@ -429,7 +286,7 @@ function UserProfilePageHome() {
                         >
                           {product.category}
                         </span>
-                      )}
+                      }
                     </TableCell>
                     <TableCell className="text-right">
                       <Button
@@ -438,14 +295,12 @@ function UserProfilePageHome() {
                         className="bg-green-600 hover:bg-green-700 text-white"
                         asChild
                       >
-                        {product.productId === undefined ? (
-                          <FailureSpan />
-                        ) : (
+                        {
                           <Link to={`/products/${product.productId}`}>
                             Buy Again
                             <ShoppingCart className="ml-2 h-4 w-4" />
                           </Link>
-                        )}
+                        }
                       </Button>
                     </TableCell>
                   </TableRow>

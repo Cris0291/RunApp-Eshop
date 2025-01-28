@@ -15,14 +15,6 @@ export type AddressSettingsForm = {
   country: string;
 };
 
-export type AddressResponse = {
-  street: string;
-  city: string;
-  state: string;
-  zipcode: string;
-  country: string;
-};
-
 export type PaymentSettingsForm = {
   cardnumber: string;
   cardname: string;

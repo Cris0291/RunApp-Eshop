@@ -44,6 +44,7 @@ import useUpdateOrCreatePaymentInfo from "./useUpdateOrCreatePaymentInfo";
 import toast from "react-hot-toast";
 import ProductLoadingCard from "@/ui/ProductLoadingCard";
 import UserInfoErrorCard from "@/ui/UserInfoErrorCard";
+import Cookies from "js-cookie";
 
 export default function UserSettingsPage() {
   const { userInfo, isLoading, error, isError } = useGetUserAccountInfo();
@@ -211,6 +212,14 @@ export default function UserSettingsPage() {
     updateUserAccountInfo(data, {
       onSuccess: (data) => {
         toast.success("User account info was updated");
+        Cookies.set(
+          "Session",
+          JSON.stringify({
+            name: data.name,
+            email: data.email,
+            userName: data.nickname,
+          })
+        );
         dispatch(
           updateUser({
             name: data.name,
@@ -229,7 +238,7 @@ export default function UserSettingsPage() {
     });
   };
   const onPasswordSubmit: SubmitHandler<PasswordSettingsForm> = (data) => {
-    const mail = getAccountValues("oldemail");
+    const mail = userInfo === undefined ? "" : userInfo.email;
 
     const newPassword = {
       oldpassword: data.oldpassword,
@@ -248,8 +257,9 @@ export default function UserSettingsPage() {
     updateOrCreateAddress(
       { addressInfo: data, wasCreated },
       {
-        onSuccess: () => {
+        onSuccess: (data) => {
           toast.success("User address was updated");
+          Cookies.set("Address", JSON.stringify(data));
           addressReset();
           queryClient.invalidateQueries({
             queryKey: ["userInfo"],
@@ -266,8 +276,9 @@ export default function UserSettingsPage() {
     updateOrCreatePayment(
       { paymentInfo: data, wasCreated },
       {
-        onSuccess: () => {
+        onSuccess: (data) => {
           toast.success("User payment info was updated");
+          Cookies.set("Payment", JSON.stringify(data));
           paymentReset();
           queryClient.invalidateQueries({
             queryKey: ["userInfo"],

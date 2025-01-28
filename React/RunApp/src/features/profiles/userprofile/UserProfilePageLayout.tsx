@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Tooltip,
   TooltipContent,
@@ -26,9 +24,7 @@ import {
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import UserProfileLayoutWrapper from "./UserProfileLayoutWrapper";
-import { useAppDispatch } from "@/hooks/reduxHooks";
-import { clearUser } from "../../registration/userSlice";
-import { useNavigate } from "react-router";
+import { useAuth } from "@/utils/AuhtProvider";
 
 const navItems = [
   { name: "Dashboard", icon: Home },
@@ -39,16 +35,10 @@ const navItems = [
 
 export default function UserProfilePageLayout() {
   const [activeLink, setActiveLink] = useState("Dashboard");
-  const dispatch = useAppDispatch();
-  let navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleActiveLink = (newLink: string) => {
     setActiveLink(newLink);
-  };
-
-  const logoutUser = () => {
-    dispatch(clearUser());
-    navigate("/login");
   };
 
   return (
@@ -66,7 +56,7 @@ export default function UserProfilePageLayout() {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
                     <LogOut className="mr-2 h-4 w-4" />
-                    <Button onClick={logoutUser}>Log out</Button>
+                    <Button onClick={logout}>Log out</Button>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
