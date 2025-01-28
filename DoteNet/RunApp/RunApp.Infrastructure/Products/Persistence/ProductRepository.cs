@@ -49,7 +49,7 @@ namespace RunApp.Infrastructure.Products.Persistence
         {
             var boughtProductsSet = boughtProducts.ToHashSet();
 
-            return _appDbContext.Products.Where(x => boughtProductsSet.Contains(x.ProductId));
+            return _appDbContext.Products.Include(x => x.Categories).Where(x => boughtProductsSet.Contains(x.ProductId));
         }
         public IQueryable<Product> GetCreatedProducts(List<Guid> createdProdcucts)
         {

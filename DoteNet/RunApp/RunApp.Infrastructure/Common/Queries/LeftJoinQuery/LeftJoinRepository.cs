@@ -22,13 +22,12 @@ namespace RunApp.Infrastructure.Common.Queries.LeftJoinQuery
         {
             IQueryable<ProductStatus> productStatus = _appStoreDbContext.ProductStatuses.Where(x => x.Id == UserId);
             IQueryable<Product> products = _appStoreDbContext.Products;
-            IQueryable<ProductWithMainImage>  productsWithImage = GetProductsWithImage(products);
             Expression<Func<ProductStatus, Guid>> statusKey = (productStatus) => productStatus.ProductId;
-            Expression<Func<ProductWithMainImage, Guid>> productKey = (product) => product.Product.ProductId;
-            Expression<Func<ProductStatus, ProductWithMainImage?, ProductUserLikesDto>> resultSelector = (productStatus, product) => new ProductUserLikesDto { Product = product, ProductStatus = productStatus };
+            Expression<Func<Product, Guid>> productKey = (product) => product.ProductId;
+            Expression<Func<ProductStatus, Product?, ProductUserLikesDto>> resultSelector = (productStatus, product) => new ProductUserLikesDto { Product = product, ProductStatus = productStatus };
 
 
-            return productStatus.CreateOuterJoinQuery(productsWithImage, statusKey, productKey, resultSelector);
+            return productStatus.CreateOuterJoinQuery(products, statusKey, productKey, resultSelector);
             
         }
         public IQueryable<ProductsJoin> GetProductsAndStatusLeftJoin(Guid UserId, IQueryable<ProductForCard> products)
