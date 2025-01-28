@@ -17,20 +17,10 @@ import useGetProductQuery from "./useGetProductQuery";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import ReviewForm from "../../../ui/ReviewForm";
 import useCreateReviewCommand from "./useCreateReviewCommand";
-import {
-  getUserAddress,
-  getUserPaymentMethod,
-} from "../../registration/userSlice";
 import LikeButton from "@/ui/LikeButton";
 import useAddOrRemoveLikeHook from "@/hooks/useAddOrRemoveLikeHook";
-import useCreateOrderOrAddItem from "@/utils/useCreateOrderOrAddItem";
-import {
-  addError,
-  getIsCurrentOrder,
-  getOrderError,
-} from "../../payment/checkout/orderSlice";
+import { addError, getOrderError } from "../../payment/checkout/orderSlice";
 import StatusPopup from "@/ui/SatusPopup";
-import { Product, Review } from "./contracts";
 import ProductNotFound from "@/ui/ProductNotFound";
 import NoImagePlaceholder from "@/ui/NoImagePlaceholder";
 import { iconsForCategories } from "@/utils/categories";
@@ -43,11 +33,11 @@ import ProductLoadingCard from "@/ui/ProductLoadingCard";
 import toast from "react-hot-toast";
 import {
   addCartError,
+  addItem,
   getCartError,
 } from "../../payment/shoppingcart/cartSlice";
-import { setSearch } from "../products/productsQuerySlice";
 import HeaderProducts from "../products/HeaderProducts";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation } from "react-router";
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -67,6 +57,7 @@ function StarRating({ rating }: { rating: number }) {
 export default function ProductDisplay() {
   const { pathname } = useLocation();
   const productIdArray = pathname.split("/");
+  console.log(productIdArray);
   const productId = productIdArray[productIdArray.length - 1];
   const { isLoading, product, error, isGetProductError } =
     useGetProductQuery(productId);
@@ -75,12 +66,8 @@ export default function ProductDisplay() {
   const [quantity, setQuantity] = useState(1);
   const [isAddedTocart, setIsAddedToCart] = useState(false);
   const [isError, setIsError] = useState(false);
-  const createOrderOrAddItem = useCreateOrderOrAddItem();
   const dispatch = useAppDispatch();
   const [currentReviewsPage, setCurrentReviewsPage] = useState(1);
-  const existOrder = useAppSelector(getIsCurrentOrder);
-  const userAddress = useAppSelector(getUserAddress);
-  const userPaymentMethod = useAppSelector(getUserPaymentMethod);
   const isBoughtProduct = useAppSelector(getIsProductBought(productId));
   const isBoughtProductHasReview = useAppSelector(
     getIsProductBoughtAndHasReview(productId)
@@ -88,8 +75,6 @@ export default function ProductDisplay() {
   const { updateReviewsMutation, updatingReviews } = useUpdateUserReview();
   const cartError = useAppSelector(getCartError);
   const orderError = useAppSelector(getOrderError);
-  const [searchProduct, setSearchProduct] = useState("");
-  let navigate = useNavigate();
   const reviewsPerPage = 5;
 
   useEffect(() => {
@@ -114,12 +99,12 @@ export default function ProductDisplay() {
   const initialIndex = 0;
 
   const currentReviews =
-    product !== undefined && product.reviews !== undefined
+    product !== undefined && product.reviews !== null
       ? product.reviews.slice(initialIndex, lastIndex)
       : [];
 
   const isRendered =
-    product !== undefined && product.reviews !== undefined
+    product !== undefined && product.reviews !== null
       ? lastIndex < product.reviews.length
       : 0;
 
@@ -135,12 +120,7 @@ export default function ProductDisplay() {
       };
 
       if (!isNaN(quantity) && quantity !== 0) {
-        createOrderOrAddItem(
-          productForCart,
-          existOrder,
-          userAddress,
-          userPaymentMethod
-        );
+        dispatch(addItem(productForCart));
         setIsAddedToCart(true);
       } else {
         setIsError(true);
@@ -193,34 +173,12 @@ export default function ProductDisplay() {
     }
   };
 
-  const handleSearch = (search: string) => {
-    setSearchProduct(search);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    dispatch(
-      setSearch({
-        sortBy: "",
-        search: searchProduct,
-        categories: [],
-        priceRange: [],
-        starFilters: [],
-      })
-    );
-    navigate("/products");
-  };
-
   return isLoading ? (
     <ProductLoadingCard />
   ) : product !== undefined && !isGetProductError ? (
     <div className="min-h-screen bg-gradient-to-br from-white to-pink-50">
       <div>
-        <HeaderProducts
-          handleSearch={handleSearch}
-          search={searchProduct}
-          handleSubmit={handleSubmit}
-        />
+        <HeaderProducts />
         <Card className="overflow-hidden bg-white shadow-xl hover:shadow-2xl transition-shadow duration-300">
           <CardContent className="p-6 sm:p-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -429,7 +387,7 @@ export default function ProductDisplay() {
 
                   {/* Individual Reviews */}
                   <div className="space-y-6">
-                    {product.reviews === undefined ? (
+                    {currentReviews === null ? (
                       <Card className="w-full max-w-md mx-auto">
                         <CardContent className="flex flex-col items-center justify-center p-6">
                           <MessageSquare className="w-12 h-12 text-gray-400 mb-4" />
@@ -442,7 +400,7 @@ export default function ProductDisplay() {
                         </CardContent>
                       </Card>
                     ) : (
-                      product.reviews.map((review) => (
+                      currentReviews.map((review) => (
                         <div
                           key={review.reviewId}
                           className="border-t border-gray-200 pt-6 group"

@@ -1,15 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useGlobal } from "@/utils/GlobalProvider";
 import { Dumbbell, Search, ShoppingCart, User } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
-interface Props {
-  handleSearch: (search: string) => void;
-  search: string;
-  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-}
+function HeaderProducts() {
+  const navigate = useNavigate();
+  const { searchQuery, setSearchQuery } = useGlobal();
 
-function HeaderProducts({ handleSearch, search, handleSubmit }: Props) {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate("/products");
+  };
   return (
     <header className="bg-white shadow-sm">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -25,8 +27,8 @@ function HeaderProducts({ handleSearch, search, handleSubmit }: Props) {
                 className="pl-10 pr-4 py-2 w-full text-black"
                 placeholder="Search for fitness products..."
                 type="search"
-                value={search}
-                onChange={(e) => handleSearch(e.target.value)}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </form>
           </div>

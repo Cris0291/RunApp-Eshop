@@ -24,9 +24,9 @@ export type ProductForCard = {
 export type ProductForCardWithDiscount = {
   productId: string;
   productName: string;
-  image?: string;
+  image: string | null;
   price: number;
-  discount?: number;
-  priceWithDiscount: number | undefined;
+  discount: number | null;
+  priceWithDiscount: number | null;
   size: string;
 };
