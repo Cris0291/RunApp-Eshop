@@ -8,17 +8,29 @@ import {
   PaymentResponse,
   PaymentSettingsForm,
 } from "../payment/checkout/contracts";
+import Cookies from "js-cookie";
 
-const initData = localStorage.getItem("userSession");
-const userSession: UserSession =
-  initData !== null ? JSON.parse(initData) : null;
+const initData = Cookies.get("Session");
+const userSession: UserSession | undefined = initData
+  ? JSON.parse(initData)
+  : undefined;
+
+const addressDataText = Cookies.get("Address");
+const addressData: AddressSettingsForm | undefined = addressDataText
+  ? JSON.parse(addressDataText)
+  : undefined;
+
+const paymentText = Cookies.get("Payment");
+const paymentData: PaymentSettingsForm | undefined = paymentText
+  ? JSON.parse(paymentText)
+  : undefined;
 
 const initialState: UserWithSettingsDto = {
-  name: userSession === null ? "" : userSession.name,
-  userName: userSession === null ? "" : userSession.userName,
-  email: userSession === null ? "" : userSession.email,
-  address: undefined,
-  card: undefined,
+  name: userSession ? userSession.name : "",
+  userName: userSession ? userSession.userName : "",
+  email: userSession ? userSession.email : "",
+  address: addressData ? addressData : undefined,
+  card: paymentData ? paymentData : undefined,
 };
 
 export const userSlice = createSlice({
@@ -60,7 +72,5 @@ export const { setUser, updateUser, addUserAddress, addUserCard, clearUser } =
 
 export default userSlice.reducer;
 
-export const getUserConfirmationOfRegistration = (state: RootState) =>
-  state.user.name !== "" && localStorage.getItem("tokenModel") !== null;
 export const getUserAddress = (state: RootState) => state.user.address;
 export const getUserPaymentMethod = (state: RootState) => state.user.card;
