@@ -9,9 +9,13 @@ import {
   updateItemQuantity,
 } from "@/services/apiCart";
 import { ExistProduct } from "@/services/apiProduct";
-import { addOrderId } from "../checkout/orderSlice";
-import { GetCurrentOrder } from "@/services/apiOrders";
-import { AxiosError } from "axios";
+import Cookies from "js-cookie";
+import { OrderItems } from "../checkout/contracts";
+
+const currentOrderText = Cookies.get("Order");
+const orderCookie: OrderItems | undefined = currentOrderText
+  ? JSON.parse(currentOrderText)
+  : undefined;
 
 type cartState = {
   products: ProductForLineItem[];
@@ -21,7 +25,7 @@ type cartState = {
 };
 
 const initialState: cartState = {
-  products: [],
+  products: orderCookie ? orderCookie.items : [],
   currentProducId: "",
   pendingProductIfOrderDoesNotExist: undefined,
   cart_error: undefined,
@@ -39,22 +43,42 @@ export const cartSlice = createSlice({
       state.currentProducId = action.payload;
       state.products = state.products.filter((x) => x.id !== action.payload);
     },
+    deleteItemWithoutListening: (state, action: PayloadAction<string>) => {
+      state.currentProducId = action.payload;
+      state.products = state.products.filter((x) => x.id !== action.payload);
+
+      const currentOrderText = Cookies.get("Order");
+      const orderCookie: OrderItems | undefined = currentOrderText
+        ? JSON.parse(currentOrderText)
+        : undefined;
+
+      if (orderCookie) {
+        orderCookie.items = orderCookie.items.filter(
+          (item) => item.id !== state.currentProducId
+        );
+        Cookies.set("Order", JSON.stringify(orderCookie));
+      }
+    },
     increaseItemQuantity: (state, action: PayloadAction<string>) => {
       try {
+        console.log("cart1");
         const product = state.products.find((x) => x.id === action.payload);
         if (product == undefined) throw new Error("Cart item was not found");
+        console.log("cart2");
         if (product.quantity === null)
           throw new Error("Quantity should not be undefined");
-
+        console.log("cart3");
         state.currentProducId = product.id;
         product.quantity += 1;
 
         product.totalPrice =
           product.quantity *
-          (product.priceWithDiscount === undefined
+          (product.priceWithDiscount === null
             ? product.price
             : product.priceWithDiscount);
+        console.log("cart4");
       } catch (error) {
+        console.log("carts5");
         state.cart_error =
           "There was a problem with the item selected and the quantity you are trying to increase";
       }
@@ -71,7 +95,7 @@ export const cartSlice = createSlice({
 
         product.totalPrice =
           product.quantity *
-          (product.priceWithDiscount === undefined
+          (product.priceWithDiscount === null
             ? product.price
             : product.priceWithDiscount);
 
@@ -79,7 +103,7 @@ export const cartSlice = createSlice({
           product.quantity = 1;
           product.totalPrice =
             product.quantity *
-            (product.priceWithDiscount === undefined
+            (product.priceWithDiscount === null
               ? product.price
               : product.priceWithDiscount);
         }
@@ -103,7 +127,7 @@ export const cartSlice = createSlice({
         product.quantity = action.payload.newQuantity;
         product.totalPrice =
           product.quantity *
-          (product.priceWithDiscount === undefined
+          (product.priceWithDiscount === null
             ? product.price
             : product.priceWithDiscount);
 
@@ -111,7 +135,7 @@ export const cartSlice = createSlice({
           product.quantity = 1;
           product.totalPrice =
             product.quantity *
-            (product.priceWithDiscount === undefined
+            (product.priceWithDiscount === null
               ? product.price
               : product.priceWithDiscount);
         }
@@ -124,12 +148,6 @@ export const cartSlice = createSlice({
         state.cart_error =
           "There was a problem with the item selected and the quantity you are trying to change";
       }
-    },
-    addPendingProduct: (state, action: PayloadAction<ProductForLineItem>) => {
-      state.pendingProductIfOrderDoesNotExist = action.payload;
-    },
-    deletePendingProduct: (state) => {
-      state.pendingProductIfOrderDoesNotExist = undefined;
     },
     clearCart: (state) => {
       state.products = [];
@@ -151,11 +169,10 @@ export const {
   increaseItemQuantity,
   decreaseItemQuantity,
   changeItemQuantity,
-  addPendingProduct,
-  deletePendingProduct,
   clearCart,
   addCartError,
   addCurrentItems,
+  deleteItemWithoutListening,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
@@ -163,9 +180,7 @@ export default cartSlice.reducer;
 export const getTotalPrice = (state: RootState) =>
   state.cart.products.reduce((sum, item) => {
     const priceToReduce =
-      item.priceWithDiscount === undefined
-        ? item.price
-        : item.priceWithDiscount;
+      item.priceWithDiscount === null ? item.price : item.priceWithDiscount;
     const quantityPeritem = item.quantity === null ? 0 : item.quantity;
     return sum + priceToReduce * quantityPeritem;
   }, 0);
@@ -193,40 +208,56 @@ export const addChangeQuantityListener = (
       try {
         listenerApi.cancelActiveListeners();
 
-        await listenerApi.delay(500);
+        await listenerApi.delay(1000);
 
         const state = listenerApi.getState();
 
         const cartState = state.cart;
         const orderState = state.order;
-
+        console.log("cart6");
         const product = cartState.products.find(
           (x) => x.id === cartState.currentProducId
         );
+        console.log("cart7");
         if (product == undefined) throw new Error("Cart item was not found");
         if (orderState.currentOrderId.trim().length === 0)
           throw new Error("Something unexpected happened, order was not added");
-
-        const result = await ExistProduct({
-          productId: cartState.currentProducId,
-        });
+        console.log("cart8");
+        const result = await ExistProduct(cartState.currentProducId);
+        console.log("cart9");
         if (result !== 200)
           throw new Error(
             "Testing. Requested item was not find in the database"
           );
-
+        console.log("cart10");
         if (product.quantity !== null)
           await updateItemQuantity({
             orderId: orderState.currentOrderId,
             productId: cartState.currentProducId,
             quantity: product.quantity,
           });
+        console.log("cart11");
+        const currentOrderText = Cookies.get("Order");
+        const orderCookie: OrderItems | undefined = currentOrderText
+          ? JSON.parse(currentOrderText)
+          : undefined;
+        console.log("cart12");
+        if (orderCookie) {
+          orderCookie.items = orderCookie.items.map((item) => {
+            if (item.id === cartState.currentProducId) {
+              item.quantity = product.quantity;
+              item.totalPrice = product.totalPrice;
+              return item;
+            } else {
+              return item;
+            }
+          });
+          console.log("cart13");
+          Cookies.set("Order", JSON.stringify(orderCookie));
+          console.log("cart14");
+        }
       } catch (error) {
-        listenerApi.dispatch(
-          addCartError(
-            "There was error while permorming an action on the new quantity"
-          )
-        );
+        console.log("cart15");
       }
     },
   });
@@ -236,38 +267,43 @@ export const addItemListener = (startAppListening: AppStartListening) => {
   startAppListening({
     actionCreator: addItem,
     effect: async (action, listenerApi) => {
+      const state = listenerApi.getState();
+
+      const cartState = state.cart;
+      const orderState = state.order;
       try {
-        const state = listenerApi.getState();
-
-        const cartState = state.cart;
-
         const product = cartState.products.find(
           (x) => x.id === cartState.currentProducId
         );
         if (product == undefined) throw new Error("Cart item was not found");
 
-        const result = await ExistProduct({
-          productId: cartState.currentProducId,
-        });
-
+        const result = await ExistProduct(cartState.currentProducId);
         if (result !== 200)
           throw new Error(
             "Testing. Requested item was not find in the database"
           );
 
-        const order = await GetCurrentOrder();
-        if (order instanceof AxiosError)
-          throw new Error("Current order could not be fetched");
-
-        if (order.order === undefined)
-          throw new Error("Current order was not found");
+        if (orderState.currentOrderId.trim().length === 0)
+          throw new Error("Something unexpected happened, order was not added");
 
         await addItemToCart({
           productForCart: product,
-          orderId: order.order.OrderId,
+          orderId: orderState.currentOrderId,
         });
-        listenerApi.dispatch(addOrderId(order.order.OrderId));
+
+        const currentOrderText = Cookies.get("Order");
+        const orderCookie: OrderItems | undefined = currentOrderText
+          ? JSON.parse(currentOrderText)
+          : undefined;
+
+        if (orderCookie) {
+          orderCookie.items = [...orderCookie.items, product];
+          Cookies.set("Order", JSON.stringify(orderCookie));
+        }
       } catch (error) {
+        listenerApi.dispatch(
+          deleteItemWithoutListening(cartState.currentProducId)
+        );
         listenerApi.dispatch(
           addCartError(
             "There was error while permorming an action on the new item"
@@ -288,9 +324,7 @@ export const deleteItemListener = (startAppListening: AppStartListening) => {
         const cartState = state.cart;
         const orderState = state.order;
 
-        const result = await ExistProduct({
-          productId: cartState.currentProducId,
-        });
+        const result = await ExistProduct(cartState.currentProducId);
         if (result !== 200)
           throw new Error(
             "Testing. Requested item was not find in the database"
@@ -301,8 +335,20 @@ export const deleteItemListener = (startAppListening: AppStartListening) => {
 
         await deleteItemToCart({
           orderId: orderState.currentOrderId,
-          DeleteItemDto: { ProductId: cartState.currentProducId },
+          productId: cartState.currentProducId,
         });
+
+        const currentOrderText = Cookies.get("Order");
+        const orderCookie: OrderItems | undefined = currentOrderText
+          ? JSON.parse(currentOrderText)
+          : undefined;
+
+        if (orderCookie) {
+          orderCookie.items = orderCookie.items.filter(
+            (item) => item.id !== cartState.currentProducId
+          );
+          Cookies.set("Order", JSON.stringify(orderCookie));
+        }
       } catch (error) {
         listenerApi.dispatch(
           addCartError(

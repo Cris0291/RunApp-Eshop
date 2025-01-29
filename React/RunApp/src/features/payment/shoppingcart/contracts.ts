@@ -1,37 +1,37 @@
 export type ProductForCart = {
-    id: string,
-    name: string,
-    quantity: number | null,
-    price: number,
-    priceWithDiscount: number | undefined,
-    totalPrice: number,
-    image?: string
-}
+  id: string;
+  name: string;
+  quantity: number | null;
+  price: number;
+  priceWithDiscount: number | null;
+  totalPrice: number;
+  image?: string;
+};
 
 export type ProductForLineItem = {
-    id: string,
-    name: string,
-    quantity: number | null,
-    price: number,
-    priceWithDiscount: number | undefined,
-    totalPrice: number,
-}
+  id: string;
+  name: string;
+  quantity: number | null;
+  price: number;
+  priceWithDiscount: number | null;
+  totalPrice: number;
+};
 
 export type CartProductsResponse = {
-    productId: string,
-    lineItemId: string,
-    name: string,
-    quantity: number,
-    price: number,
-    priceWithDiscount: number | undefined,
-    totalPrice: number,
-}
+  productId: string;
+  lineItemId: string;
+  name: string;
+  quantity: number;
+  price: number;
+  priceWithDiscount: number | null;
+  totalPrice: number;
+};
 
-export type DeleteItemDto ={
-    ProductId: string
-}
+export type DeleteItemDto = {
+  ProductId: string;
+};
 
 export type ChangeItemQuantityRequestDto = {
-    quantity: number,
-    productId: string
-}
+  quantity: number;
+  productId: string;
+};

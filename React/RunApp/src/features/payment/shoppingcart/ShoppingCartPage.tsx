@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,15 +22,11 @@ import {
   getTotalPrice,
   increaseItemQuantity,
 } from "./cartSlice";
-import Spinner from "@/ui/Spinner";
-import { setSearch } from "../../store/products/productsQuerySlice";
 import HeaderProducts from "../../store/products/HeaderProducts";
 import { useNavigate } from "react-router";
 
 function ShoppingCartPage() {
-  const [isRedirected, setIsRedirected] = useState(false);
-  const [searchProduct, setSearchProduct] = useState("");
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   const dispatch = useAppDispatch();
   const cartItems = useAppSelector(getCartItems);
@@ -50,43 +44,19 @@ function ShoppingCartPage() {
 
   const handleCheckout = () => {
     if (cartItems.length > 0) {
-      navigate("checkout");
+      navigate("/orders/checkout");
     } else {
       navigate("/products");
     }
-    setIsRedirected(true);
   };
 
   const handleEmptyCart = () => {
-    navigate("/products");
-    setIsRedirected(true);
-  };
-
-  const handleSearch = (search: string) => {
-    setSearchProduct(search);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    dispatch(
-      setSearch({
-        sortBy: "",
-        search: searchProduct,
-        categories: [],
-        priceRange: [],
-        starFilters: [],
-      })
-    );
     navigate("/products");
   };
 
   return (
     <div>
-      <HeaderProducts
-        handleSearch={handleSearch}
-        search={searchProduct}
-        handleSubmit={handleSubmit}
-      />
+      <HeaderProducts />
       <Separator />
       <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-100 text-black">
         <h1 className="text-3xl font-bold mb-8 flex items-center text-black">
@@ -99,11 +69,7 @@ function ShoppingCartPage() {
                 className="w-full bg-yellow-400 text-black hover:bg-yellow-500 transition-colors duration-300"
                 onClick={handleEmptyCart}
               >
-                {isRedirected ? (
-                  <Spinner />
-                ) : (
-                  "Your cart is empty!!! Go buy some products"
-                )}
+                "Your cart is empty!!! Go buy some products"
               </Button>
             </CardContent>
           </Card>
@@ -120,7 +86,7 @@ function ShoppingCartPage() {
                       {item.name}
                     </h2>
                     <div className="flex justify-start items-center gap-2">
-                      {item.priceWithDiscount === undefined ? (
+                      {item.priceWithDiscount === null ? (
                         <p className="font-semibold text-lg text-yellow-500">
                           $
                           {(
@@ -227,13 +193,9 @@ function ShoppingCartPage() {
                     onClick={handleCheckout}
                     disabled={cartItems.length === 0}
                   >
-                    {isRedirected ? (
-                      <Spinner />
-                    ) : cartItems.length > 0 ? (
-                      "Proceed to Checkout"
-                    ) : (
-                      "Your cart is empty!!! Go buy some products"
-                    )}
+                    {cartItems.length > 0
+                      ? "Proceed to Checkout"
+                      : "Your cart is empty!!! Go buy some products"}
                   </Button>
                 </CardFooter>
               </Card>

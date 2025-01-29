@@ -97,17 +97,18 @@ export default function CheckoutPage() {
   }, [orderError]);
 
   const handleAddressSubmit = () => {
+    console.log(orderId);
     if (orderId.trim().length === 0) {
       toast.error(
         "No order was created. Please add your personal info in the settings page"
       );
-      navigate("/userprofile/settings");
+      navigate("/userprofile");
     }
     if (userAddress === undefined) {
       toast.error(
         "No order was created. Please add your personal info in the settings page"
       );
-      navigate("/userprofile/settings");
+      navigate("/userprofile");
     }
     if (userAddress !== undefined) {
       updateOrderAddress(
@@ -124,14 +125,14 @@ export default function CheckoutPage() {
       toast.error(
         "No order was created. Please add your personal info inthe settings page"
       );
-      navigate("/userprofile/settings");
+      navigate("/userprofile");
     }
 
     if (userPaymentMethod === undefined) {
       toast.error(
         "No order was created. Please add your personal info in the settings page"
       );
-      navigate("/userprofile/settings");
+      navigate("/userprofile");
     }
 
     if (userPaymentMethod !== undefined) {
@@ -176,7 +177,7 @@ export default function CheckoutPage() {
                             Quantity: {item.quantity}
                           </p>
                         </div>
-                        {item.priceWithDiscount === undefined ? (
+                        {item.priceWithDiscount === null ? (
                           <p className="font-semibold text-lg">
                             $
                             {(
