@@ -1,7 +1,5 @@
-import { UserDto } from "@/features/registration/contracts";
 import Cookies from "js-cookie";
 import { createContext, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
 
 const AuthContext = createContext<any>(null);
 
@@ -9,22 +7,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [authStatus, setAuthStatus] = useState(false);
   const [authSignal, setAuthSignal] = useState(false);
 
-  const login = (user: UserDto) => {
-    Cookies.set("Session", JSON.stringify(user));
-  };
-
   const logout = () => {
+    Cookies.remove("Token");
+    Cookies.remove("Order");
     Cookies.remove("Session");
+    Cookies.remove("Address");
+    Cookies.remove("Payment");
     window.location.replace("/");
   };
 
   useEffect(() => {
-    const user = Cookies.get("Session");
-    setAuthStatus(user !== undefined);
+    const token = Cookies.get("Token");
+    setAuthStatus(token !== undefined);
   }, [authSignal]);
 
   return (
-    <AuthContext.Provider value={{ authStatus, login, logout, setAuthSignal }}>
+    <AuthContext.Provider value={{ authStatus, logout, setAuthSignal }}>
       {children}
     </AuthContext.Provider>
   );
