@@ -29,9 +29,9 @@ namespace RunApp.Api.Controllers.LineItems
 
         [Authorize]
         [HttpDelete(ApiEndpoints.Orders.DeleteItem)]
-        public async Task<IActionResult> DeleteItem([FromRoute] Guid id, [FromBody] DeleteItemRequestDto deleteItem)
+        public async Task<IActionResult> DeleteItem([FromRoute] Guid id, [FromQuery] Guid productId)
         {
-            var result = await _mediator.Send(new DeleteItemCommand(id, deleteItem.ProductId));
+            var result = await _mediator.Send(new DeleteItemCommand(id, productId));
 
             return result.MatchFirst(value => Ok(), Problem);
         }

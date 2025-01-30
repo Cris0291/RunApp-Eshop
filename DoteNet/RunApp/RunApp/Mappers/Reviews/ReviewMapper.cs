@@ -23,7 +23,7 @@ namespace RunApp.Api.Mappers.Reviews
         }
         public static UserReviewsResponse ReviewToUserReviewResponse(this ReviewWithProductImage review)
         {
-            return new UserReviewsResponse(review.ProductImage?.ProductId, review.ProductImage?.Name, review.ProductImage?.Image, review.Review.ReviewId, review.Review.Rating, review.Review.ReviewDescription.Name, review.Review.Comment, review.Review.Date);
+            return new UserReviewsResponse(review.ProductImage?.ProductId, review.ProductImage?.Name, review.Review.ReviewId, review.Review.Rating, review.Review.ReviewDescription.Name, review.Review.Comment, review.Review.Date);
         }
     }
 }
