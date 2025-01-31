@@ -15,9 +15,8 @@ import { CreditCard } from "lucide-react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { PaymentResponse, PaymentSettingsForm } from "./contracts";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
-import { getCurrentOrderId } from "./orderSlice";
+import { addOrderPayment, getCurrentOrderId } from "./orderSlice";
 import useModifyOrderPaymentMethod from "./useModifyOrderPaymentMethod";
-import { addUserCard } from "../../registration/userSlice";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 
@@ -51,12 +50,13 @@ export default function PaymentInfoForm({
       toast.error(
         "No order was created. Please add your personal info inthe settings page"
       );
-      navigate("/userprofile/settings");
+      navigate("/userprofile");
     }
     updateOrderPamentMethod(
       { orderId, paymentInfo: data },
       {
         onSuccess: (data) => {
+          dispatch(addOrderPayment(data));
           handlePayment(true);
         },
       }

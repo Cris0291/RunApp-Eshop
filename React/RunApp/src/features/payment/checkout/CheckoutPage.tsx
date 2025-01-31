@@ -19,8 +19,6 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
 import { getCartItems, getTotalPrice } from "../shoppingcart/cartSlice";
 import {
-  addUserAddress,
-  addUserCard,
   getUserAddress,
   getUserPaymentMethod,
 } from "../../registration/userSlice";
@@ -37,14 +35,8 @@ import EmptyCartCard from "./EmptyCartcard";
 import toast from "react-hot-toast";
 import HeaderProducts from "../../store/products/HeaderProducts";
 import { useNavigate } from "react-router";
-import useModifyOrderAddress from "./useModifyOrderAddress";
-import Spinner from "@/ui/Spinner";
-import useModifyOrderPaymentMethod from "./useModifyOrderPaymentMethod";
 
 export default function CheckoutPage() {
-  const { updateOrderAddress, isPending } = useModifyOrderAddress();
-  const { updateOrderPamentMethod, pendingPayment } =
-    useModifyOrderPaymentMethod();
   const dispatch = useAppDispatch();
   const cartItems = useAppSelector(getCartItems);
   const totalPrice = useAppSelector(getTotalPrice);
@@ -59,7 +51,8 @@ export default function CheckoutPage() {
   const orderError = useAppSelector(getOrderError);
   const { payOrder } = usePayOrder();
   const navigate = useNavigate();
-
+  console.log(userAddress);
+  console.log(userPaymentMethod);
   const onSubmitPayOrder = () => {
     const newErrors: (string | undefined)[] = [];
     if (userAddress === undefined)
@@ -95,55 +88,6 @@ export default function CheckoutPage() {
       throw new Error(tempOrderError);
     }
   }, [orderError]);
-
-  const handleAddressSubmit = () => {
-    console.log(orderId);
-    if (orderId.trim().length === 0) {
-      toast.error(
-        "No order was created. Please add your personal info in the settings page"
-      );
-      navigate("/userprofile");
-    }
-    if (userAddress === undefined) {
-      toast.error(
-        "No order was created. Please add your personal info in the settings page"
-      );
-      navigate("/userprofile");
-    }
-    if (userAddress !== undefined) {
-      updateOrderAddress(
-        { orderId, addressInfo: userAddress },
-        {
-          onSuccess: (data) => {},
-        }
-      );
-    }
-  };
-
-  const handlePaymentSubmit = () => {
-    if (orderId.trim().length === 0) {
-      toast.error(
-        "No order was created. Please add your personal info inthe settings page"
-      );
-      navigate("/userprofile");
-    }
-
-    if (userPaymentMethod === undefined) {
-      toast.error(
-        "No order was created. Please add your personal info in the settings page"
-      );
-      navigate("/userprofile");
-    }
-
-    if (userPaymentMethod !== undefined) {
-      updateOrderPamentMethod(
-        { orderId, paymentInfo: userPaymentMethod },
-        {
-          onSuccess: (data) => {},
-        }
-      );
-    }
-  };
 
   return (
     <div>
@@ -252,12 +196,6 @@ export default function CheckoutPage() {
                       >
                         Change Address
                       </Button>
-                      <Button
-                        className="w-full bg-green-600 hover:bg-green-700"
-                        onClick={() => handleAddressSubmit()}
-                      >
-                        {!isPending ? "Confirm Address" : <Spinner />}
-                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -302,12 +240,6 @@ export default function CheckoutPage() {
                         onClick={() => setChangePayment(true)}
                       >
                         Change Payment
-                      </Button>
-                      <Button
-                        className="w-full bg-green-600 hover:bg-green-700"
-                        onClick={() => handlePaymentSubmit()}
-                      >
-                        {!pendingPayment ? "Confirm Payment" : <Spinner />}
                       </Button>
                     </div>
                   </CardContent>

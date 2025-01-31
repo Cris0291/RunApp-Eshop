@@ -15,8 +15,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { AddressSettingsForm } from "./contracts";
 import useModifyOrderAddress from "./useModifyOrderAddress";
 import { useAppDispatch, useAppSelector } from "@/hooks/reduxHooks";
-import { getCurrentOrderId } from "./orderSlice";
-import { addUserAddress } from "../../registration/userSlice";
+import { addOrderAddress, getCurrentOrderId } from "./orderSlice";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 
@@ -51,12 +50,13 @@ export default function ShippingInfoForm({
       toast.error(
         "No order was created. Please add your personal info in the settings page"
       );
-      navigate("/userprofile/settings");
+      navigate("/userprofile");
     }
     updateOrderAddress(
       { orderId, addressInfo: data },
       {
         onSuccess: (data) => {
+          dispatch(addOrderAddress(data));
           handleAddress(true);
         },
       }
