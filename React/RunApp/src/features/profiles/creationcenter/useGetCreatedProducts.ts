@@ -3,7 +3,7 @@ import { GetCreatedProducts } from "@/services/apiProduct";
 
 export default function useGetCreatedProducts() {
   const {
-    data: productCreated,
+    data: products,
     isLoading,
     error,
     isError,
@@ -12,5 +12,5 @@ export default function useGetCreatedProducts() {
     queryFn: () => GetCreatedProducts(),
   });
 
-  return { productCreated, isLoading, error, isError };
+  return { products, isLoading, error, isError };
 }

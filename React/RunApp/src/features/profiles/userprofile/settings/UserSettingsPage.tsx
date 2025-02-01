@@ -39,7 +39,11 @@ import useUpdatePasswordInfo from "./useUpdatePasswordInfo";
 import useUpdateOrCreateAddressInfo from "./useUpdateOrCreateAddressInfo";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAppDispatch } from "@/hooks/reduxHooks";
-import { updateUser } from "@/features/registration/userSlice";
+import {
+  addUserAddressWithListener,
+  addUserCardWithListener,
+  updateUser,
+} from "@/features/registration/userSlice";
 import useUpdateOrCreatePaymentInfo from "./useUpdateOrCreatePaymentInfo";
 import toast from "react-hot-toast";
 import ProductLoadingCard from "@/ui/ProductLoadingCard";
@@ -72,7 +76,6 @@ export default function UserSettingsPage() {
     (string | undefined)[]
   >([]);
   const dispatch = useAppDispatch();
-  console.log(userInfo);
 
   useEffect(() => {
     if (userInfo === undefined && isError) {
@@ -259,7 +262,7 @@ export default function UserSettingsPage() {
       {
         onSuccess: (data) => {
           toast.success("User address was updated");
-          Cookies.set("Address", JSON.stringify(data));
+          dispatch(addUserAddressWithListener(data));
           addressReset();
           queryClient.invalidateQueries({
             queryKey: ["userInfo"],
@@ -278,7 +281,7 @@ export default function UserSettingsPage() {
       {
         onSuccess: (data) => {
           toast.success("User payment info was updated");
-          Cookies.set("Payment", JSON.stringify(data));
+          dispatch(addUserCardWithListener(data));
           paymentReset();
           queryClient.invalidateQueries({
             queryKey: ["userInfo"],
