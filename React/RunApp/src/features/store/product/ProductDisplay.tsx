@@ -24,10 +24,6 @@ import StatusPopup from "@/ui/SatusPopup";
 import ProductNotFound from "@/ui/ProductNotFound";
 import NoImagePlaceholder from "@/ui/NoImagePlaceholder";
 import { iconsForCategories } from "@/utils/categories";
-import {
-  getIsProductBought,
-  getIsProductBoughtAndHasReview,
-} from "./productSlice";
 import useUpdateUserReview from "../../profiles/userprofile/useUpdateUserReview";
 import ProductLoadingCard from "@/ui/ProductLoadingCard";
 import toast from "react-hot-toast";
@@ -35,6 +31,7 @@ import {
   addCartError,
   addItem,
   getCartError,
+  getIsProductsAddedToCart,
 } from "../../payment/shoppingcart/cartSlice";
 import HeaderProducts from "../products/HeaderProducts";
 import { useLocation } from "react-router";
@@ -61,17 +58,14 @@ export default function ProductDisplay() {
   const productId = productIdArray[productIdArray.length - 1];
   const { isLoading, product, error, isGetProductError } =
     useGetProductQuery(productId);
+  const isProductInCart = useAppSelector(getIsProductsAddedToCart(productId));
   const { AddOrRemoveLikeMutation } = useAddOrRemoveLikeHook();
   const { isPending, AddReview } = useCreateReviewCommand();
   const [quantity, setQuantity] = useState(1);
-  const [isAddedTocart, setIsAddedToCart] = useState(false);
+  const [isAddedTocart, setIsAddedToCart] = useState(isProductInCart);
   const [isError, setIsError] = useState(false);
   const dispatch = useAppDispatch();
   const [currentReviewsPage, setCurrentReviewsPage] = useState(1);
-  const isBoughtProduct = useAppSelector(getIsProductBought(productId));
-  const isBoughtProductHasReview = useAppSelector(
-    getIsProductBoughtAndHasReview(productId)
-  );
   const { updateReviewsMutation, updatingReviews } = useUpdateUserReview();
   const cartError = useAppSelector(getCartError);
   const orderError = useAppSelector(getOrderError);
@@ -185,7 +179,7 @@ export default function ProductDisplay() {
               {/* Product Images */}
               <div className="space-y-4">
                 <div className="aspect-square relative overflow-hidden rounded-lg bg-gray-100 group">
-                  {product.mainImage === undefined ? (
+                  {product.mainImage === null ? (
                     <NoImagePlaceholder />
                   ) : (
                     <img
@@ -290,7 +284,11 @@ export default function ProductDisplay() {
                       )}
                     </>
                   )}
-                  <LikeButton size="sm" onLikeChange={handleLike} />
+                  <LikeButton
+                    size="sm"
+                    onLikeChange={handleLike}
+                    initialLiked={product.like}
+                  />
                 </div>
 
                 {/* Shipping and Returns */}
@@ -350,11 +348,11 @@ export default function ProductDisplay() {
                         </span>
                       </div>
                     </div>
-                    {isBoughtProduct && !isBoughtProductHasReview ? (
+                    {product.isBought && !product.isBoughtWithReview ? (
                       <ReviewForm onSubmit={onSubmit} isSubmitting={isPending}>
                         <Pencil className="mr-2 h-4 w-4" /> Add Review
                       </ReviewForm>
-                    ) : isBoughtProduct && isBoughtProductHasReview ? (
+                    ) : product.isBought && product.isBoughtWithReview ? (
                       <ReviewForm
                         size="sm"
                         className="border-green-600 text-green-600 hover:bg-pink-50"

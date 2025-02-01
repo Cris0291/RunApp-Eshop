@@ -4,15 +4,18 @@ export type Product = {
   description: string;
   actualPrice: number;
   bulletPoints: string[];
-  priceWithDiscount: number | undefined;
-  promotionalText: string | undefined;
-  discount: number | undefined;
-  numberOfreviews: number | undefined;
-  numberOflikes: number | undefined;
+  priceWithDiscount: number | null;
+  promotionalText: string | null;
+  discount: number | null;
+  numberOfreviews: number | null;
+  numberOflikes: number | null;
   averageRatings: number;
   reviews: Review[] | null;
-  mainImage?: string;
+  mainImage: string | null;
   categoryNames: string[];
+  like: boolean;
+  isBought: boolean;
+  isBoughtWithReview: boolean;
 };
 
 export type Review = {
