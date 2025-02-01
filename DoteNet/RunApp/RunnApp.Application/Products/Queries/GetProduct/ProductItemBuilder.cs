@@ -1,15 +1,11 @@
-﻿using RunApp.Domain.CustomerProfileAggregate;
-using RunApp.Domain.PhotoAggregate;
-using RunApp.Domain.Products;
-using RunApp.Domain.ReviewAggregate;
-using RunnApp.Application.Products.Queries.GetProducts;
-using System.Xml.Linq;
+﻿using RunnApp.Application.Products.Queries.GetProducts;
+
 
 namespace RunnApp.Application.Products.Queries.GetProduct
 {
     public static class ProductItemBuilder
     {
-        public static IQueryable<ProductItemDto> CreateProductItemDto(this IQueryable<ProductWithMainImage> productWithImage)
+        public static IQueryable<ProductItemDto> CreateProductItemDto(this IQueryable<ProductWithMainImage> productWithImage, List<Guid> boughtProduct, List<Guid> boughtProductWithReview, bool? liked)
         {
             return productWithImage.Select(x => new ProductItemDto {
                 ProductId = x.Product.ProductId,
@@ -25,6 +21,9 @@ namespace RunnApp.Application.Products.Queries.GetProduct
                 MainImage = x.MainImage == null ? null : x.MainImage.Url,
                 BulletPoints = x.Product.BulletPoints.Select(x => x.BulletPoint).ToList(),
                 Reviews = null,
+                Like = liked ?? false,
+                IsBought = boughtProduct.Contains(x.Product.ProductId),
+                IsBoughtWithReview = boughtProductWithReview.Contains(x.Product.ProductId),
             });
             
         }
