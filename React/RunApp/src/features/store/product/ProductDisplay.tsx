@@ -163,7 +163,7 @@ export default function ProductDisplay() {
         reviewDescription: sentiment,
         rating,
       };
-      updateReviewsMutation({ reviewDto, reviewId });
+      updateReviewsMutation({ reviewDto, productId: reviewId });
     }
   };
 

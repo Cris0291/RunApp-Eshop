@@ -26,6 +26,7 @@ import Spinner from "@/ui/Spinner";
 import NoProductsFound from "@/ui/NoProductsFound";
 import { Link } from "react-router";
 import ProductLoadingPage from "@/ui/ProductLoadingPage";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface Props {
   handleSelectedCategories: (categories: string[]) => void;
@@ -60,10 +61,20 @@ function MainPageProductsServerSide({
 }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const { AddOrRemoveLikeMutation } = useAddOrRemoveLikeHook();
+  const queryClient = useQueryClient();
   const productsPerPage = 6;
   console.log(products);
   const handleLike = (liked: boolean, productId: string) => {
-    AddOrRemoveLikeMutation({ liked, productId });
+    AddOrRemoveLikeMutation(
+      { liked, productId },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: ["products"],
+          });
+        },
+      }
+    );
   };
 
   const indexOfLastProduct = productsPerPage * currentPage;
