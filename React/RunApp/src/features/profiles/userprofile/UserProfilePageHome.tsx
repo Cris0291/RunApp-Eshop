@@ -21,6 +21,7 @@ import MapCategories from "@/services/categoryMapper";
 import SearchBar from "@/ui/SearchBar";
 import NoProductsFound from "@/ui/NoProductsFound";
 import { Link } from "react-router";
+import LikeButton from "@/ui/LikeButton";
 
 function UserProfilePageHome() {
   const [activeTab, setActiveTab] = useState("liked");
@@ -44,7 +45,7 @@ function UserProfilePageHome() {
     useGetUserProfileLikes();
   const { updateReviewsMutation, updatingReviews } = useUpdateUserReview();
   const { AddOrRemoveLikeMutation } = useAddOrRemoveLikeHook();
-
+  console.log(userLikes);
   const handleReviewUpdate = ({
     sentiment,
     reviewId,
@@ -61,7 +62,7 @@ function UserProfilePageHome() {
       reviewDescription: sentiment,
       rating,
     };
-    updateReviewsMutation({ reviewDto, reviewId });
+    updateReviewsMutation({ reviewDto, productId: reviewId });
   };
 
   const handleLike = ({
@@ -140,30 +141,19 @@ function UserProfilePageHome() {
                       {product.productName}
                     </TableCell>
                     <TableCell className="font-medium text-black">
-                      {product.productPrice}
+                      {`${product.productPrice}`}
                     </TableCell>
                     <TableCell className="text-right">
                       {
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className={`bg-pink-500 text-white hover:bg-pink-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${
-                            unliked && product.productId === key
-                              ? "border-pink-600 bg-white text-pink-600 hover:bg-pink-50"
-                              : ""
-                          }`}
-                          onClick={() => {
-                            setKey(product.productId);
+                        <LikeButton
+                          initialLiked={product.like}
+                          onLikeChange={(like: boolean) =>
                             handleLike({
                               productId: product.productId,
-                              like: unliked,
-                            });
-                            setUnliked((prev) => !prev);
-                          }}
-                        >
-                          <Heart className="mr-2 h-4 w-4" />
-                          Unlike
-                        </Button>
+                              like: like,
+                            })
+                          }
+                        />
                       }
                     </TableCell>
                   </TableRow>

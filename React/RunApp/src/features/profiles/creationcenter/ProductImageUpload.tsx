@@ -88,7 +88,7 @@ export default function ProductImageUpload({
     event.preventDefault();
 
     const formData = new FormData();
-    formData.append("file", selectedImage as Blob);
+    formData.append("photoRequest", selectedImage as Blob);
 
     uploadImage(
       { formData, productId: product.productId },

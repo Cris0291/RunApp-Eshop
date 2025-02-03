@@ -10,15 +10,15 @@ export default function useUpdateUserReview() {
     useMutation({
       mutationFn: ({
         reviewDto,
-        reviewId,
+        productId,
       }: {
         reviewDto: ReviewDto;
-        reviewId: string;
-      }) => UpdateReview({ reviewDto, reviewId }),
+        productId: string;
+      }) => UpdateReview({ reviewDto, productId }),
       onSuccess: () => {
         toast.success("review was updated");
         queryClient.invalidateQueries({
-          queryKey: ["userReviews"],
+          queryKey: ["product"],
         });
       },
       onError: (error) => {
