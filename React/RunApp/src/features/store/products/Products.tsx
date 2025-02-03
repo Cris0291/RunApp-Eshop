@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 function Products() {
   const { searchQuery } = useGlobal();
   const [firstRefetch, setFirstRefetch] = useState<boolean>();
-  const [priceRange, setPriceRange] = useState<number[]>([0, 300]);
+  const [priceRange, setPriceRange] = useState<number[]>([0, 4000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("SimpleOrder");
   const [starFilters, setStarFilters] = useState<number[]>([]);
@@ -27,7 +27,7 @@ function Products() {
     categories: selectedCategories,
     starFilters,
   };
-  console.log("another test");
+
   const { isLoading, products, refetch, error, isError } =
     useGetProductsQuery(queryValues);
 

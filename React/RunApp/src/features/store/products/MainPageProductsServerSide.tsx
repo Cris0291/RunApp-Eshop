@@ -61,20 +61,10 @@ function MainPageProductsServerSide({
 }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const { AddOrRemoveLikeMutation } = useAddOrRemoveLikeHook();
-  const queryClient = useQueryClient();
   const productsPerPage = 6;
   console.log(products);
   const handleLike = (liked: boolean, productId: string) => {
-    AddOrRemoveLikeMutation(
-      { liked, productId },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries({
-            queryKey: ["products"],
-          });
-        },
-      }
-    );
+    AddOrRemoveLikeMutation({ liked, productId });
   };
 
   const indexOfLastProduct = productsPerPage * currentPage;
@@ -146,7 +136,7 @@ function MainPageProductsServerSide({
                   <h3 className="text-lg font-semibold mb-2">Price Range</h3>
                   <Slider
                     min={0}
-                    max={300}
+                    max={4000}
                     step={10}
                     value={priceRange}
                     onValueChange={(value) => {

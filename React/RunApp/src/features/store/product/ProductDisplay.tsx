@@ -35,6 +35,7 @@ import {
 } from "../../payment/shoppingcart/cartSlice";
 import HeaderProducts from "../products/HeaderProducts";
 import { useLocation } from "react-router";
+import { useQueryClient } from "@tanstack/react-query";
 
 function StarRating({ rating }: { rating: number }) {
   return (

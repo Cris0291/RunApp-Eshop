@@ -66,6 +66,7 @@ export default function useGetProductsQuery({
     queryFn: () => getProducts(queryParams),
     queryKey: ["products", sortBy, search, categories, priceRange],
     enabled: false,
+    gcTime: 500,
   });
 
   return { isLoading, products, refetch, error, isError };

@@ -10,6 +10,7 @@ export default function useGetProductQuery(query: string) {
   } = useQuery({
     queryFn: () => GetProduct(query),
     queryKey: ["product"],
+    gcTime: 500,
   });
 
   return { isLoading, product, error, isGetProductError };
