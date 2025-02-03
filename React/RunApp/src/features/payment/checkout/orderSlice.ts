@@ -10,8 +10,6 @@ import { RootState } from "@/utils/store";
 import { AppStartListening } from "@//utils/listenerMiddleware";
 import { CreateOrderRequest, GetCurrentOrder } from "@/services/apiOrders";
 import { addCurrentItems, clearCart } from "../shoppingcart/cartSlice";
-import { GetBoughtProducts } from "@/services/apiUserProfle";
-import { setBoughtproducts } from "../../store/product/productSlice";
 import { ProductForLineItem } from "../shoppingcart/contracts";
 import Cookies from "js-cookie";
 import {
@@ -213,14 +211,11 @@ export const payOrderListener = (startAppListening: AppStartListening) => {
       const state = listenerApi.getState();
 
       try {
-        const boughtProducts = await GetBoughtProducts();
-        listenerApi.dispatch(setBoughtproducts(boughtProducts));
-
         listenerApi.dispatch(clearCart());
 
         const orderResponse = await CreateOrderRequest({
-          cardRequest: null,
-          addressRequest: null,
+          cardRequest: state.user.card ? state.user.card : null,
+          addressRequest: state.user.address ? state.user.address : null,
         });
         const nextOrder: OrderItems = {
           orderId: orderResponse.orderId,

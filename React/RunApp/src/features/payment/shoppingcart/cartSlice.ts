@@ -194,6 +194,14 @@ export const getTotalItems = (state: RootState) =>
 
 export const getCartItems = (state: RootState) => state.cart.products;
 export const getCartError = (state: RootState) => state.cart.cart_error;
+export const getIsProductsAddedToCart = (productId: string) => {
+  return (state: RootState) => {
+    const product = state.cart.products.find(
+      (product) => product.id === productId
+    );
+    return product ? true : false;
+  };
+};
 
 export const addChangeQuantityListener = (
   startAppListening: AppStartListening
