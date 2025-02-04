@@ -4,7 +4,6 @@ import {
   AccountInfoResponse,
   PasswordUpdatedSettings,
   AddressSettingsForm,
-  AddressResponse,
   PaymentSettingsForm,
 } from "../features/profiles/userprofile/settings/contracts";
 import { axiosInstance } from "./axiosInstance";
@@ -22,7 +21,8 @@ export async function UpdateAccountInfo({
 }) {
   const accountSettings = {
     Name: accountInfo.name,
-    Email: accountInfo.email,
+    OldEmail: accountInfo.oldemail,
+    NewEmail: accountInfo.newemail,
     NickName: accountInfo.username,
   };
 
@@ -37,7 +37,7 @@ export async function UpdatePasswordInfo({
   passwordInfo: PasswordUpdatedSettings;
 }) {
   return axiosInstance
-    .put<number>("api/user/password", passwordInfo)
+    .post<number>("api/user/password", passwordInfo)
     .then((response) => response.status);
 }
 
@@ -47,7 +47,7 @@ export async function CreateAddressInfo({
   addressInfo: AddressSettingsForm;
 }) {
   return axiosInstance
-    .post<AddressResponse>("api/user/address", addressInfo)
+    .post<AddressSettingsForm>("api/user/address", addressInfo)
     .then((response) => response.data);
 }
 
@@ -57,7 +57,7 @@ export async function UpdateAddressInfo({
   addressInfo: AddressSettingsForm;
 }) {
   return axiosInstance
-    .put<AddressResponse>("api/user/address", addressInfo)
+    .put<AddressSettingsForm>("api/user/address", addressInfo)
     .then((response) => response.data);
 }
 
@@ -67,8 +67,8 @@ export async function CreatePaymentMethod({
   paymentInfo: PaymentSettingsForm;
 }) {
   return axiosInstance
-    .post<number>("api/user/payment", paymentInfo)
-    .then((response) => response.status);
+    .post<PaymentSettingsForm>("api/user/payment", paymentInfo)
+    .then((response) => response.data);
 }
 
 export async function UpdatePaymentMethod({
@@ -77,6 +77,6 @@ export async function UpdatePaymentMethod({
   paymentInfo: PaymentSettingsForm;
 }) {
   return axiosInstance
-    .put<number>("api/user/payment", paymentInfo)
-    .then((response) => response.status);
+    .put<PaymentSettingsForm>("api/user/payment", paymentInfo)
+    .then((response) => response.data);
 }
