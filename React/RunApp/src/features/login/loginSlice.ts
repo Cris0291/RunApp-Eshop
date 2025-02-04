@@ -51,15 +51,15 @@ export const getCurrentOrderListener = (
       if (response instanceof AxiosError) {
         listenerApi.dispatch(setOrderError(response));
       } else {
-        if (response.order !== undefined) {
+        if (response.order !== null) {
           const currentOrder = response.order;
 
           const orderWithoutItems: OrderResponse = {
-            OrderId: currentOrder.OrderId,
-            CardRequest: currentOrder.CardRequest,
-            AddressRequest: currentOrder.AddressRequest,
+            orderId: currentOrder.orderId,
+            cardRequest: currentOrder.cardRequest,
+            addressRequest: currentOrder.addressRequest,
           };
-          const currentItems: ProductForLineItem[] = currentOrder.Items.map(
+          const currentItems: ProductForLineItem[] = currentOrder.items.map(
             (item) => {
               return {
                 id: item.productId,
