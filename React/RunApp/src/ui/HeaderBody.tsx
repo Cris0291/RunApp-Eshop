@@ -1,6 +1,7 @@
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useGlobal } from "@/utils/GlobalProvider";
-import { Search, ShoppingCart } from "lucide-react";
+import { FilePlus2, Search, ShoppingCart, User } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 
 export function HeaderBody({ isRegisterd }: { isRegisterd: boolean }) {
@@ -19,18 +20,20 @@ export function HeaderBody({ isRegisterd }: { isRegisterd: boolean }) {
     return (
       <div className="flex items-center space-x-4">
         <nav className="md:flex space-x-4">
-          <Link
+          <Button
             className="border-green-500 text-green-500 hover:bg-green-50"
-            to="/login"
+            variant="outline"
+            asChild
           >
-            Login
-          </Link>
-          <Link
+            <Link to="/login">Login</Link>
+          </Button>
+          <Button
             className="bg-green-500 text-white hover:bg-green-600"
-            to="/register"
+            asChild
+            variant="outline"
           >
-            Register
-          </Link>
+            <Link to="/register">Register</Link>
+          </Button>
         </nav>
       </div>
     );
@@ -55,25 +58,39 @@ export function HeaderBody({ isRegisterd }: { isRegisterd: boolean }) {
           </form>
         </div>
       </div>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-1">
         <nav className="hidden md:flex space-x-6">
-          <Link
-            className="text-sm font-medium hover:text-green-600 transition-colors"
-            to="/userprofile"
+          <Button
+            className="border-green-500 text-green-500 hover:bg-green-50"
+            variant="outline"
+            asChild
+            size="icon"
           >
-            User
-          </Link>
-          <Link
-            className="text-sm font-medium hover:text-green-600 transition-colors"
-            to="/userprofile/creationcenter"
+            <Link to="/userprofile">
+              <User />
+            </Link>
+          </Button>
+          <Button
+            className="bg-green-500 text-white hover:bg-green-600"
+            asChild
+            variant="outline"
           >
-            Creation Center
-          </Link>
+            <Link to="/userprofile/creationcenter">
+              <FilePlus2 />
+            </Link>
+          </Button>
         </nav>
-        <Link to="/orders/cart">
-          <ShoppingCart className="h-5 w-5 text-green-500" />
-          <span className="sr-only">Cart</span>
-        </Link>
+        <Button
+          className="mr-2 border-green-500 text-black"
+          size="icon"
+          variant="outline"
+          asChild
+        >
+          <Link to="/orders/cart">
+            <ShoppingCart className="h-5 w-5" />
+            <span className="sr-only">Cart</span>
+          </Link>
+        </Button>
       </div>
     </>
   );

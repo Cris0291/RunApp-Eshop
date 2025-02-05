@@ -1,6 +1,5 @@
-
-import { useState} from "react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,76 +8,80 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Star, ThumbsUp, ThumbsDown, Meh, Smile, Frown } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+} from "@/components/ui/select";
+import { Star, ThumbsUp, ThumbsDown, Meh, Smile, Frown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ReviewFormData {
-  sentiment: string
-  content: string,
-  rating: number,
+  sentiment: string;
+  content: string;
+  rating: number;
 }
 
 interface Props {
-  onSubmit: (data: ReviewFormData) => void,
-  isSubmitting: boolean,
-  size?: "sm" | "lg",
-  children?: React.ReactNode,
-  className?: string
+  onSubmit: (data: ReviewFormData) => void;
+  isSubmitting: boolean;
+  size?: "sm" | "lg";
+  children?: React.ReactNode;
+  className?: string;
 }
 
 const sentimentOptions = [
-  { value: "excellent", label: "Excellent", icon: ThumbsUp },
-  { value: "good", label: "Good", icon: Smile },
-  { value: "average", label: "Average", icon: Meh },
-  { value: "incomplete", label: "incomplete", icon: Frown },
-  { value: "terrible", label: "Terrible", icon: ThumbsDown },
-]
+  { value: "Excellent", label: "Excellent", icon: ThumbsUp },
+  { value: "Good", label: "Good", icon: Smile },
+  { value: "Average", label: "Average", icon: Meh },
+  { value: "Incomplete", label: "Incomplete", icon: Frown },
+  { value: "Terrible", label: "Terrible", icon: ThumbsDown },
+];
 
-export default function ReviewForm({ onSubmit, isSubmitting, size="sm", children, className = "bg-pink-500 text-white hover:bg-pink-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg" }: Props) {
+export default function ReviewForm({
+  onSubmit,
+  isSubmitting,
+  size = "sm",
+  children,
+  className = "bg-pink-500 text-white hover:bg-pink-600 transition-all duration-300 transform hover:scale-105 hover:shadow-lg",
+}: Props) {
   const [sentiment, setSentiment] = useState("average");
   const [content, setContent] = useState("");
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
 
-  
-  const handleSubmit =  (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    onSubmit({ sentiment, content, rating })
-    setSentiment("")
-    setContent("")
-    setIsOpen(false)
-    setRating(0)
-  }
- //<Pencil className="w-4 h-4 mr-2" /> Write a Review
-          
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    onSubmit({ sentiment, content, rating });
+    setSentiment("");
+    setContent("");
+    setIsOpen(false);
+    setRating(0);
+  };
+  //<Pencil className="w-4 h-4 mr-2" /> Write a Review
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button
-          size={size}
-          variant="outline"
-          className={className}
-        >
-         {children}
+        <Button size={size} variant="outline" className={className}>
+          {children}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] overflow-hidden bg-white">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-pink-600">Write a Review</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-pink-600">
+            Write a Review
+          </DialogTitle>
           <DialogDescription className="text-gray-600">
-            Share your thoughts about the product. Your review will help other customers make informed decisions.
+            Share your thoughts about the product. Your review will help other
+            customers make informed decisions.
           </DialogDescription>
         </DialogHeader>
         <motion.form
@@ -89,8 +92,11 @@ export default function ReviewForm({ onSubmit, isSubmitting, size="sm", children
           transition={{ duration: 0.3 }}
         >
           <div className="space-y-4">
-          <div className="space-y-2">
-              <Label htmlFor="rating" className="text-sm font-medium text-gray-700">
+            <div className="space-y-2">
+              <Label
+                htmlFor="rating"
+                className="text-sm font-medium text-gray-700"
+              >
                 Rating
               </Label>
               <div className="flex items-center">
@@ -115,7 +121,10 @@ export default function ReviewForm({ onSubmit, isSubmitting, size="sm", children
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="sentiment" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="sentiment"
+                className="text-sm font-medium text-gray-700"
+              >
                 Overall Experience
               </Label>
               <Select value={sentiment} onValueChange={setSentiment} required>
@@ -132,7 +141,10 @@ export default function ReviewForm({ onSubmit, isSubmitting, size="sm", children
                         exit={{ opacity: 0, y: 10 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <SelectItem value={option.value} className="flex items-center space-x-2 cursor-pointer">
+                        <SelectItem
+                          value={option.value}
+                          className="flex items-center space-x-2 cursor-pointer"
+                        >
                           <option.icon className="w-5 h-5 text-pink-500" />
                           <span>{option.label}</span>
                         </SelectItem>
@@ -143,7 +155,10 @@ export default function ReviewForm({ onSubmit, isSubmitting, size="sm", children
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="content" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="content"
+                className="text-sm font-medium text-gray-700"
+              >
                 Your Review
               </Label>
               <Textarea
@@ -169,8 +184,18 @@ export default function ReviewForm({ onSubmit, isSubmitting, size="sm", children
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  <svg className="animate-spin h-5 w-5 mr-3 text-white" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <svg
+                    className="animate-spin h-5 w-5 mr-3 text-white"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
                     <path
                       className="opacity-75"
                       fill="currentColor"
@@ -187,5 +212,5 @@ export default function ReviewForm({ onSubmit, isSubmitting, size="sm", children
         </motion.form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
