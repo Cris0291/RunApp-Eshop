@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -5,10 +6,10 @@ import {
   SelectItem,
   SelectLabel,
   SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { SelectValue } from "@radix-ui/react-select";
 import {
   ChevronLeft,
   ChevronRight,
@@ -16,7 +17,6 @@ import {
   ShoppingCart,
   Star,
 } from "lucide-react";
-import { useState } from "react";
 import FilterOptionsStars from "./FilterOptionsStars";
 import LikeButton from "@/ui/LikeButton";
 import useAddOrRemoveLikeHook from "@/hooks/useAddOrRemoveLikeHook";
@@ -26,7 +26,6 @@ import Spinner from "@/ui/Spinner";
 import NoProductsFound from "@/ui/NoProductsFound";
 import { Link } from "react-router";
 import ProductLoadingPage from "@/ui/ProductLoadingPage";
-import { useQueryClient } from "@tanstack/react-query";
 
 interface Props {
   handleSelectedCategories: (categories: string[]) => void;
@@ -44,7 +43,7 @@ interface Props {
   isLoading: boolean;
 }
 
-function MainPageProductsServerSide({
+function MainPageProducts({
   handleSelectedCategories,
   handlePriceRange,
   handleSortBy,
@@ -62,18 +61,18 @@ function MainPageProductsServerSide({
   const [currentPage, setCurrentPage] = useState(1);
   const { AddOrRemoveLikeMutation } = useAddOrRemoveLikeHook();
   const productsPerPage = 6;
-  console.log(products);
+
   const handleLike = (liked: boolean, productId: string) => {
     AddOrRemoveLikeMutation({ liked, productId });
   };
 
   const indexOfLastProduct = productsPerPage * currentPage;
-  const indextOfFistProduct = indexOfLastProduct - productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
 
   const filteredProducts = products;
 
-  const currentproducts = filteredProducts?.slice(
-    indextOfFistProduct,
+  const currentProducts = filteredProducts?.slice(
+    indexOfFirstProduct,
     indexOfLastProduct
   );
 
@@ -92,9 +91,9 @@ function MainPageProductsServerSide({
   return (
     <main className="flex-1 container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8 text-black">Fitness Products</h1>
-      <div className="flex flex-col md:flex-row gap-8">
-        <aside className="w-full md:w-1/4">
-          <div className="bg-white p-6 rounded-lg shadow-md space-y-6">
+      <div className="flex flex-col lg:flex-row gap-8">
+        <aside className="w-full lg:w-1/4">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md space-y-6">
             <div>
               <h3 className="text-lg font-semibold mb-2 text-black">
                 Categories
@@ -145,7 +144,7 @@ function MainPageProductsServerSide({
                     className="my-4"
                   />
                   <div className="flex justify-between">
-                    <span className="txt-sm text-gray-600">
+                    <span className="text-sm text-gray-600">
                       ${priceRange[0]}
                     </span>
                     <span className="text-sm text-gray-600">
@@ -169,15 +168,15 @@ function MainPageProductsServerSide({
               <Spinner size="lg" color="secondary" />
             ) : (
               <form onSubmit={handleSubmit}>
-                <Button className="bg-green-500 text-white hover:bg-green-600">
+                <Button className="w-full bg-green-500 text-white hover:bg-green-600">
                   Search
                 </Button>
               </form>
             )}
           </div>
         </aside>
-        <div className="w-full md:w-3/4">
-          <div className="flex justify-between items-center mb-6">
+        <div className="w-full lg:w-3/4">
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
             {isLoading ? (
               <Spinner size="sm" color="secondary" />
             ) : (
@@ -196,7 +195,7 @@ function MainPageProductsServerSide({
                   handleSortBy(value);
                 }}
               >
-                <SelectTrigger className="w-48 border-black">
+                <SelectTrigger className="w-full sm:w-48 border-black">
                   <SelectValue>
                     <p className="text-black">select a filter option</p>
                   </SelectValue>
@@ -222,25 +221,25 @@ function MainPageProductsServerSide({
               </Select>
             )}
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {isLoading ? (
-              <ProductLoadingPage />
-            ) : currentproducts !== undefined && !isError ? (
-              currentproducts.map((product) => (
+          {isLoading ? (
+            <ProductLoadingPage />
+          ) : currentProducts !== undefined && !isError ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {currentProducts.map((product) => (
                 <div
                   key={product.productId}
                   className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow"
                 >
                   <img
                     alt={product.name}
-                    className="objext-cover w-full h-48"
+                    className="object-cover w-full h-48"
                     height="200"
                     style={{
                       aspectRatio: "200/200",
                       objectFit: "cover",
                     }}
                     width="200"
-                    src={product.mainImage}
+                    src={product.mainImage || "/placeholder.svg"}
                   />
                   <div className="p-4">
                     <div className="flex justify-between items-center">
@@ -301,16 +300,16 @@ function MainPageProductsServerSide({
                     </Button>
                   </div>
                 </div>
-              ))
-            ) : (
-              <NoProductsFound />
-            )}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <NoProductsFound />
+          )}
           <div className="mt-8 flex justify-center">
             {isLoading ? (
               <Spinner size="sm" color="secondary" />
-            ) : currentproducts !== undefined && !isError ? (
-              <nav className="inline-flex rounded-m">
+            ) : currentProducts !== undefined && !isError ? (
+              <nav className="inline-flex rounded-md flex-wrap justify-center">
                 <Button
                   variant="outline"
                   onClick={() =>
@@ -319,7 +318,7 @@ function MainPageProductsServerSide({
                   disabled={currentPage === 1}
                   className="rounded-l-md border-black text-black"
                 >
-                  <ChevronLeft className="h-4 w-4 mr-2 " />
+                  <ChevronLeft className="h-4 w-4 mr-2" />
                   Previous
                 </Button>
                 {pageNumbers.map((number) => (
@@ -327,9 +326,9 @@ function MainPageProductsServerSide({
                     key={number}
                     variant={currentPage === number ? "default" : "outline"}
                     onClick={() => setCurrentPage(number)}
-                    className={
+                    className={`${
                       currentPage !== number ? "border-black text-black" : ""
-                    }
+                    } hidden sm:inline-flex`}
                   >
                     {number}
                   </Button>
@@ -342,15 +341,13 @@ function MainPageProductsServerSide({
                     )
                   }
                   disabled={currentPage === pageNumbers.length}
-                  className="rounded-l-md border-black text-black"
+                  className="rounded-r-md border-black text-black"
                 >
                   Next
-                  <ChevronRight className="H-4 W-4 ML-2" />
+                  <ChevronRight className="h-4 w-4 ml-2" />
                 </Button>
               </nav>
-            ) : (
-              ""
-            )}
+            ) : null}
           </div>
         </div>
       </div>
@@ -358,4 +355,4 @@ function MainPageProductsServerSide({
   );
 }
 
-export default MainPageProductsServerSide;
+export default MainPageProducts;

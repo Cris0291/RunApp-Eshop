@@ -7,6 +7,7 @@ import { Link } from "react-router";
 import { Dumbbell, Search, ShoppingCart, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import MainPageProducts from "./MainPageProducts";
 
 function Products() {
   const { searchQuery } = useGlobal();
@@ -121,7 +122,7 @@ function Products() {
           </div>
         </div>
       </header>
-      <MainPageProductsServerSide
+      <MainPageProducts
         handleSelectedCategories={handleSelectedCategories}
         handlePriceRange={handlePriceRange}
         handleSortBy={handleSortBy}
