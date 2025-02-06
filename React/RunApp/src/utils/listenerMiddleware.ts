@@ -12,10 +12,16 @@ import {
   deleteItemListener,
 } from "../features/payment/shoppingcart/cartSlice";
 import {
+  addressOrderListener,
   createOrderListener,
+  paymentOrderListener,
   payOrderListener,
 } from "../features/payment/checkout/orderSlice";
 import { getCurrentOrderListener } from "../features/login/loginSlice";
+import {
+  addressUserListener,
+  paymentUserListener,
+} from "@/features/registration/userSlice";
 
 export const listenerMiddleware = createListenerMiddleware();
 
@@ -36,3 +42,7 @@ deleteItemListener(startAppListening);
 createOrderListener(startAppListening);
 payOrderListener(startAppListening);
 getCurrentOrderListener(startAppListening);
+addressOrderListener(startAppListening);
+paymentOrderListener(startAppListening);
+addressUserListener(startAppListening);
+paymentUserListener(startAppListening);

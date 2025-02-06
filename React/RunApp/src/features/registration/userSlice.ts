@@ -9,6 +9,15 @@ import {
   PaymentSettingsForm,
 } from "../payment/checkout/contracts";
 import Cookies from "js-cookie";
+import { AppStartListening } from "@/utils/listenerMiddleware";
+import {
+  ModifyOrderAddress,
+  ModifyOrderPaymentMethod,
+} from "@/services/apiOrders";
+import {
+  addOrderAddressWithoutListener,
+  addOrderPaymentWithoutListener,
+} from "../payment/checkout/orderSlice";
 
 const initData = Cookies.get("Session");
 const userSession: UserSession | undefined = initData
@@ -59,6 +68,20 @@ export const userSlice = createSlice({
     ) => {
       state.card = action.payload;
     },
+    addUserAddressWithListener: (
+      state,
+      action: PayloadAction<AddressSettingsForm | AddressResponse>
+    ) => {
+      state.address = action.payload;
+      Cookies.set("Address", JSON.stringify(action.payload));
+    },
+    addUserCardWithListener: (
+      state,
+      action: PayloadAction<PaymentSettingsForm | PaymentResponse>
+    ) => {
+      state.card = action.payload;
+      Cookies.set("Payment", JSON.stringify(action.payload));
+    },
     clearUser: (state) => {
       state.name = "";
       state.email = "";
@@ -67,10 +90,70 @@ export const userSlice = createSlice({
   },
 });
 
-export const { setUser, updateUser, addUserAddress, addUserCard, clearUser } =
-  userSlice.actions;
+export const {
+  setUser,
+  updateUser,
+  addUserAddress,
+  addUserCard,
+  clearUser,
+  addUserAddressWithListener,
+  addUserCardWithListener,
+} = userSlice.actions;
 
 export default userSlice.reducer;
 
 export const getUserAddress = (state: RootState) => state.user.address;
 export const getUserPaymentMethod = (state: RootState) => state.user.card;
+
+export const addressUserListener = (startAppListening: AppStartListening) => {
+  startAppListening({
+    actionCreator: addUserAddressWithListener,
+    effect: async (action, listenerApi) => {
+      const state = listenerApi.getState();
+      const orderId = state.order.currentOrderId;
+
+      try {
+        const address = await ModifyOrderAddress({
+          orderId: orderId,
+          addressInfo: action.payload,
+        });
+
+        listenerApi.dispatch(
+          addOrderAddressWithoutListener({
+            address: address.address,
+            city: address.city,
+            state: address.state,
+            zipcode: address.zipcode,
+            country: address.country,
+          })
+        );
+      } catch (error) {}
+    },
+  });
+};
+
+export const paymentUserListener = (startAppListening: AppStartListening) => {
+  startAppListening({
+    actionCreator: addUserCardWithListener,
+    effect: async (action, listenerApi) => {
+      const state = listenerApi.getState();
+      const orderId = state.order.currentOrderId;
+
+      try {
+        const payment = await ModifyOrderPaymentMethod({
+          orderId: orderId,
+          paymentInfo: action.payload,
+        });
+
+        listenerApi.dispatch(
+          addOrderPaymentWithoutListener({
+            cardnumber: payment.cardnumber,
+            cardname: payment.cardname,
+            expirydate: payment.expirydate,
+            cvv: payment.cvv,
+          })
+        );
+      } catch (error) {}
+    },
+  });
+};
