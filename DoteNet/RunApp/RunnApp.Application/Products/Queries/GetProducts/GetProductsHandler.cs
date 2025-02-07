@@ -19,7 +19,8 @@ namespace RunnApp.Application.Products.Queries.GetProducts
             var filterMappingValues = new FilterMappingValues(request.Stars, request.Categories, request.PriceRange, request.Search);
             var filterMappingOptions = GetFilterOptions(filterMappingValues);
 
-            var productsQuery = _productsRepository.GetProducts();
+            var productsQuery = _productsRepository.GetProducts()
+                                                   .AddSortingBy(request.OrderByOptions);
 
             var productsWithMainImage = _leftJoinRepository.GetProductsWithImage(productsQuery);
             var productForCardWithImage = productsWithMainImage.TransformProductWithImageQuery();
@@ -27,8 +28,8 @@ namespace RunnApp.Application.Products.Queries.GetProducts
             var productsAndStatus = _leftJoinRepository.GetProductsAndStatusLeftJoin(request.UserId, productForCardWithImage);
 
             var finalProductsQuery = productsAndStatus
-                 .AddFiltering(filterMappingValues, filterMappingOptions)
-                 .AddSortingBy(request.OrderByOptions);
+                 .AddFiltering(filterMappingValues, filterMappingOptions);
+                 
 
             
 

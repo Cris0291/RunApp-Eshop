@@ -1,4 +1,5 @@
-﻿using RunnApp.Application.Common.SortingPagingFiltering;
+﻿using RunApp.Domain.Products;
+using RunnApp.Application.Common.SortingPagingFiltering;
 
 namespace RunnApp.Application.Products.Queries.GetProducts
 {
@@ -22,22 +23,22 @@ namespace RunnApp.Application.Products.Queries.GetProducts
                 UserLike = null,
             }); ; ;
         }
-        public static IQueryable<ProductsJoin> AddSortingBy(this IQueryable<ProductsJoin> products, OrderByOptions orderByOptions)
+        public static IQueryable<Product> AddSortingBy(this IQueryable<Product> products, OrderByOptions orderByOptions)
         {
             switch (orderByOptions)
             {
                 case OrderByOptions.SimpleOrder:
-                    return products.OrderByDescending(x => x.Product.ProductId);
+                    return products.OrderByDescending(x => x.ProductId);
                 case OrderByOptions.PriceDescendingOrder:
-                    return products.OrderByDescending(x => x.Product.ActualPrice);
+                    return products.OrderByDescending(x => x.ActualPrice);
                 case OrderByOptions.PriceAscendingOrder:
-                    return products.OrderBy(x => x.Product.ActualPrice);
+                    return products.OrderBy(x => x.ActualPrice);
                 case OrderByOptions.AverageRatingAscendingOrder:
-                    return products.OrderBy(x => x.Product.AverageRatings);
+                    return products.OrderBy(x => x.AverageRatings);
                 case OrderByOptions.AverageRatingDescendingOrder:
-                    return products.OrderByDescending(x => x.Product.AverageRatings);
+                    return products.OrderByDescending(x => x.AverageRatings);
                 default:
-                    return products.OrderByDescending(x => x.Product.ProductId);
+                    return products.OrderByDescending(x => x.ProductId);
             }
         }
         public static IQueryable<ProductsJoin> AddFiltering(this IQueryable<ProductsJoin> products, FilterMappingValues filterValues, IEnumerable<FilterByOptions> options)
