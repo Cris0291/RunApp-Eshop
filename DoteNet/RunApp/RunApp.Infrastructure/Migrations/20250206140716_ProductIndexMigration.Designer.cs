@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RunApp.Infrastructure.Common.Persistence;
 
@@ -11,9 +12,11 @@ using RunApp.Infrastructure.Common.Persistence;
 namespace RunApp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppStoreDbContext))]
-    partial class AppStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250206140716_ProductIndexMigration")]
+    partial class ProductIndexMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

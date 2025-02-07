@@ -38,27 +38,28 @@ namespace RunApp.Infrastructure.Products.Persistence
             builder.HasMany(x => x.Categories)
                 .WithMany();
                 
-              
+            builder.HasIndex(x => x.ActualPrice);
+            builder.HasIndex(x => x.AverageRatings);
 
 
-           /* builder.HasData(new Product()
-            {
-                ProductId = Guid.NewGuid(),
-                Name = "Xbox",
-                PriceWithDiscount = 275.75m,
-                ActualPrice = 500m,
-                Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                PromotionalText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vitae enim dolor. Nunc in nibh lectus. Cvestibulum id augue. Sed luctus convar. Sed interdum non quam quis eleifend",
-            },
-            new Product()
-            {
-                ProductId = Guid.NewGuid(),
-                Name = "PlayStation",
-                ActualPrice = 500m,
-                Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                PromotionalText = "",
-            }
-            );*/
+            /* builder.HasData(new Product()
+             {
+                 ProductId = Guid.NewGuid(),
+                 Name = "Xbox",
+                 PriceWithDiscount = 275.75m,
+                 ActualPrice = 500m,
+                 Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                 PromotionalText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vitae enim dolor. Nunc in nibh lectus. Cvestibulum id augue. Sed luctus convar. Sed interdum non quam quis eleifend",
+             },
+             new Product()
+             {
+                 ProductId = Guid.NewGuid(),
+                 Name = "PlayStation",
+                 ActualPrice = 500m,
+                 Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                 PromotionalText = "",
+             }
+             );*/
         }
     }
 }
