@@ -28,5 +28,9 @@ namespace RunApp.Infrastructure.Photos.Persistence
         {
             return await _appStoreDbContext.Photos.Where(x => x.ProductId == productId).SingleOrDefaultAsync();
         }
+        public async Task<IEnumerable<Photo>> GetPhotos()
+        {
+            return await _appStoreDbContext.Photos.ToListAsync();
+        }
     }
 }

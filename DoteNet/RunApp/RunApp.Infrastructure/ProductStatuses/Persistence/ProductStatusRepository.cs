@@ -20,5 +20,9 @@ namespace RunApp.Infrastructure.ProductStatuses.Persistence
         {
             return await _appStoreDbContext.ProductStatuses.AnyAsync(x => x.ProductId == productId && x.Id == customerId);
         }
+        public async Task<IEnumerable<ProductStatus>> GetProductStatuses(Guid customerId)
+        {
+            return await _appStoreDbContext.ProductStatuses.Where(x => x.Id == customerId).ToListAsync();
+        }
     }
 }
