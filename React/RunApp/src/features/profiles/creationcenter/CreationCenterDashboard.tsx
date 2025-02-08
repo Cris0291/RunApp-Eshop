@@ -126,7 +126,7 @@ function CreationCenterDashboard() {
 
   return (
     <TooltipProvider>
-      <div className="flex h-screen bg-white">
+      <div className="flex bg-white">
         <aside className="hidden md:flex flex-col w-16 lg:w-48 bg-black text-white">
           <div className="flex items-center justify-center h-16 border-b border-gray-800">
             <ShoppingCart className="w-6 h-6" />

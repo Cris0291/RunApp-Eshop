@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,11 +12,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, User, Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import useRegisterUser from "./useRegisterUser";
 import { FormValues } from "./contracts";
-import RegisterLoadingCard from "@/ui/RegisterLoadingCard";
 import Spinner from "@/ui/Spinner";
 
 function Register() {
@@ -54,20 +53,21 @@ function Register() {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
-      <div className="md:w-1/2 relative">
+      <div className="md:w-1/2 relative h-64 md:h-auto">
         <img
           src="https://images.unsplash.com/photo-1528629297340-d1d466945dc5?q=80&w=1522&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           alt="Registration background"
+          className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 opacity-75"></div>
         <div className="absolute inset-0 flex items-center justify-center">
-          <h1 className="text-4xl font bold text-white">
+          <h1 className="text-2xl md:text-4xl font-bold text-white text-center px-4">
             Welcome to Our Platform
           </h1>
         </div>
       </div>
 
-      <div className="md:w-1/2 flex items-center justify-center p-8">
+      <div className="md:w-1/2 flex items-center justify-center p-4 md:p-8">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="text-2xl font-bold">
@@ -92,9 +92,7 @@ function Register() {
                   <Input
                     id="name"
                     type="text"
-                    {...register("name", {
-                      required: "Name is required",
-                    })}
+                    {...register("name", { required: "Name is required" })}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="John Doe"
@@ -119,7 +117,7 @@ function Register() {
                     })}
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
-                    placeholder="John Doe"
+                    placeholder="johndoe"
                     className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -164,7 +162,7 @@ function Register() {
                     type={showPassword ? "text" : "password"}
                     {...register("password", {
                       required: "Password is required",
-                      min: {
+                      minLength: {
                         value: 8,
                         message: "Password must be at least 8 characters",
                       },
@@ -196,7 +194,7 @@ function Register() {
                     id="confirm"
                     type={showPassword ? "text" : "password"}
                     {...register("confirm", {
-                      required: "Password is required",
+                      required: "Password confirmation is required",
                       validate: (value) =>
                         value === getValues("password") ||
                         "Passwords do not match",
