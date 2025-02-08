@@ -1,27 +1,29 @@
-﻿using RunApp.Domain.Products;
+﻿using RunApp.Domain.PhotoAggregate;
+using RunApp.Domain.Products;
+using RunApp.Domain.ProductStatusAggregate;
 using RunnApp.Application.Common.SortingPagingFiltering;
 
 namespace RunnApp.Application.Products.Queries.GetProducts
 {
     public static class QueryBuilder
     {
-        public static IQueryable<ProductForCard> TransformProductWithImageQuery(this IQueryable<ProductWithMainImage> productsWithImage)
+        public static IQueryable<ProductForCard> TransformProductWithImageQuery(this IQueryable<Product> productsWithImage)
         {
             return productsWithImage.Select(x => new ProductForCard
             {
-                ProductId = x.Product.ProductId,
-                Name = x.Product.Name,
-                ActualPrice = x.Product.ActualPrice,
-                NumberOfReviews = x.Product.NumberOfReviews,
-                NumberOflikes = x.Product.NumberOfLikes,
-                AverageRatings = x.Product.AverageRatings,
-                PriceWithDiscount = x.Product.PriceOffer == null ? null : x.Product.PriceOffer.PriceWithDiscount,
-                PromotionalText = x.Product.PriceOffer == null ? null : x.Product.PriceOffer.PromotionalText,
-                Discount = x.Product.PriceOffer == null ? null : x.Product.PriceOffer.Discount,
-                CategoryNames = x.Product.Categories.Select(x => x.CategoryName),
-                MainImage = x.MainImage == null ? null : x.MainImage.Url,
+                ProductId = x.ProductId,
+                Name = x.Name,
+                ActualPrice = x.ActualPrice,
+                NumberOfReviews = x.NumberOfReviews,
+                NumberOflikes = x.NumberOfLikes,
+                AverageRatings = x.AverageRatings,
+                PriceWithDiscount = x.PriceOffer == null ? null : x.PriceOffer.PriceWithDiscount,
+                PromotionalText = x.PriceOffer == null ? null : x.PriceOffer.PromotionalText,
+                Discount = x.PriceOffer == null ? null : x.PriceOffer.Discount,
+                CategoryNames = x.Categories.Select(x => x.CategoryName),
+                MainImage = null,
                 UserLike = null,
-            }); ; ;
+            }); 
         }
         public static IQueryable<Product> AddSortingBy(this IQueryable<Product> products, OrderByOptions orderByOptions)
         {
@@ -41,9 +43,9 @@ namespace RunnApp.Application.Products.Queries.GetProducts
                     return products.OrderByDescending(x => x.ProductId);
             }
         }
-        public static IQueryable<ProductsJoin> AddFiltering(this IQueryable<ProductsJoin> products, FilterMappingValues filterValues, IEnumerable<FilterByOptions> options)
+        public static IQueryable<ProductForCard> AddFiltering(this IQueryable<ProductForCard> products, FilterMappingValues filterValues, IEnumerable<FilterByOptions> options)
         {
-            IQueryable<ProductsJoin> newProducts = products;
+            IQueryable<ProductForCard> newProducts = products;
             var categoriesSet = filterValues.Categories?.ToHashSet();
             var starsSet = filterValues.Stars?.ToHashSet();
 
@@ -52,16 +54,16 @@ namespace RunnApp.Application.Products.Queries.GetProducts
                 switch (option)
                 {
                     case FilterByOptions.Categories:
-                        newProducts = newProducts.Where(x => x.Product.CategoryNames.Any(c => categoriesSet!.Contains(c)));
+                        newProducts = newProducts.Where(x => x.CategoryNames.Any(c => categoriesSet!.Contains(c)));
                         break;
                     case FilterByOptions.Search:
-                        newProducts = filterValues.Search == "all" ? newProducts : newProducts = newProducts.Where(x => x.Product.Name.Contains(filterValues.Search));
+                        newProducts = filterValues.Search == "all" ? newProducts : newProducts = newProducts.Where(x => x.Name.Contains(filterValues.Search));
                         break;
                     case FilterByOptions.PriceRange:
-                        newProducts = newProducts.Where(x => x.Product.ActualPrice >= filterValues.PriceRange[0] && x.Product.ActualPrice <= filterValues.PriceRange[1]);
+                        newProducts = newProducts.Where(x => x.ActualPrice >= filterValues.PriceRange[0] && x.ActualPrice <= filterValues.PriceRange[1]);
                         break;
                     case FilterByOptions.Stars:
-                        newProducts = newProducts.Where(x => starsSet!.Contains((int)Math.Round(x.Product.AverageRatings)));
+                        newProducts = newProducts.Where(x => starsSet!.Contains((int)Math.Round(x.AverageRatings)));
                         break;
                     default:
                         return products;
@@ -74,6 +76,37 @@ namespace RunnApp.Application.Products.Queries.GetProducts
         {
             if (pageNumZeroStart != 0) query.Skip(pageNumZeroStart * pageSize);
             return query.Take(pageSize);
+        }
+        public static List<ProductsJoin> CreateProductWithStatus(this IEnumerable<ProductForCard> products, IEnumerable<ProductStatus> status)
+        {
+            return products
+                .GroupJoin(status,
+                           product => product.ProductId,
+                           status => status.ProductId,
+                           (o, i) => new { o, i })
+                .SelectMany(x => x.i.DefaultIfEmpty(),
+
+                (product, status) => new ProductsJoin { Product = product.o, ProductStatus = status }
+                ).ToList();
+        }
+
+        public static IEnumerable<ProductForCard> CreateProductWithImage(this List<ProductForCard> products, IEnumerable<Photo> photos)
+        {
+            var result =  products
+                .GroupJoin(photos,
+                           product => product.ProductId,
+                           photo => photo.ProductId,
+                           (o, i) => new { o, i })
+                .SelectMany(x => x.i.DefaultIfEmpty(),
+
+                (product, photo) => new ProductImage { Product = product.o, MainImage = photo }
+                ).ToList();
+
+            return result.Select(x =>
+            {
+                x.Product.MainImage = x.MainImage?.Url;
+                return x.Product;
+            });
         }
     }
 }
