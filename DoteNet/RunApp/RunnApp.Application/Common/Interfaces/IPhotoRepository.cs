@@ -8,5 +8,6 @@ namespace RunnApp.Application.Common.Interfaces
         Task RemovePhoto(Photo photo);
         Task<Photo?> GetPhoto(string photoId);
         Task<Photo?> GetPhotoForProduct(Guid productId);
+        Task<IEnumerable<Photo>> GetPhotos();
     }
 }

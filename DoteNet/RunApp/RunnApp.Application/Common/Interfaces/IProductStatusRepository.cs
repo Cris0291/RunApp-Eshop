@@ -8,6 +8,8 @@ namespace RunnApp.Application.Common.Interfaces
         Task AddProductStatus(ProductStatus productStatus);
         Task<ProductStatus?> GetProductStatus(Guid productId, Guid customerId);
         Task<bool> ExistProductStatus(Guid productId, Guid customerId);
-        
+        Task<IEnumerable<ProductStatus>> GetProductStatuses(Guid customerId);
+
+
     }
 }
