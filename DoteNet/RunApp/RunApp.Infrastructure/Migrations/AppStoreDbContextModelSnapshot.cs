@@ -200,10 +200,10 @@ namespace RunApp.Infrastructure.Migrations
                         .HasDefaultValueSql("NEWID()");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(10,2)");
+                        .HasColumnType("decimal(20,2)");
 
                     b.Property<decimal?>("PriceWithDiscount")
-                        .HasColumnType("decimal(10,2)");
+                        .HasColumnType("decimal(20,2)");
 
                     b.Property<string>("ProductName")
                         .IsRequired()
@@ -213,7 +213,7 @@ namespace RunApp.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalItemPrice")
-                        .HasColumnType("decimal(10,2)");
+                        .HasColumnType("decimal(20,2)");
 
                     b.HasKey("ProductId", "OrderId");
 
@@ -244,7 +244,7 @@ namespace RunApp.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(10,2)");
+                        .HasColumnType("decimal(20,2)");
 
                     b.HasKey("OrderId");
 
@@ -360,10 +360,6 @@ namespace RunApp.Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ProductId");
-
-                    b.HasIndex("ActualPrice");
-
-                    b.HasIndex("AverageRatings");
 
                     b.ToTable("Products");
                 });

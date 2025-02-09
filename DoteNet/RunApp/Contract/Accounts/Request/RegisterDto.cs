@@ -16,11 +16,11 @@ namespace Contracts.Accounts.Request
         public string ConfirmPassword { get; init; }
 
         [Required(ErrorMessage = "{0} can't be null or empty")]
-        [StringLength(15, MinimumLength = 4, ErrorMessage ="{0} msut be between 4 and 10 characters long")]
+        [StringLength(10, MinimumLength = 4, ErrorMessage ="{0} must be between 4 and 10 characters long")]
         public string UserName { get; init; }
 
         [Required(ErrorMessage = "{0} can't be null or empty")]
-        [StringLength(15, MinimumLength = 4, ErrorMessage = "{0} msut be between 4 and 10 characters long")]
+        [StringLength(10, MinimumLength = 4, ErrorMessage = "{0} must be between 4 and 10 characters long")]
         public string NickName { get; init; }
     }
 }

@@ -15,6 +15,7 @@ using RunApp.Infrastructure.Orders.Persistence;
 using RunApp.Infrastructure.Photos;
 using Microsoft.Extensions.Configuration;
 using RunApp.Infrastructure.Photos.Persistence;
+using Microsoft.Extensions.Options;
 
 namespace RunApp.Infrastructure
 {
@@ -43,6 +44,7 @@ namespace RunApp.Infrastructure
                 opt.Password.RequireUppercase = true;
                 opt.Password.RequiredLength = 7;
                 opt.Password.RequiredUniqueChars = 1;
+                opt.User.AllowedUserNameCharacters += " ";
             })
                 .AddEntityFrameworkStores<AppStoreDbContext>()
                 .AddRoles<AppRole>()
