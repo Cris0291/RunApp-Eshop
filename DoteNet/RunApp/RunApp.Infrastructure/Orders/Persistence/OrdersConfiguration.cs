@@ -9,7 +9,7 @@ namespace RunApp.Infrastructure.Orders.Persistence
         public void Configure(EntityTypeBuilder<Order> builder)
         {
             builder.Property(x => x.TotalPrice)
-                .HasColumnType("decimal(10,2)");
+                .HasColumnType("decimal(20,2)");
 
             builder.OwnsOne(x => x.Address);
             builder.OwnsOne(x => x.PaymentMethod);

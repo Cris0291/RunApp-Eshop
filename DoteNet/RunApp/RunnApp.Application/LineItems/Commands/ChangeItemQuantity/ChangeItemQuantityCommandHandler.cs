@@ -1,6 +1,5 @@
 ﻿using ErrorOr;
 using MediatR;
-using RunApp.Domain.OrderAggregate.LineItems;
 using RunnApp.Application.Common.Interfaces;
 
 namespace RunnApp.Application.LineItems.Commands.ChangeItemQuantity
