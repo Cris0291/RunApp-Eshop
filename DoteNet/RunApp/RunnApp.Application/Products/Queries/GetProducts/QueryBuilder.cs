@@ -21,11 +21,9 @@ namespace RunnApp.Application.Products.Queries.GetProducts
                 PromotionalText = x.PriceOffer == null ? null : x.PriceOffer.PromotionalText,
                 Discount = x.PriceOffer == null ? null : x.PriceOffer.Discount,
                 CategoryNames = x.Categories.Select(x => x.CategoryName),
-                MainImage = null,
-                UserLike = null,
             }); 
         }
-        public static IQueryable<Product> AddSortingBy(this IQueryable<Product> products, OrderByOptions orderByOptions)
+        public static IEnumerable<ProductForCard> AddSortingBy(this List<ProductForCard> products, OrderByOptions orderByOptions)
         {
             switch (orderByOptions)
             {
@@ -90,7 +88,7 @@ namespace RunnApp.Application.Products.Queries.GetProducts
                 ).ToList();
         }
 
-        public static IEnumerable<ProductForCard> CreateProductWithImage(this List<ProductForCard> products, IEnumerable<Photo> photos)
+        public static IEnumerable<ProductForCard> CreateProductWithImage(this IEnumerable<ProductForCard> products, IEnumerable<Photo> photos)
         {
             var result =  products
                 .GroupJoin(photos,

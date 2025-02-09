@@ -43,7 +43,7 @@ namespace RunApp.Infrastructure.Products.Persistence
         }
         public IQueryable<Product> GetProducts()
         {
-            return _appDbContext.Products.Include(x => x.Categories);
+            return _appDbContext.Products.Include(x => x.Categories).AsSplitQuery();
         }
         public IQueryable<Product> GetBoughtProducts(List<Guid> boughtProducts)
         {

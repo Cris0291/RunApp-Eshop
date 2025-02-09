@@ -24,15 +24,17 @@ namespace RunnApp.Application.Products.Queries.GetProducts
             var filterMappingValues = new FilterMappingValues(request.Stars, request.Categories, request.PriceRange, request.Search);
             var filterMappingOptions = GetFilterOptions(filterMappingValues);
 
+
             var productsQuery = await _productsRepository.GetProducts()
-                                                   .AddSortingBy(request.OrderByOptions)
                                                    .TransformProductWithImageQuery()
-                                                   .AddFiltering(filterMappingValues, filterMappingOptions)                                             
+                                                   .AddFiltering(filterMappingValues, filterMappingOptions)
                                                    .ToListAsync();
+
+            var orderProducts = productsQuery.AddSortingBy(request.OrderByOptions);
 
 
             var photos = await _photoRepository.GetPhotos();
-            var productWithImage = productsQuery.CreateProductWithImage(photos);
+            var productWithImage = orderProducts.CreateProductWithImage(photos);
             
 
             var statuses = await _productStatusRepository.GetProductStatuses(request.UserId);

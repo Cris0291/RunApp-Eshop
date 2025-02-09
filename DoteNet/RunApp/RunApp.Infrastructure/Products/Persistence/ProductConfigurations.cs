@@ -37,9 +37,6 @@ namespace RunApp.Infrastructure.Products.Persistence
 
             builder.HasMany(x => x.Categories)
                 .WithMany();
-                
-            builder.HasIndex(x => x.ActualPrice);
-            builder.HasIndex(x => x.AverageRatings);
 
 
             /* builder.HasData(new Product()
