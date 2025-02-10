@@ -8,6 +8,7 @@ import { useLocation, useNavigate } from "react-router";
 import Cookies from "js-cookie";
 import { useAuth } from "@/utils/AuhtProvider";
 import { createOrder } from "../payment/checkout/orderSlice";
+import { AxiosError } from "axios";
 
 export default function useRegisterUser() {
   let navigate = useNavigate();
@@ -46,9 +47,15 @@ export default function useRegisterUser() {
       navigate("/");
     },
     onError: (error) => {
+      const axiosError = error as AxiosError;
       toast.error(
-        `${error.message}: User was not registered. Something unexpected happened`
+        `${
+          axiosError.response !== undefined
+            ? axiosError.response.data
+            : axiosError.message
+        }`
       );
+      return error;
     },
   });
   return { mutate, isPending };

@@ -51,8 +51,7 @@ export default function CheckoutPage() {
   const orderError = useAppSelector(getOrderError);
   const { payOrder } = usePayOrder();
   const navigate = useNavigate();
-  console.log(userAddress);
-  console.log(userPaymentMethod);
+
   const onSubmitPayOrder = () => {
     const newErrors: (string | undefined)[] = [];
     if (userAddress === undefined)
@@ -237,7 +236,7 @@ export default function CheckoutPage() {
                     <div className="flex gap-4">
                       <Button
                         className="w-full bg-indigo-600 hover:bg-indigo-700"
-                        onClick={() => setChangePayment(true)}
+                        onClick={() => setChangePayment((prev) => !prev)}
                       >
                         Change Payment
                       </Button>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +32,7 @@ function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [submittedErrors, setSubmittedErrors] = useState<
     (string | undefined)[]
   >([]);
@@ -92,7 +93,17 @@ function Register() {
                   <Input
                     id="name"
                     type="text"
-                    {...register("name", { required: "Name is required" })}
+                    {...register("name", {
+                      required: "Name is required",
+                      minLength: {
+                        value: 4,
+                        message: "Name must be at least 4 characters",
+                      },
+                      maxLength: {
+                        value: 10,
+                        message: "Name must be at least 8 characters",
+                      },
+                    })}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="John Doe"
@@ -114,6 +125,14 @@ function Register() {
                     type="text"
                     {...register("username", {
                       required: "User name is required",
+                      minLength: {
+                        value: 4,
+                        message: "User name must be at least 4 characters",
+                      },
+                      maxLength: {
+                        value: 10,
+                        message: "User name must be at least 8 characters",
+                      },
                     })}
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
@@ -192,7 +211,7 @@ function Register() {
                   />
                   <Input
                     id="confirm"
-                    type={showPassword ? "text" : "password"}
+                    type={showConfirmPassword ? "text" : "password"}
                     {...register("confirm", {
                       required: "Password confirmation is required",
                       validate: (value) =>
@@ -204,6 +223,17 @@ function Register() {
                     placeholder="********"
                     className="pl-10 pr-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff size={18} />
+                    ) : (
+                      <Eye size={18} />
+                    )}
+                  </button>
                 </div>
               </div>
               {submittedErrors.length > 0 && (

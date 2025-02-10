@@ -56,8 +56,12 @@ export default function ShippingInfoForm({
       { orderId, addressInfo: data },
       {
         onSuccess: (data) => {
+          toast.success("Order address was updated");
           dispatch(addOrderAddress(data));
           handleAddress(true);
+        },
+        onError: () => {
+          toast.error("Something unexpected happened");
         },
       }
     );
@@ -89,6 +93,8 @@ export default function ShippingInfoForm({
             </Label>
             <Input
               id="address"
+              placeholder="Av New Hope"
+              type="text"
               {...register("address", {
                 required: "Address is required",
               })}
@@ -102,6 +108,8 @@ export default function ShippingInfoForm({
               </Label>
               <Input
                 id="city"
+                type="text"
+                placeholder="Mexico city"
                 {...register("city", {
                   required: "City is required",
                 })}
@@ -114,6 +122,8 @@ export default function ShippingInfoForm({
               </Label>
               <Input
                 id="state"
+                type="text"
+                placeholder="Veracruz"
                 {...register("state", {
                   required: "State is required",
                 })}
@@ -127,6 +137,7 @@ export default function ShippingInfoForm({
             </Label>
             <Input
               id="zipcode"
+              placeholder="12345 or 12345-1234"
               {...register("zipcode", {
                 required: "Zipcode is required",
                 pattern: {
@@ -144,6 +155,7 @@ export default function ShippingInfoForm({
             <Input
               id="country"
               type="text"
+              placeholder="Mexico"
               {...register("country", { required: "Country is required" })}
               className="border-yellow-500 focus:ring-yellow-500 focus:border-yellow-500 text-black"
             />

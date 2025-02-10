@@ -17,6 +17,7 @@ import {
   AddressSettingsForm,
   PaymentSettingsForm,
 } from "../payment/checkout/contracts";
+import { AxiosError } from "axios";
 
 export default function useLoginUser() {
   const dispatch = useAppDispatch();
@@ -83,8 +84,18 @@ export default function useLoginUser() {
       dispatch(createOrder());
       navigate("/");
     },
-    onError: () =>
-      toast.error("Something unexpected happened. User could not be logged in"),
+    onError: (error) => {
+      const axiosError = error as AxiosError;
+      const dataResponse: any = axiosError.response?.data;
+      toast.error(
+        `${
+          axiosError.response !== undefined
+            ? dataResponse.detail
+            : axiosError.message
+        }`
+      );
+      return error;
+    },
   });
 
   return { loginUser, isPending };

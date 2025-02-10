@@ -19,6 +19,7 @@ import { addOrderPayment, getCurrentOrderId } from "./orderSlice";
 import useModifyOrderPaymentMethod from "./useModifyOrderPaymentMethod";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
+import isValidExpirationDate from "@/features/profiles/userprofile/settings/dateValidation";
 
 export default function PaymentInfoForm({
   handlePayment,
@@ -56,8 +57,13 @@ export default function PaymentInfoForm({
       { orderId, paymentInfo: data },
       {
         onSuccess: (data) => {
+          toast.success("Order payment information was succesfully updated");
           dispatch(addOrderPayment(data));
           handlePayment(true);
+        },
+        onError: (error) => {
+          toast.error("Something unexpected happened");
+          return error;
         },
       }
     );
@@ -106,8 +112,8 @@ export default function PaymentInfoForm({
                 {...register("cardnumber", {
                   required: "Card number is required",
                   pattern: {
-                    value: /^(?:\d[ -]*?){13,16}$/,
-                    message: "Card number is invalid",
+                    value: /^(?:\d[ -]*?){13,19}$/,
+                    message: "Card number must be between 13 and 19 digits.",
                   },
                 })}
               />
@@ -117,10 +123,16 @@ export default function PaymentInfoForm({
                 <Label htmlFor="expiry-date">Expiry Date</Label>
                 <Input
                   id="expiry-date"
-                  placeholder="MM/YY"
+                  placeholder="MM/YY or MM/YYYY"
                   className="border-yellow-500 focus:ring-yellow-500 focus:border-yellow-500 text-black"
                   {...register("expirydate", {
                     required: "Expiry date is required",
+                    pattern: {
+                      value: /^(0[1-9]|1[0-2])\/\d{2}(\d{2})?$/,
+                      message:
+                        "Expiration date must be in MM/YY or MM/YYYY format.",
+                    },
+                    validate: (fieldValue) => isValidExpirationDate(fieldValue),
                   })}
                 />
               </div>
@@ -134,8 +146,8 @@ export default function PaymentInfoForm({
                   {...register("cvv", {
                     required: "Cvv is required",
                     pattern: {
-                      value: /^[0-9]{3,4}$/,
-                      message: "Cvv is inva;id",
+                      value: /^\d{3}$/,
+                      message: "Invalid CVV",
                     },
                   })}
                 />
