@@ -4,6 +4,7 @@ import {
   CreatePaymentMethod,
   UpdatePaymentMethod,
 } from "@/services/apiSettings";
+import toast from "react-hot-toast";
 
 export default function useUpdateOrCreatePaymentInfo() {
   const {
@@ -20,6 +21,12 @@ export default function useUpdateOrCreatePaymentInfo() {
       const result = wasCreated ? UpdatePaymentMethod : CreatePaymentMethod;
 
       return result({ paymentInfo });
+    },
+    onSuccess: () =>
+      toast.success("User payment information was succesfully updated"),
+    onError: (error) => {
+      toast.error("Something unexpected happened");
+      return error;
     },
   });
 

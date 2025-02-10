@@ -16,7 +16,6 @@ import {
   User,
   Mail,
   MapPin,
-  Check,
   Eye,
   EyeOff,
   Lock,
@@ -49,6 +48,7 @@ import toast from "react-hot-toast";
 import ProductLoadingCard from "@/ui/ProductLoadingCard";
 import UserInfoErrorCard from "@/ui/UserInfoErrorCard";
 import Cookies from "js-cookie";
+import isValidExpirationDate from "./dateValidation";
 
 export default function UserSettingsPage() {
   const { userInfo, isLoading, error, isError } = useGetUserAccountInfo();
@@ -61,7 +61,9 @@ export default function UserSettingsPage() {
   const [wasCreated, setWasCreated] = useState(false);
   const [activeTab, setActiveTab] = useState("account");
   const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showConfirmOldPassword, setShowConfirmOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
   const queryClient = useQueryClient();
   const [submittedAccountErrors, setSubmittedAccountErrors] = useState<
     (string | undefined)[]
@@ -214,7 +216,6 @@ export default function UserSettingsPage() {
   const onAccountSubmit: SubmitHandler<AccountSettingsForm> = (data) => {
     updateUserAccountInfo(data, {
       onSuccess: (data) => {
-        toast.success("User account info was updated");
         Cookies.set(
           "Session",
           JSON.stringify({
@@ -235,9 +236,6 @@ export default function UserSettingsPage() {
           queryKey: ["userInfo"],
         });
       },
-      onError: (error) => {
-        toast.error(error.message);
-      },
     });
   };
   const onPasswordSubmit: SubmitHandler<PasswordSettingsForm> = (data) => {
@@ -250,9 +248,6 @@ export default function UserSettingsPage() {
     };
     updatePassword(newPassword, {
       onSuccess: () => passwordReset(),
-      onError: (error) => {
-        toast.error(error.message);
-      },
     });
   };
 
@@ -261,15 +256,11 @@ export default function UserSettingsPage() {
       { addressInfo: data, wasCreated },
       {
         onSuccess: (data) => {
-          toast.success("User address was updated");
           dispatch(addUserAddressWithListener(data));
           addressReset();
           queryClient.invalidateQueries({
             queryKey: ["userInfo"],
           });
-        },
-        onError: (error) => {
-          toast.error(error.message);
         },
       }
     );
@@ -280,15 +271,11 @@ export default function UserSettingsPage() {
       { paymentInfo: data, wasCreated },
       {
         onSuccess: (data) => {
-          toast.success("User payment info was updated");
           dispatch(addUserCardWithListener(data));
           paymentReset();
           queryClient.invalidateQueries({
             queryKey: ["userInfo"],
           });
-        },
-        onError: (error) => {
-          toast.error(error.message);
         },
       }
     );
@@ -418,6 +405,16 @@ export default function UserSettingsPage() {
                               className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                               {...accountRegister("username", {
                                 required: "User name is required",
+                                minLength: {
+                                  value: 4,
+                                  message:
+                                    "User name must be at least 4 characters",
+                                },
+                                maxLength: {
+                                  value: 10,
+                                  message:
+                                    "User name must be at least 8 characters",
+                                },
                               })}
                             />
                           </div>
@@ -435,6 +432,14 @@ export default function UserSettingsPage() {
                               className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                               {...accountRegister("name", {
                                 required: "Name is required",
+                                minLength: {
+                                  value: 4,
+                                  message: "Name must be at least 4 characters",
+                                },
+                                maxLength: {
+                                  value: 10,
+                                  message: "Name must be at least 8 characters",
+                                },
                               })}
                             />
                           </div>
@@ -617,7 +622,9 @@ export default function UserSettingsPage() {
                             />
                             <Input
                               id="confirmoldpassword"
-                              type={showOldPassword ? "text" : "password"}
+                              type={
+                                showConfirmOldPassword ? "text" : "password"
+                              }
                               {...passwordRegister("confirmoldpassword", {
                                 required:
                                   "Confirmation of old password is required",
@@ -627,6 +634,21 @@ export default function UserSettingsPage() {
                               })}
                               className="pl-10 pr-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                             />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setShowConfirmOldPassword(
+                                  !showConfirmOldPassword
+                                )
+                              }
+                              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            >
+                              {showConfirmOldPassword ? (
+                                <EyeOff size={18} />
+                              ) : (
+                                <Eye size={18} />
+                              )}
+                            </button>
                           </div>
                         </div>
                         <div className="space-y-2">
@@ -683,7 +705,9 @@ export default function UserSettingsPage() {
                             />
                             <Input
                               id="confirmnewpassword"
-                              type={showNewPassword ? "text" : "password"}
+                              type={
+                                showConfirmNewPassword ? "text" : "password"
+                              }
                               {...passwordRegister("confirmnewpassword", {
                                 required:
                                   "Confirmation of new password is required",
@@ -693,6 +717,21 @@ export default function UserSettingsPage() {
                               })}
                               className="pl-10 pr-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                             />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setShowConfirmNewPassword(
+                                  !showConfirmNewPassword
+                                )
+                              }
+                              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            >
+                              {showConfirmNewPassword ? (
+                                <EyeOff size={18} />
+                              ) : (
+                                <Eye size={18} />
+                              )}
+                            </button>
                           </div>
                         </div>
                       </CardContent>
@@ -740,6 +779,7 @@ export default function UserSettingsPage() {
                             <Input
                               id="address"
                               type="text"
+                              placeholder="Av New Hope"
                               className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                               {...addressRegister("address", {
                                 required: "Address is required",
@@ -758,6 +798,7 @@ export default function UserSettingsPage() {
                               <Input
                                 id="city"
                                 type="text"
+                                placeholder="Mexico city"
                                 className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                                 {...addressRegister("city", {
                                   required: "City is required",
@@ -775,6 +816,7 @@ export default function UserSettingsPage() {
                               <Input
                                 id="state"
                                 type="text"
+                                placeholder="Veracruz"
                                 className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                                 {...addressRegister("state", {
                                   required: "State is required",
@@ -792,6 +834,7 @@ export default function UserSettingsPage() {
                               <Input
                                 id="country"
                                 type="text"
+                                placeholder="Mexico"
                                 className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                                 {...addressRegister("country", {
                                   required: "Country is required",
@@ -809,8 +852,8 @@ export default function UserSettingsPage() {
                             />
                             <Input
                               id="zipcode"
-                              type="number"
                               className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
+                              placeholder="12345 or 12345-1234"
                               {...addressRegister("zipcode", {
                                 required: "Zipcode is required",
                                 pattern: {
@@ -866,6 +909,7 @@ export default function UserSettingsPage() {
                             <Input
                               id="cardName"
                               type="text"
+                              placeholder="John Doe"
                               className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                               {...paymentRegister("cardname", {
                                 required: "Card name is required",
@@ -883,12 +927,14 @@ export default function UserSettingsPage() {
                             <Input
                               id="cardNumber"
                               type="number"
+                              placeholder="1234 5678 9012 3456"
                               className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                               {...paymentRegister("cardnumber", {
                                 required: "Card number is required",
                                 pattern: {
-                                  value: /^(?:\d[ -]*?){13,16}$/,
-                                  message: "Card number is invalid",
+                                  value: /^(?:\d[ -]*?){13,19}$/,
+                                  message:
+                                    "Card number must be between 13 and 19 digits.",
                                 },
                               })}
                             />
@@ -905,9 +951,17 @@ export default function UserSettingsPage() {
                               <Input
                                 id="expiryDate"
                                 type="text"
+                                placeholder="MM/YY or MM/YYYY"
                                 className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                                 {...paymentRegister("expirydate", {
                                   required: "Expiry date is required",
+                                  pattern: {
+                                    value: /^(0[1-9]|1[0-2])\/\d{2}(\d{2})?$/,
+                                    message:
+                                      "Expiration date must be in MM/YY or MM/YYYY format.",
+                                  },
+                                  validate: (fieldValue) =>
+                                    isValidExpirationDate(fieldValue),
                                 })}
                               />
                             </div>
@@ -923,12 +977,13 @@ export default function UserSettingsPage() {
                                 id="cvv"
                                 typeof="number"
                                 type="password"
+                                placeholder="123"
                                 className="pl-10 transition-all duration-300 focus:ring-2 focus:ring-blue-500"
                                 {...paymentRegister("cvv", {
                                   required: "Cvv is required",
                                   pattern: {
-                                    value: /^[0-9]{3,4}$/,
-                                    message: "Cvv is inva;id",
+                                    value: /^\d{3}$/,
+                                    message: "Invalid CVV",
                                   },
                                 })}
                               />
