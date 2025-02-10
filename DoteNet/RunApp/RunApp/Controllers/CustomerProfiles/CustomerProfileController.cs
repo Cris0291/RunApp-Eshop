@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RunApp.Api.Mappers.CustomerProfiles;
 using RunApp.Api.Mappers.Orders;
 using RunApp.Api.Mappers.Products;
@@ -123,6 +124,13 @@ namespace RunApp.Api.Controllers.CustomerProfiles
         {
             var user = await _userManager.FindByEmailAsync(accountInfo.OldEmail);
             if (user == null) return BadRequest("User was not found");
+
+            var isUserNickNameTaken = await _userManager.Users.AnyAsync(x => x.NickName == accountInfo.NickName);
+            if (isUserNickNameTaken) return BadRequest("User nickname was already registerd");
+
+            var isUserEmailTaken = await _userManager.Users.AnyAsync(x => x.Email == accountInfo.NewEmail);
+            if (isUserEmailTaken) return BadRequest("New user email was already registerd");
+
             user.Email = accountInfo.NewEmail;
             user.UserName = accountInfo.Name;
             user.NickName = accountInfo.NickName;
