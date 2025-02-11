@@ -1,5 +1,6 @@
 ﻿using ErrorOr;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -13,9 +14,17 @@ namespace RunApp.Api.Controllers
         {
             if (errors.Count == 0) return Problem();
 
-            if (errors.All(error => error.Type == ErrorType.Validation)) return ValidationProblem(errors);
+            //if (errors.All(error => error.Type == ErrorType.Validation)) return ValidationProblem(errors);
 
-            return Problem(errors[0]);
+            
+            var errorDetails = errors.Select(error => error.Description);
+            return BadRequest(new ProblemDetails()
+            {
+                Status = 400,
+                Title = errors[0].Description,
+                Detail = string.Join(",", errorDetails),
+
+            });
         }
   
         protected IActionResult ValidationProblem(List<Error> errors)
@@ -39,7 +48,14 @@ namespace RunApp.Api.Controllers
                 ErrorType.Forbidden => StatusCodes.Status403Forbidden,
                 _ => StatusCodes.Status500InternalServerError
             };
-            return Problem(statusCode: errorType, detail: error.Description);
+            return BadRequest(new ProblemDetails()
+            {
+                Status = errorType,
+                Title = error.Description,
+                Detail = error.Description,
+
+            });
+
         }
     }
 }
