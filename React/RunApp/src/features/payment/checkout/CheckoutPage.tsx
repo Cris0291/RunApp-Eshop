@@ -51,7 +51,7 @@ export default function CheckoutPage() {
   const orderError = useAppSelector(getOrderError);
   const { payOrder } = usePayOrder();
   const navigate = useNavigate();
-
+  console.log(userAddress);
   const onSubmitPayOrder = () => {
     const newErrors: (string | undefined)[] = [];
     if (userAddress === undefined)
