@@ -81,7 +81,7 @@ namespace RunApp.Api.Controllers.Products
             ErrorOr<Product> productorError =  await _mediator.Send(productCommand);
 
             return productorError.Match(product => CreatedAtAction(nameof(Get), new { id = product.ProductId }, product.ProductToProductResponse()),
-              Problem); 
+              error => Problem(error)); 
         }
        
         [Authorize]
