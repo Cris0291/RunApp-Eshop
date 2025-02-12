@@ -26,6 +26,7 @@ namespace RunApp.Domain.Products
             PriceOffer = priceOffer;
             BulletPoints = bulletpoints;
         }
+        private int _averageSum;
         public List<Guid> Reviews { get; internal set; }
         public List<Guid> Ratings { get; internal set; }
         public Guid ProductId { get; internal set; }
@@ -112,18 +113,25 @@ namespace RunApp.Domain.Products
             PriceOffer = null;
             
         }
-        public void AddReview(Guid reviewId)
+        public void AddReview(Review review)
         {
-            if (Reviews.Contains(reviewId)) throw new InvalidOperationException("Cannot add more than one review per user");
-            Reviews.Add(reviewId);
+            if (Reviews.Contains(review.ReviewId)) throw new InvalidOperationException("Cannot add more than one review per user");
+            Reviews.Add(review.ReviewId);
 
             NumberOfReviews = Reviews.Count();
+
+            _averageSum += review.Rating;
+            AverageRatings = _averageSum / NumberOfReviews;
         }
-        public void DeleteReview(Guid reviewId)
+        public void DeleteReview(Review review)
         {
-            var wasRemoved = Reviews.Remove(reviewId);
+            var wasRemoved = Reviews.Remove(review.ReviewId);
             NumberOfReviews = Reviews.Count();
             if (!wasRemoved) throw new InvalidOperationException("Review was not removerd");
+
+            _averageSum -= review.Rating;
+            AverageRatings = _averageSum / NumberOfReviews;
+
         }
         public void AddProductLike(bool like)
         {

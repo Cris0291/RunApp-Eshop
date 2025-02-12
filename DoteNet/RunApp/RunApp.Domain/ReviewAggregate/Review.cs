@@ -28,13 +28,13 @@ namespace RunApp.Domain.ReviewAggregate
                 Rating = rating,
             };
 
-            review.RaiseEvent(new AddReviewEvent(review.ReviewId, productId, customerProfileId));
+            review.RaiseEvent(new AddReviewEvent(review, productId, customerProfileId));
             return review;
         }
 
         public void RemoveReview(Guid reviewId, Guid productId, Guid customerProfileId)
         {
-            RaiseEvent(new DeleteReviewEvent(reviewId, productId, customerProfileId));
+            RaiseEvent(new DeleteReviewEvent(this, productId, customerProfileId));
         }
         public void UpdateReview(string comment, int rating, ReviewDescriptionEnums reviewDescription)
         {

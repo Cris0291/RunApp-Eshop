@@ -13,7 +13,7 @@ namespace RunnApp.Application.Products.Events
             var product = await _productsRepository.GetProduct(notification.ProductId);
             if (product == null) throw new InvalidOperationException("product was not found");
 
-            product.DeleteReview(notification.ReviewId);
+            product.DeleteReview(notification.Review);
 
             int wasDeleted = await _unitOfWorkPattern.CommitChangesAsync();
             if (wasDeleted == 0) throw new InvalidOperationException("Review could not be deleted");

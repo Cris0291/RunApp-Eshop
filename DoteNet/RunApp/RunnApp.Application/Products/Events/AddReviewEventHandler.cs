@@ -13,7 +13,7 @@ namespace RunnApp.Application.Products.Events
             var product = await _productsRepository.GetProduct(notification.ProductId);
             if (product == null) throw new InvalidOperationException("Product was not found");
 
-            product.AddReview(notification.ReviewId);
+            product.AddReview(notification.Review);
             await _unitOfWorkPattern.CommitChangesAsync();
         }
     }

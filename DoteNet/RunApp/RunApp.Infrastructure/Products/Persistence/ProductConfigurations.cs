@@ -38,6 +38,9 @@ namespace RunApp.Infrastructure.Products.Persistence
             builder.HasMany(x => x.Categories)
                 .WithMany();
 
+            builder.Property("_averageSum")
+                .HasColumnName("AverageSum");
+
 
             /* builder.HasData(new Product()
              {

@@ -2,5 +2,5 @@
 
 namespace RunApp.Domain.ReviewAggregate.Events
 {
-    public record DeleteReviewEvent(Guid ReviewId, Guid ProductId, Guid CustomerProfileId) : IDomainEvent;
+    public record DeleteReviewEvent(Review Review, Guid ProductId, Guid CustomerProfileId) : IDomainEvent;
 }
