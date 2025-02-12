@@ -38,7 +38,8 @@ namespace RunApp.Domain.Common
                 nameof(ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount) => ProductError.ActualPriceCannotBeLowerThanPriceWithDiscount,
                 nameof(ReviewError.AllReviewsMustHaveAComment) => ReviewError.AllReviewsMustHaveAComment,
                 nameof(ReviewError.MinimumNunberOfStarsCannotBeLessThanOne) => ReviewError.MinimumNunberOfStarsCannotBeLessThanOne,
-                nameof(StoreOwnerprofileError.InitialInvestmentCannotBeLowerThan5000) => StoreOwnerprofileError.InitialInvestmentCannotBeLowerThan5000
+                nameof(StoreOwnerprofileError.InitialInvestmentCannotBeLowerThan5000) => StoreOwnerprofileError.InitialInvestmentCannotBeLowerThan5000,
+                nameof(ProductError.ProductWeightCannotBeGreaterThan200Kilograms) => ProductError.ProductWeightCannotBeGreaterThan200Kilograms
             };
 
             AddError(ValidationError);
