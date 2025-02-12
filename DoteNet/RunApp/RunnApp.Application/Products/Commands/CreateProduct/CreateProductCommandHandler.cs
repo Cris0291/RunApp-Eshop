@@ -22,7 +22,10 @@ namespace RunnApp.Application.Products.Commands.CreateProduct
             ErrorOr<Product> productOrError = Product.CreateProduct(request.Name, request.Description, request.Price, request.Bulletpoints, 
                                                                     request.PriceWithDiscount, request.PromotionalText, request.Brand, request.Type, request.Color, request.Weight, request.UserId);
 
-            if (productOrError.IsError) return productOrError.Errors;
+            if (productOrError.IsError)
+            {
+                return productOrError.Errors;
+            }
 
             foreach(var category in request.Categories)
             {
