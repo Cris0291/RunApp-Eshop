@@ -281,7 +281,6 @@ export default function ProductDisplay() {
                     </>
                   )}
                   <LikeButton
-                    size="sm"
                     onLikeChange={handleLike}
                     initialLiked={product.like}
                   />

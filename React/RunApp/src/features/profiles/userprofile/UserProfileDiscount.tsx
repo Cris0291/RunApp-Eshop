@@ -88,7 +88,7 @@ export default function UserProfileDiscount() {
                       <NoImagePlaceholder />
                     )}
                     <Badge className="absolute top-2 right-2 bg-pink-500 text-white">
-                      {product.discount}% OFF
+                      {product.discount?.toFixed()}% OFF
                     </Badge>
                   </div>
                 </CardHeader>

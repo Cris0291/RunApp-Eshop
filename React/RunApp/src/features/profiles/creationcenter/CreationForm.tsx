@@ -20,6 +20,8 @@ import { ProductCreationDto, ProductResponseDto } from "./contracts";
 import useCreateProductCommand from "./useCreateProductCommand";
 import StatusPopup from "@/ui/SatusPopup";
 import toast from "react-hot-toast";
+import { AxiosError } from "axios";
+import Spinner from "@/ui/Spinner";
 
 const CATEGORIES = [
   "Equipment",
@@ -58,7 +60,7 @@ export default function CreationForm({
     weight: 0,
     type: "",
   });
-
+  console.log(`idle ${isIdle} isError ${isError} isSuccess ${isSuccess}`);
   const handleProductSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const errors = validateFormData();
@@ -66,11 +68,34 @@ export default function CreationForm({
     if (errors.length === 0) {
       ProductsCraetionFunction(formData, {
         onSuccess: (data) => {
-          toast.success("review was updated");
+          toast.success("product was created");
           onHandleAddAnImage(data);
+          setFormData({
+            name: "",
+            description: "",
+            price: 0,
+            bulletPoints: [""],
+            priceWithDiscount: undefined,
+            promotionalText: undefined,
+            categories: [],
+            brand: "",
+            color: "",
+            weight: 0,
+            type: "",
+          });
         },
         onError: (error) => {
-          toast.error(error.message);
+          const axiosError = error as AxiosError;
+          console.log(axiosError);
+          const dataResponse: any = axiosError.response?.data;
+          toast.error(
+            `${
+              axiosError.response !== undefined
+                ? dataResponse.detail
+                : axiosError.message
+            }`
+          );
+          return error;
         },
       });
     }
@@ -497,26 +522,20 @@ export default function CreationForm({
               <Button
                 type="submit"
                 className="w-full bg-yellow-500 hover:bg-yellow-600 text-black text-lg font-semibold py-4 sm:py-6 transition-all duration-300 transform hover:scale-105"
+                disabled={isCreating}
               >
-                <Plus className="mr-2 h-5 w-5" /> Create Product
+                {isCreating ? <Spinner /> : "Create Product"}
               </Button>
             </form>
-            {isSuccess && !isError ? (
+            {isSuccess && !isError && !isIdle ? (
               <StatusPopup
                 status="success"
                 message="Your product has been successfully loaded!"
                 actionLabel="Add an image"
                 onAction={(link: string) => onHandleAddLink(link)}
               />
-            ) : isIdle ? (
-              ""
             ) : (
-              <StatusPopup
-                status="failure"
-                message="Failed to load data. Please try again."
-                actionLabel="Retry"
-                onAction={() => {}}
-              />
+              ""
             )}
           </CardContent>
         </Card>
