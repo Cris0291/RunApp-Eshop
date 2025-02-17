@@ -1,4 +1,6 @@
 ﻿using RunApp.Domain.Common;
+using RunApp.Domain.CustomerProfileAggregate;
+using RunApp.Domain.Products;
 using RunApp.Domain.ReviewAggregate.Events;
 using RunApp.Domain.ReviewAggregate.ReviewEnum;
 using System.Runtime.CompilerServices;
@@ -36,11 +38,15 @@ namespace RunApp.Domain.ReviewAggregate
         {
             RaiseEvent(new DeleteReviewEvent(this, productId, customerProfileId));
         }
-        public void UpdateReview(string comment, int rating, ReviewDescriptionEnums reviewDescription)
+        public void UpdateReview(Guid productId, Guid customerProfileId, string comment, int rating, ReviewDescriptionEnums reviewDescription)
         {
+            int oldRating = Rating;
+
             Comment = comment;
             ReviewDescription = reviewDescription;
             Rating = rating;
+
+            RaiseEvent(new UpdateReviewEvent(this, productId, customerProfileId, oldRating));
         }
     }
 }

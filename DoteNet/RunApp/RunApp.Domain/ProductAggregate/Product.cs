@@ -133,6 +133,14 @@ namespace RunApp.Domain.Products
             AverageRatings = _averageSum / NumberOfReviews;
 
         }
+        public void UpdateReview(Review review, int oldRating)
+        {
+            if (!Reviews.Contains(review.ReviewId)) throw new InvalidOperationException("Review was not found");
+
+            _averageSum -= oldRating;
+            _averageSum += review.Rating;
+            AverageRatings = _averageSum / NumberOfReviews;
+        }
         public void AddProductLike(bool like)
         {
             NumberOfLikes = like ? NumberOfLikes++ : NumberOfLikes == 0 ? NumberOfLikes : NumberOfLikes--;

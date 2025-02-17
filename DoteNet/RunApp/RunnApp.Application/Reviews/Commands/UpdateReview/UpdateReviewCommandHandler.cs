@@ -19,7 +19,7 @@ namespace RunnApp.Application.Reviews.Commands.UpdateReview
             var review  = await _reviewsRepository.GetReview(request.UserId, request.ProductId);
             if (review == null) throw new InvalidOperationException("Review was not found");
 
-            review.UpdateReview(request.Comment, request.Rating, request.ReviewDescriptionEnums);
+            review.UpdateReview(request.ProductId, request.UserId ,request.Comment, request.Rating, request.ReviewDescriptionEnums);
             await _unitOfWorkPattern.CommitChangesAsync();
 
             return review;
