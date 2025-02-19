@@ -7,7 +7,7 @@ namespace RunnApp.Application.Products.Queries.GetProducts
 {
     public static class QueryBuilder
     {
-        public static IQueryable<ProductForCard> TransformProductWithImageQuery(this IQueryable<Product> productsWithImage)
+        public static IEnumerable<ProductForCard> TransformProductWithImageQuery(this IEnumerable<Product> productsWithImage)
         {
             return productsWithImage.Select(x => new ProductForCard
             {
@@ -23,7 +23,7 @@ namespace RunnApp.Application.Products.Queries.GetProducts
                 CategoryNames = x.Categories.Select(x => x.CategoryName),
             }); 
         }
-        public static IEnumerable<ProductForCard> AddSortingBy(this List<ProductForCard> products, OrderByOptions orderByOptions)
+        public static IEnumerable<ProductForCard> AddSortingBy(this IEnumerable<ProductForCard> products, OrderByOptions orderByOptions)
         {
             switch (orderByOptions)
             {
@@ -41,9 +41,9 @@ namespace RunnApp.Application.Products.Queries.GetProducts
                     return products.OrderByDescending(x => x.ProductId);
             }
         }
-        public static IQueryable<ProductForCard> AddFiltering(this IQueryable<ProductForCard> products, FilterMappingValues filterValues, IEnumerable<FilterByOptions> options)
+        public static IEnumerable<ProductForCard> AddFiltering(this IEnumerable<ProductForCard> products, FilterMappingValues filterValues, IEnumerable<FilterByOptions> options)
         {
-            IQueryable<ProductForCard> newProducts = products;
+            IEnumerable<ProductForCard> newProducts = products;
             var categoriesSet = filterValues.Categories?.ToHashSet();
             var starsSet = filterValues.Stars?.ToHashSet();
 

@@ -25,10 +25,11 @@ namespace RunnApp.Application.Products.Queries.GetProducts
             var filterMappingOptions = GetFilterOptions(filterMappingValues);
 
 
-            var productsQuery = await _productsRepository.GetProducts()
-                                                   .TransformProductWithImageQuery()
-                                                   .AddFiltering(filterMappingValues, filterMappingOptions)
-                                                   .ToListAsync();
+            var products = await _productsRepository.GetProducts().ToListAsync();
+
+            var productsQuery = products.TransformProductWithImageQuery()
+                                        .AddFiltering(filterMappingValues, filterMappingOptions);
+                                                   
 
             var orderProducts = productsQuery.AddSortingBy(request.OrderByOptions);
 
