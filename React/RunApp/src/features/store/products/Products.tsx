@@ -1,5 +1,4 @@
 import { ProductsQuery } from "./contracts";
-import MainPageProductsServerSide from "./MainPageProductsServerSide";
 import { useState } from "react";
 import useGetProductsQuery from "./useGetProductsQuery";
 import { useGlobal } from "@/utils/GlobalProvider";

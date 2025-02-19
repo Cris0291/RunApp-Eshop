@@ -242,7 +242,7 @@ function MainPageProducts({
                     src={product.mainImage || "/placeholder.svg"}
                   />
                   <div className="p-4">
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center mb-3">
                       <h3 className="text-lg font-semibold mb-1 text-gray-500">
                         {product.name.slice(0, 20)}
                       </h3>
@@ -259,11 +259,11 @@ function MainPageProducts({
                       <p className="text-sm text-gray-500 mb-2">
                         {product.categoryNames[0]}
                       </p>
-                      <div className="flex items-center">
-                        <Heart className="w-5 h-5 fill-current text-red-500" />
+                      <div className="flex items-center gap-1 ">
                         <span className="ml-1 text-sm text-gray-600">
-                          {product.numberOfLikes}
+                          {product.numberOflikes}
                         </span>
+                        <Heart className="w-5 h-5 fill-current text-red-500" />
                       </div>
                     </div>
                     <div className="flex items-center justify-between mb-4">
@@ -281,11 +281,11 @@ function MainPageProducts({
                           </span>
                         </div>
                       )}
-                      <div className="flex items-center">
-                        <Star className="w-5 h-5 fill-current text-yellow-500" />
+                      <div className="flex items-center gap-1">
                         <span className="ml-1 text-sm text-gray-600">
-                          {product.averageRating}
+                          {product.averageRatings}
                         </span>
+                        <Star className="w-5 h-5 fill-current text-yellow-500" />
                       </div>
                     </div>
                     <Button

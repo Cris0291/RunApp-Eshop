@@ -14,9 +14,9 @@ export type ProductForCard = {
   priceWithDiscount: number | null;
   promotionalText: string | null;
   discount: number | null;
-  numberOfLikes: number | null;
+  numberOflikes: number | null;
   numberOfReviews: number | null;
-  averageRating: number;
+  averageRatings: number;
   userLike: boolean | null;
   categoryNames: string[];
 };
