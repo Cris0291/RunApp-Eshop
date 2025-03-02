@@ -1,4 +1,3 @@
-import { useAppSelector } from "@/hooks/reduxHooks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DeleteProduct } from "@/services/apiProduct";
 import toast from "react-hot-toast";

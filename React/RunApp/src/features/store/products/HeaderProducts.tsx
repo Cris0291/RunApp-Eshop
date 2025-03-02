@@ -2,11 +2,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useGlobal } from "@/utils/GlobalProvider";
 import { Dumbbell, Search, ShoppingCart, User } from "lucide-react";
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 
 function HeaderProducts() {
   const navigate = useNavigate();
   const { searchQuery, setSearchQuery } = useGlobal();
+
+  useEffect(() => {
+    setSearchQuery("");
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

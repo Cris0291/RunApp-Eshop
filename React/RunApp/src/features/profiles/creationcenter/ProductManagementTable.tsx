@@ -1,3 +1,7 @@
+"use client";
+
+import type React from "react";
+
 import { useState } from "react";
 import {
   Table,
@@ -25,8 +29,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Trash2, Upload, DollarSign, Tag, AlertCircle } from "lucide-react";
-import { newPromotionDto, ProductCreated } from "./contracts";
-import { SubmitHandler, useForm } from "react-hook-form";
+import type { newPromotionDto, ProductCreated } from "./contracts";
+import { type SubmitHandler, useForm } from "react-hook-form";
 import useAddNewDiscount from "./useAddNewDiscount";
 import useAddNewCategory from "./useAddNewCategory";
 import useDeleteCreatedProduct from "./useDeleteCreatedProduct";
@@ -34,6 +38,8 @@ import useGetCreatedProducts from "./useGetCreatedProducts";
 import useDeleteNewDiscount from "./useDeleteNewDiscount";
 import ProductLoadingCard from "@/ui/ProductLoadingCard";
 import NoProductsFound from "@/ui/NoProductsFound";
+import { useAppDispatch } from "@/hooks/reduxHooks";
+import { addItemsDueToDeletion } from "@/features/payment/shoppingcart/cartSlice";
 
 const categories = [
   "Equipment",
@@ -54,6 +60,7 @@ export default function ProductManagementTable({
   onHandleCurrentProduct: (link: string, product: ProductCreated) => void;
 }) {
   const { products, isLoading, error, isError } = useGetCreatedProducts();
+  const dispatch = useAppDispatch();
   const [currentProductId, setCurrentProductId] = useState<string>("");
   const [isPriceDialogOpen, setIsPriceDialogOpen] = useState(false);
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
@@ -75,7 +82,9 @@ export default function ProductManagementTable({
   const { deleteDiscount } = useDeleteNewDiscount();
 
   const handleDeleteProduct = (id: string) => {
-    deleteCreatedProduct(id);
+    deleteCreatedProduct(id, {
+      onSuccess: () => dispatch(addItemsDueToDeletion()),
+    });
   };
 
   const handleDeleteDiscount = (id: string) => {
@@ -147,11 +156,11 @@ export default function ProductManagementTable({
   };
 
   return (
-    <div className="container mx-auto p-4 bg-gray-50">
+    <div className="container mx-auto p-4 bg-gray-50 min-h-screen flex flex-col">
       <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
         Product Management
       </h1>
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden flex-grow">
         <div className="overflow-x-auto">
           {isLoading ? (
             <ProductLoadingCard />
@@ -194,7 +203,7 @@ export default function ProductManagementTable({
                     <TableCell>
                       {product.image ? (
                         <img
-                          src={product.image}
+                          src={product.image || "/placeholder.svg"}
                           alt={product.name}
                           className="w-16 h-16 object-cover rounded-md"
                         />
@@ -255,7 +264,9 @@ export default function ProductManagementTable({
               </TableBody>
             </Table>
           ) : (
-            <NoProductsFound />
+            <div className="flex items-center justify-center h-[50vh]">
+              <NoProductsFound />
+            </div>
           )}
         </div>
       </div>

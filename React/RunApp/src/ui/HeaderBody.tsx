@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useGlobal } from "@/utils/GlobalProvider";
 import { FilePlus2, Search, ShoppingCart, User } from "lucide-react";
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 
 export function HeaderBody({ isRegisterd }: { isRegisterd: boolean }) {
@@ -11,6 +12,10 @@ export function HeaderBody({ isRegisterd }: { isRegisterd: boolean }) {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
   };
+
+  useEffect(() => {
+    setSearchQuery("");
+  }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

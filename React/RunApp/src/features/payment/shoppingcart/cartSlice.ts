@@ -11,6 +11,9 @@ import {
 import { ExistProduct } from "@/services/apiProduct";
 import Cookies from "js-cookie";
 import { OrderItems } from "../checkout/contracts";
+import { GetCurrentOrder } from "@/services/apiOrders";
+import { setOrderError } from "@/features/login/loginSlice";
+import { AxiosError } from "axios";
 
 const currentOrderText = Cookies.get("Order");
 const orderCookie: OrderItems | undefined = currentOrderText
@@ -160,6 +163,9 @@ export const cartSlice = createSlice({
     addCurrentItems: (state, action: PayloadAction<ProductForLineItem[]>) => {
       state.products = [...action.payload];
     },
+    addItemsDueToDeletion: (state) => {
+      state.products = [];
+    },
   },
 });
 
@@ -173,6 +179,7 @@ export const {
   addCartError,
   addCurrentItems,
   deleteItemWithoutListening,
+  addItemsDueToDeletion,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
@@ -361,6 +368,56 @@ export const deleteItemListener = (startAppListening: AppStartListening) => {
         listenerApi.dispatch(
           addCartError(
             "There was error while permorming an action on the deleted item"
+          )
+        );
+      }
+    },
+  });
+};
+
+export const addItemsDueToDeletionListener = (
+  startAppListening: AppStartListening
+) => {
+  startAppListening({
+    actionCreator: addItemsDueToDeletion,
+    effect: async (action, listenerApi) => {
+      try {
+        const response = await GetCurrentOrder();
+
+        if (response instanceof AxiosError) {
+          listenerApi.dispatch(setOrderError(response));
+        } else {
+          if (response.order !== null) {
+            const currentOrder = response.order;
+
+            const currentItems: ProductForLineItem[] = currentOrder.items.map(
+              (item) => {
+                return {
+                  id: item.productId,
+                  name: item.name,
+                  quantity: item.quantity,
+                  price: item.price,
+                  priceWithDiscount: item.priceWithDiscount,
+                  totalPrice: item.totalPrice,
+                };
+              }
+            );
+
+            const currentOrderText = Cookies.get("Order");
+            const orderCookie: OrderItems | undefined = currentOrderText
+              ? JSON.parse(currentOrderText)
+              : undefined;
+
+            if (orderCookie) {
+              orderCookie.items = currentItems;
+              Cookies.set("Order", JSON.stringify(orderCookie));
+            }
+          }
+        }
+      } catch (error) {
+        listenerApi.dispatch(
+          addCartError(
+            "There was error while permorming an action on the cart items"
           )
         );
       }

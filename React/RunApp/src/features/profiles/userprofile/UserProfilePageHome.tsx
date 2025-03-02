@@ -22,6 +22,7 @@ import SearchBar from "@/ui/SearchBar";
 import NoProductsFound from "@/ui/NoProductsFound";
 import { Link } from "react-router";
 import LikeButton from "@/ui/LikeButton";
+import formatDate from "./formatDate";
 
 function UserProfilePageHome() {
   const [activeTab, setActiveTab] = useState("liked");
@@ -188,7 +189,7 @@ function UserProfilePageHome() {
                       {product.productName}
                     </TableCell>
                     <TableCell className="font-medium text-black">
-                      {product.reviewDate}
+                      {formatDate(product.reviewDate)}
                     </TableCell>
                     <TableCell className="font-medium text-black">
                       {product.reviewDescription}
