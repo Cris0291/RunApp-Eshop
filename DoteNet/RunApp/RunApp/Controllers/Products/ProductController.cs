@@ -99,7 +99,8 @@ namespace RunApp.Api.Controllers.Products
         [HttpDelete(ApiEndpoints.Products.DeleteProduct)]
         public async Task<IActionResult> DeleteProduct([FromRoute] Guid id)
         {
-            var deleteProductCommand = new DeleteProductCommand(id);
+            Guid userId = HttpContext.GetUserId();
+            var deleteProductCommand = new DeleteProductCommand(id, userId);
             var deleteResult = await _mediator.Send(deleteProductCommand);
 
             return deleteResult.MatchFirst(result => Ok(), Problem);

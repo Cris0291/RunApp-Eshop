@@ -23,7 +23,7 @@ namespace RunnApp.Application.CustomerProfiles.Queries.GetUserReviews
             var productsDto = products.FromProductsToProductsDto();
             var productsImage = await _leftJoinRepository.ExecuteQuery(productsDto);
 
-            var userReviews = await _reviewsRepository.GetUserReviews(customer.Reviews);
+            var userReviews = await _reviewsRepository.GetUserReviews(customer.Reviews, customer.Id);
 
             return userReviews.CreateReviewsWithProduct(productsImage);
 

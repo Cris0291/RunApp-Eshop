@@ -1,6 +1,5 @@
 ﻿using ErrorOr;
 using MediatR;
-using RunApp.Domain.OrderAggregate;
 using RunnApp.Application.Common.Interfaces;
 
 namespace RunnApp.Application.Orders.Commands.PayOrder

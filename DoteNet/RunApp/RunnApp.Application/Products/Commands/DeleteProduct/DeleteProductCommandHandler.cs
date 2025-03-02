@@ -14,6 +14,7 @@ namespace RunnApp.Application.Products.Commands.DeleteProduct
            var product =  await _productsRepository.GetProduct(request.ProductId);
            if(product == null) return Error.NotFound(code: "ProductWasNotFoundWithGivenId", description: "Product was not found");
 
+           product.DeleteProduct(request.UserId);
            await _productsRepository.DeleteProduct(product);
            int numberOfRowsDeleted =  await _unitOfWorkPattern.CommitChangesAsync();
            if (numberOfRowsDeleted == 0) throw new InvalidOperationException("Product could not be deleted");

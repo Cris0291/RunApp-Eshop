@@ -92,6 +92,10 @@ namespace RunApp.Domain.Products
 
             return Result.Success;
         }
+        public void DeleteProduct(Guid userId)
+        {
+            RaiseEvent(new DeleteProductEvent(ProductId, userId));
+        }
 
         public ErrorOr<Success> AddPriceWithDiscount(decimal priceWithDiscount, string promotionalText)
         {

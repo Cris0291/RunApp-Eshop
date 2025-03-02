@@ -26,10 +26,10 @@ namespace RunApp.Infrastructure.Reviews.Persistence
             _appStoreDbContext.Remove(review);
             await Task.CompletedTask;
         }
-        public async Task<List<Review>> GetUserReviews(IEnumerable<Guid> userReviews)
+        public async Task<List<Review>> GetUserReviews(IEnumerable<Guid> userReviews, Guid userId)
         {
             var reviewsSet = userReviews.ToHashSet();
-            return await _appStoreDbContext.Reviews.Where(x => reviewsSet.Contains(x.ProductId)).ToListAsync();
+            return await _appStoreDbContext.Reviews.Where(x => reviewsSet.Contains(x.ProductId) && x.Id == userId).ToListAsync();
         }
         public async Task<bool> ExistReviewsForProduct(Guid productId)
         {

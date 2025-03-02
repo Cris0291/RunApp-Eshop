@@ -65,6 +65,10 @@ namespace RunApp.Domain.OrderAggregate
 
             return item;
         }
+        public void DeleteItemForEvent(LineItem item)
+        {
+            TotalPrice -= item.TotalItemPrice;
+        }
         public ErrorOr<Success> ChangeItemQuantity(int quantity, Guid productId)
         {
             var item = LineItems.SingleOrDefault(x => x.ProductId == productId);
