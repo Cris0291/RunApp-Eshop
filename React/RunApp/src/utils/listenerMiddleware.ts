@@ -9,6 +9,7 @@ import { AppDispatch, RootState } from "./store";
 import {
   addChangeQuantityListener,
   addItemListener,
+  addItemsDueToDeletionListener,
   deleteItemListener,
 } from "../features/payment/shoppingcart/cartSlice";
 import {
@@ -46,3 +47,4 @@ addressOrderListener(startAppListening);
 paymentOrderListener(startAppListening);
 addressUserListener(startAppListening);
 paymentUserListener(startAppListening);
+addItemsDueToDeletionListener(startAppListening);

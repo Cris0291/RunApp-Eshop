@@ -5,7 +5,9 @@ import { store } from "../utils/store";
 import { clearUser } from "../features/registration/userSlice";
 import Cookies from "js-cookie";
 
-export const axiosInstance = axios.create({ baseURL: "http://localhost:5253" });
+export const axiosInstance = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+});
 
 interface RetryQueueItem {
   resolve: (value?: any) => void;
@@ -45,7 +47,6 @@ axiosInstance.interceptors.response.use(
       tokenModel !== undefined
     ) {
       try {
-        console.log("problem 1");
         const data = await refreshAccessToken(
           tokenModel.token,
           tokenModel.refreshToken
