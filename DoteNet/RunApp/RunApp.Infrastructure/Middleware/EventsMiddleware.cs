@@ -6,43 +6,61 @@ using RunApp.Infrastructure.Common.Persistence;
 
 namespace RunApp.Infrastructure.Middleware
 {
-    public class EventsMiddleware(RequestDelegate next)
+    public class EventsMiddleware
     {
-        private readonly RequestDelegate _next = next;
-        public async Task InvokeAsync(HttpContext httpContext, AppStoreDbContext appDbContext, IPublisher publisher, ILogger<EventsMiddleware> log)
+        private readonly RequestDelegate _next;
+
+        public EventsMiddleware(RequestDelegate next) => _next = next;
+
+        public async Task InvokeAsync(
+            HttpContext httpContext,
+            AppStoreDbContext appDbContext,
+            IPublisher publisher,
+            ILogger<EventsMiddleware> log)
         {
-           var transaction =  await appDbContext.Database.BeginTransactionAsync();
-            httpContext.Response.OnCompleted(async () =>
+            // Execute the request first
+            await _next(httpContext);
+
+            // After the request has been handled, check if there are domain events
+            if (!httpContext.Items.TryGetValue("DomainEvents", out var eventsObj)
+                || eventsObj is not Queue<IDomainEvent> domainEvents
+                || domainEvents.Count == 0)
             {
-               if( httpContext.Items.TryGetValue("DomainEvents", out var events) 
-                && events is Queue<IDomainEvent> domainEvents)
+                return;
+            }
+
+            var ct = httpContext.RequestAborted;
+
+            try
+            {
+                // Start a transaction only if we have events to publish
+                using var transaction = await appDbContext.Database.BeginTransactionAsync(ct);
+
+                while (domainEvents.TryDequeue(out var domainEvent))
                 {
                     try
                     {
-                        while (domainEvents.TryDequeue(out var resultEvent))
-                        {
-                           await  publisher.Publish(resultEvent);
-                        }
-
-                        await transaction.CommitAsync();
+                        await publisher.Publish(domainEvent, ct);
                     }
-                    catch(Exception ex)
+                    catch (Exception exEvent)
                     {
-                        log.LogInformation("{}", ex.Message);
-                    }
-                    finally
-                    {
-                        await transaction.DisposeAsync();
+                        // Log the event publication error and continue (or decide to abort)
+                        log.LogError(exEvent, "Failed to publish domain event {@Event}", domainEvent);
                     }
                 }
-                else
-                {
-                    await transaction.CommitAsync();
-                    await transaction.DisposeAsync();
-                }            
-            });
 
-            await _next(httpContext);
+                await transaction.CommitAsync(ct);
+            }
+            catch (OperationCanceledException)
+            {
+                log.LogWarning("Event publishing cancelled (request aborted).");
+            }
+            catch (Exception ex)
+            {
+                // Log full exception so you can see it in Azure logs
+                log.LogError(ex, "Failed to process domain events after request.");
+            }
         }
     }
 }
+
