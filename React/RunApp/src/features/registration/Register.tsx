@@ -16,6 +16,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import useRegisterUser from "./useRegisterUser";
 import { FormValues } from "./contracts";
 import Spinner from "@/ui/Spinner";
+import { Link } from "react-router";
 
 function Register() {
   const {
@@ -258,9 +259,12 @@ function Register() {
           <CardFooter className="justify-center">
             <p className="text-sm text-gray-600">
               Already have an account?{" "}
-              <a href="#" className="font-medium text-primary hover:underline">
+              <Link
+                to="/login"
+                className="font-medium text-primary hover:underline"
+              >
                 Log in
-              </a>
+              </Link>
             </p>
           </CardFooter>
         </Card>

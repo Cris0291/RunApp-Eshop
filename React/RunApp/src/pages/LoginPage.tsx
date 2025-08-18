@@ -125,20 +125,7 @@ export default function LoginPage() {
               </button>
             </div>
           </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Checkbox id="remember" />
-              <label
-                className="text-sm font-medium text-gray-600 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                htmlFor="remenber"
-              >
-                Remember me
-              </label>
-            </div>
-            <Link className="text-sm text-indigo-600 hover:underline" to="#">
-              Forgot password
-            </Link>
-          </div>
+          <div className="flex items-center justify-between"></div>
           {submittedErrors.length > 0 && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
@@ -159,7 +146,7 @@ export default function LoginPage() {
         </form>
         <div className="text-center text-sm text-gray-600">
           Don't have an account?{" "}
-          <Link className="text-indigo-600 hover:underline" to="#">
+          <Link className="text-indigo-600 hover:underline" to="/register">
             Sign up
           </Link>
         </div>
